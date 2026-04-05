@@ -1,0 +1,6 @@
+export { AuthService } from './auth.service'
+export { ProductsService } from './products.service'
+export { CategoriesService } from './categories.service'
+export { OrdersService } from './orders.service'
+export { RecipientsService } from './recipients.service'
+export { StorageService } from './storage.service'
