@@ -4,207 +4,150 @@ import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
-// import { Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react'
+import { ArrowUpRight, Send } from "lucide-react";
 
 export function Footer() {
-  const t = useTranslations()
-  const currentYear = new Date().getFullYear()
+  const t = useTranslations();
+  const currentYear = new Date().getFullYear();
 
   const footerLinks = {
     shop: [
-      { href: '/products', label: t('nav.products') },
-      { href: '/categories', label: t('nav.categories') },
-      { href: '/wholesale', label: t('nav.wholesale') },
+      { href: "/products", label: t("nav.products") },
+      { href: "/categories", label: t("nav.categories") },
+      { href: "/wholesale", label: t("nav.wholesale") },
     ],
     account: [
-      { href: '/profile', label: t('nav.profile') },
-      { href: '/orders', label: t('nav.orders') },
-      { href: '/cart', label: t('nav.cart') },
+      { href: "/profile", label: t("nav.profile") },
+      { href: "/orders", label: t("nav.orders") },
+      { href: "/cart", label: t("nav.cart") },
     ],
     legal: [
-      { href: '/privacy', label: t('footer.privacy') },
-      { href: '/terms', label: t('footer.terms') },
-      { href: '/contact', label: t('footer.contact') },
+      { href: "/privacy", label: t("footer.privacy") },
+      { href: "/terms", label: t("footer.terms") },
+      { href: "/contact", label: t("footer.contact") },
     ],
-  }
-
-  // const socialLinks = [
-  //   { icon: Instagram, href: '#', label: 'Instagram' },
-  //   { icon: Twitter, href: '#', label: 'Twitter' },
-  //   { icon: Facebook, href: '#', label: 'Facebook' },
-  //   { icon: Youtube, href: '#', label: 'Youtube' },
-  // ]
+  };
 
   return (
-    <footer className="relative bg-card border-t border-border">
-      {/* Main Footer */}
-      <div className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
-          {/* Brand Column */}
+    <footer className="relative mt-20 border-t border-border/40 bg-gradient-to-b from-transparent to-muted/30">
+      {/* Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 h-px w-full max-w-3xl bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+      <div className="container px-6 py-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* Brand & Newsletter Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-4"
+            className="lg:col-span-5 space-y-8"
           >
-            <Link href="/" className="inline-block mb-6">
-              <Image
-                src="/favicon.png"
-                alt="Saklayyo"
-                width={140}
-                height={50}
-                className="dark:hidden"
-              />
-              <Image
-                src="/negativo.png"
-                alt="Saklayyo"
-                width={140}
-                height={50}
-                className="hidden dark:block"
-              />
-            </Link>
-            <p className="text-muted-foreground mb-6 max-w-sm leading-relaxed">
-              {t('footer.brandDescription')}
-            </p>
+            <div className="space-y-4">
+              <Link
+                href="/"
+                className="inline-block transition-opacity hover:opacity-80"
+              >
+                <Image
+                  src="/favicon.png"
+                  alt="Saklayyo"
+                  width={130}
+                  height={45}
+                  className="dark:hidden"
+                />
+                <Image
+                  src="/negativo.png"
+                  alt="Saklayyo"
+                  width={130}
+                  height={45}
+                  className="hidden dark:block"
+                />
+              </Link>
+              <p className="text-base text-muted-foreground leading-relaxed max-w-sm">
+                {t("footer.brandDescription")}
+              </p>
+            </div>
 
-            {/* Social Links
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                  aria-label={social.label}
+            {/* Newsletter Input Simplificado */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">
+                {t("footer.subscribeTitle") || "Stay updated"}
+              </h4>
+              <div className="flex max-w-md gap-2">
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  className="flex-1 bg-background border border-border px-4 py-2 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+                <button className="bg-foreground text-background p-2 rounded-full hover:scale-105 transition-transform">
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Links Grid */}
+          <div className="lg:col-span-7">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+              {[
+                { title: t("footer.shop"), links: footerLinks.shop },
+                { title: t("footer.account"), links: footerLinks.account },
+                { title: t("footer.legal"), links: footerLinks.legal },
+              ].map((section, idx) => (
+                <motion.div
+                  key={section.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="space-y-5"
                 >
-                  <social.icon className="h-4 w-4" />
-                </a>
+                  <h4 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground">
+                    {section.title}
+                  </h4>
+                  <ul className="space-y-3">
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="group relative inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                        >
+                          <span>{link.label}</span>
+                          <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+                          <ArrowUpRight className="ml-1 h-3 w-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
               ))}
-            </div> */}
-          </motion.div>
-
-          {/* Links Columns */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-2"
-          >
-            <h4 className="font-semibold mb-5">{t('footer.shop')}</h4>
-            <ul className="space-y-3">
-              {footerLinks.shop.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="lg:col-span-2"
-          >
-            <h4 className="font-semibold mb-5">{t('footer.account')}</h4>
-            <ul className="space-y-3">
-              {footerLinks.account.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-2"
-          >
-            <h4 className="font-semibold mb-5">{t('footer.legal')}</h4>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Contact Column
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="lg:col-span-2"
-          >
-            <h4 className="font-semibold mb-5">{t('footer.contact')}</h4>
-            <ul className="space-y-4">
-              <li>
-                <a
-                  href="mailto:hello@saklayyo.com"
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Mail className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-sm">hello@saklayyo.com</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="tel:+1234567890"
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Phone className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-sm">+1 (234) 567-890</span>
-                </a>
-              </li>
-              <li>
-                <div className="flex items-start gap-3 text-muted-foreground">
-                  <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">123 Commerce St.<br />New York, NY 10001</span>
-                </div>
-              </li>
-            </ul>
-          </motion.div> */}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border">
-        <div className="container py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              &copy; {currentYear} Saklayyo. {t('footer.rights')}.
-            </p>
-            <div className="flex items-center gap-6">
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                {t('footer.systemsOperational')}
+      <div className="border-t border-border/20">
+        <div className="container px-6 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex flex-col items-center md:items-start gap-1">
+              <p className="text-[11px] text-muted-foreground/60 uppercase tracking-wider">
+                &copy; {currentYear} Saklayyo. {t("footer.rights")}
+              </p>
+            </div>
+
+            {/* Status Pill */}
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-background border border-border/50 shadow-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-tight">
+                {t("footer.systemsOperational")}
               </span>
             </div>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
