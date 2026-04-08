@@ -1,285 +1,159 @@
 'use client'
 
+import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl'
-import { motion } from 'framer-motion'
-import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react'
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, ShoppingBag, Sparkles } from "lucide-react";
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { Button } from '@/components/ui/button'
 
+const images = [
+  "/mobile1.png",
+  "/mobile2.png",
+  "/mobile3.png",
+  "/mobile4.png",
+  "/mobile5.png",
+];
+
 export function HeroSection() {
-  const t = useTranslations()
+  const t = useTranslations();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="container">
-      <div className="relative overflow-hidden rounded-3xl bg-[#101820] min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#101820] via-[#1a2a3a] to-[#101820]" />
+    <section className="container px-4 md:px-6">
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-[#101820] min-h-[700px] lg:min-h-[800px] flex items-center rounded-sm">
+        {/* --- Background Effects (Optimized) --- */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1a2a3a_0%,#101820_100%)]" />
 
-          {/* Animated gradient orbs */}
+          {/* Animated Orbs */}
           <motion.div
-            className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-[#99FF00]/30 via-[#99FF00]/10 to-transparent blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full bg-[#99FF00]/20 blur-[120px]"
           />
-          <motion.div
-            className="absolute bottom-[-30%] left-[-20%] w-[70%] h-[70%] rounded-full bg-gradient-to-tr from-[#99FF00]/20 via-[#99FF00]/5 to-transparent blur-3xl"
-            animate={{
-              scale: [1.2, 1, 1.2],
-              opacity: [0.2, 0.4, 0.2],
-              x: [0, -20, 0],
-              y: [0, 30, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute top-[40%] left-[50%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-[#99FF00]/15 to-transparent blur-3xl"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.15, 0.25, 0.15],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-[0.05] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
         </div>
 
-        {/* Logo Watermarks */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* --- Main Content Grid --- */}
+        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center px-8 md:px-16 lg:px-20 py-16">
+          {/* Left Column: Text & CTA */}
           <motion.div
-            className="absolute top-[10%] right-[5%] opacity-[0.03]"
-            animate={{ rotate: [0, 5, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="flex flex-col space-y-8"
           >
-            <Image src="/negativo.png" alt="" width={300} height={100} className="select-none" />
-          </motion.div>
-          {/* <motion.div
-            className="absolute bottom-[15%] left-[5%] opacity-[0.02]"
-            animate={{ rotate: [0, -3, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Image src="/negativo.png" alt="" width={250} height={85} className="select-none" />
-          </motion.div> */}
-          <motion.div
-            className="absolute top-[50%] right-[30%] opacity-[0.015]"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Image src="/negativo.png" alt="" width={200} height={70} className="select-none" />
-          </motion.div>
-        </div>
+            <div className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-[#99FF00]/10 border border-[#99FF00]/20 backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-[#99FF00]" />
+              <span className="text-sm font-medium text-[#99FF00] uppercase tracking-wider">
+                {t("hero.badge")}
+              </span>
+            </div>
 
-        {/* Floating geometric shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Ring 1 */}
-          <motion.div
-            className="absolute top-[15%] right-[15%] w-32 h-32 md:w-48 md:h-48 rounded-full border border-[#99FF00]/20"
-            animate={{
-              rotate: 360,
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-              scale: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-            }}
-          />
-          {/* Ring 2 */}
-          <motion.div
-            className="absolute top-[20%] right-[20%] w-24 h-24 md:w-36 md:h-36 rounded-full border border-[#99FF00]/30"
-            animate={{
-              rotate: -360,
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-          {/* Dots pattern */}
-          <motion.div
-            className="absolute bottom-[20%] right-[10%] grid grid-cols-4 gap-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-          >
-            {[...Array(16)].map((_, i) => (
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05]">
+              {t("hero.title1")}{" "}
+              <span className="text-[#99FF00] italic">{t("hero.title2")}</span>
+              <br />
+              {t("hero.title3")}
+            </h1>
+
+            <p className="text-lg md:text-xl text-white/50 max-w-lg leading-relaxed">
+              {t("hero.subtitle")}
+            </p>
+
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Link href="/products">
+                <Button
+                  size="lg"
+                  className="bg-[#99FF00] text-[#101820] hover:bg-[#b8ff4d] px-8 h-14 rounded-full font-bold group shadow-xl shadow-[#99FF00]/10"
+                >
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  {t("nav.products")}
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+              <Link href="/categories">
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="border border-white/20 text-white hover:text-white hover:bg-white/10 px-8 h-14 rounded-full backdrop-blur-sm"
+                >
+                  {t("nav.categories")}
+                </Button>
+              </Link>
+            </div>
+
+            {/* Micro-Stats */}
+            <div className="flex items-center gap-8 pt-8 border-t border-white/5">
+              {[
+                { label: "500+", sub: t("hero.stats.products") },
+                { label: "24h", sub: t("hero.stats.delivery") },
+                {
+                  label: "5K+",
+                  sub: t("hero.stats.customers"),
+                  highlight: true,
+                },
+              ].map((stat, i) => (
+                <div key={i}>
+                  <div
+                    className={`text-2xl font-bold ${stat.highlight ? "text-[#99FF00]" : "text-white"}`}
+                  >
+                    {stat.label}
+                  </div>
+                  <div className="text-xs text-white/40 uppercase tracking-widest">
+                    {stat.sub}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right Column: Dynamic Mobile Carousel */}
+          <div className="relative flex justify-center items-center h-[500px] lg:h-[600px]">
+            {/* Decorative Background for Mobile */}
+            <div className="absolute inset-0 flex justify-center items-center">
               <motion.div
-                key={i}
-                className="w-1.5 h-1.5 rounded-full bg-[#99FF00]/40"
-                animate={{
-                  opacity: [0.2, 0.6, 0.2],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: i * 0.1,
-                  ease: "easeInOut",
-                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="w-full max-w-[450px] aspect-square rounded-full border border-dashed border-[#99FF00]/20"
               />
-            ))}
-          </motion.div>
-          {/* Floating line */}
-          <motion.div
-            className="absolute top-[60%] right-[25%] w-32 h-[1px] bg-gradient-to-r from-transparent via-[#99FF00]/50 to-transparent"
-            animate={{
-              x: [0, 50, 0],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          {/* Small floating squares */}
-          <motion.div
-            className="absolute top-[30%] right-[40%] w-4 h-4 border border-[#99FF00]/30 rotate-45"
-            animate={{
-              y: [0, -20, 0],
-              rotate: [45, 90, 45],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute bottom-[35%] right-[30%] w-3 h-3 bg-[#99FF00]/20 rotate-45"
-            animate={{
-              y: [0, 15, 0],
-              rotate: [45, 0, 45],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
+            </div>
 
-        {/* Content */}
-        <div className="relative z-10 flex items-center min-h-[500px] md:min-h-[600px] lg:min-h-[700px]">
-          <div className="w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="max-w-2xl px-8 md:px-16 lg:px-20"
-            >
-              {/* Badge */}
+            <AnimatePresence mode="wait">
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="inline-flex items-center gap-2 mb-8"
+                key={currentIndex}
+                initial={{ opacity: 0, scale: 0.8, y: 40, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -40, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                className="relative z-20 w-full max-w-[280px] md:max-w-[320px] drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
               >
-                <span className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-[#99FF00]/10 text-[#99FF00] border border-[#99FF00]/20 backdrop-blur-sm">
-                  <Sparkles className="w-4 h-4" />
-                  {t('hero.badge')}
-                </span>
+                <Image
+                  src={images[currentIndex]}
+                  alt="Product Showcase"
+                  width={600}
+                  height={1200}
+                  className="w-full h-auto object-contain rounded-md"
+                  priority
+                />
               </motion.div>
+            </AnimatePresence>
 
-              {/* Heading */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-white leading-[1.1]"
-              >
-                {t('hero.title1')}
-                <br />
-                <span className="relative">
-                  <span className="relative z-10 bg-gradient-to-r from-[#99FF00] via-[#b8ff4d] to-[#99FF00] bg-clip-text text-transparent">
-                    {t('hero.title2')}
-                  </span>
-                </span>
-                <br />
-                {t('hero.title3')}
-              </motion.h1>
-
-              {/* Description */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="text-lg md:text-xl text-white/60 mb-10 max-w-md leading-relaxed"
-              >
-                {t('hero.subtitle')}
-              </motion.p>
-
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="flex flex-wrap gap-4"
-              >
-                <Link href="/products">
-                  <Button
-                    size="lg"
-                    className="group gap-3 bg-[#99FF00] text-[#101820] hover:bg-[#b8ff4d] font-semibold px-8 h-14 text-base transition-all duration-300 hover:shadow-[0_0_30px_rgba(153,255,0,0.3)]"
-                  >
-                    <ShoppingBag className="h-5 w-5" />
-                    {t('nav.products')}
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-                <Link href="/categories">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 font-semibold px-8 h-14 text-base backdrop-blur-sm transition-all duration-300"
-                  >
-                    {t('nav.categories')}
-                  </Button>
-                </Link>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                className="flex gap-10 mt-14 pt-10 border-t border-white/10"
-              >
-                <div>
-                  <div className="text-3xl font-bold text-white">500+</div>
-                  <div className="text-sm text-white/40 mt-1">{t('hero.stats.products')}</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-white">24h</div>
-                  <div className="text-sm text-white/40 mt-1">{t('hero.stats.delivery')}</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-[#99FF00]">5K+</div>
-                  <div className="text-sm text-white/40 mt-1">{t('hero.stats.customers')}</div>
-                </div>
-              </motion.div>
-            </motion.div>
           </div>
         </div>
 
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#101820] to-transparent pointer-events-none" />
+        {/* Bottom Decorative Blur */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#101820] to-transparent z-10" />
       </div>
     </section>
-  )
+  );
 }

@@ -70,6 +70,9 @@ export class ProductsService {
         images: data.images || [],
         categoryId: data.categoryId,
         stock: data.stock,
+        reference: data.reference,
+        tags: data.tags || [],
+        isActive: data.isActive ?? true,
         featured: data.featured || false,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
@@ -102,6 +105,9 @@ export class ProductsService {
       images: data.images || [],
       categoryId: data.categoryId,
       stock: data.stock,
+      reference: data.reference,
+      tags: data.tags || [],
+      isActive: data.isActive ?? true,
       featured: data.featured || false,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate(),
@@ -109,14 +115,14 @@ export class ProductsService {
   }
 
   static async getByCategory(categoryId: string): Promise<Product[]> {
+    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('categoryId', '==', categoryId),
-      orderBy('createdAt', 'desc')
+      where('categoryId', '==', categoryId)
     )
     const snapshot = await getDocs(q)
 
-    return snapshot.docs.map((doc) => {
+    const products = snapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -126,23 +132,28 @@ export class ProductsService {
         images: data.images || [],
         categoryId: data.categoryId,
         stock: data.stock,
+        reference: data.reference,
+        tags: data.tags || [],
+        isActive: data.isActive ?? true,
         featured: data.featured || false,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
       }
     })
+
+    // Sort by createdAt desc in client
+    return products.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
   static async getFeatured(limitCount: number = 8): Promise<Product[]> {
+    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('featured', '==', true),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
+      where('featured', '==', true)
     )
     const snapshot = await getDocs(q)
 
-    return snapshot.docs.map((doc) => {
+    const products = snapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -152,11 +163,19 @@ export class ProductsService {
         images: data.images || [],
         categoryId: data.categoryId,
         stock: data.stock,
+        reference: data.reference,
+        tags: data.tags || [],
+        isActive: data.isActive ?? true,
         featured: data.featured || false,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
       }
     })
+
+    // Sort by createdAt desc in client and limit
+    return products
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limitCount)
   }
 
   static async search(searchTerm: string): Promise<Product[]> {
@@ -179,6 +198,9 @@ export class ProductsService {
           images: data.images || [],
           categoryId: data.categoryId,
           stock: data.stock,
+          reference: data.reference,
+          tags: data.tags || [],
+          isActive: data.isActive ?? true,
           featured: data.featured || false,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate(),

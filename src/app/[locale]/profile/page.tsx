@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Loading } from '@/components/common/Loading'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -149,9 +150,9 @@ export default function ProfilePage() {
                       )}
                     />
 
-                    <div>
-                      <FormLabel>Email</FormLabel>
-                      <Input value={user.email} disabled className="mt-2" />
+                    <div className="space-y-2">
+                      <Label>Email</Label>
+                      <Input value={user.email} disabled />
                     </div>
 
                     <Button type="submit" disabled={profileLoading}>

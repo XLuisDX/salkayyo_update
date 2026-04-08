@@ -50,14 +50,14 @@ export function Footer() {
                 <Image
                   src="/favicon.png"
                   alt="Saklayyo"
-                  width={130}
+                  width={100}
                   height={45}
                   className="dark:hidden"
                 />
                 <Image
-                  src="/negativo.png"
+                  src="/logo-email.png"
                   alt="Saklayyo"
-                  width={130}
+                  width={100}
                   height={45}
                   className="hidden dark:block"
                 />

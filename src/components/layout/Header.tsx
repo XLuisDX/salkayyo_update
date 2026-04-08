@@ -14,7 +14,8 @@ import {
   Package,
   MapPin,
   ArrowRight,
-} from 'lucide-react'
+  Shield,
+} from "lucide-react";
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { Link, usePathname } from '@/i18n/routing'
@@ -67,10 +68,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full transition-all duration-500',
+        "sticky top-0 z-50 w-full transition-all duration-500",
         isScrolled
-          ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm'
-          : 'bg-transparent'
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
+          : "bg-transparent",
       )}
     >
       <div className="container">
@@ -115,10 +116,10 @@ export function Header() {
                 <Link
                   href={link.href}
                   className={cn(
-                    'relative px-5 py-2.5 text-sm font-medium transition-all duration-300 rounded-full',
+                    "relative px-5 py-2.5 text-sm font-medium transition-all duration-300 rounded-full",
                     pathname === link.href
-                      ? 'text-accent-foreground bg-accent'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      ? "text-accent-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground ",
                   )}
                 >
                   {link.label}
@@ -126,7 +127,11 @@ export function Header() {
                     <motion.div
                       layoutId="nav-indicator"
                       className="absolute inset-0 bg-accent rounded-full -z-10"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
                     />
                   )}
                 </Link>
@@ -143,14 +148,14 @@ export function Header() {
                   initial={{ width: 0, opacity: 0 }}
                   animate={{ width: 220, opacity: 1 }}
                   exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="hidden md:block overflow-hidden"
                 >
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="search"
-                      placeholder={t('common.search')}
+                      placeholder={t("common.search")}
                       className="h-10 pl-10 pr-4 bg-muted/50 border-0 rounded-full focus-visible:ring-accent"
                       autoFocus
                     />
@@ -168,7 +173,7 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="hidden md:flex h-10 w-10 rounded-full hover:bg-muted/50"
+                className="hidden md:flex h-10 w-10 rounded-full"
               >
                 <Search className="h-[18px] w-[18px]" />
               </Button>
@@ -192,8 +197,8 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="h-10 w-10 rounded-full hover:bg-muted/50"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="h-10 w-10 rounded-full"
               >
                 <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
@@ -211,7 +216,7 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full hover:bg-muted/50"
+                  className="h-10 w-10 rounded-full"
                 >
                   <ShoppingCart className="h-[18px] w-[18px]" />
                   <AnimatePresence>
@@ -222,7 +227,7 @@ export function Header() {
                         exit={{ scale: 0 }}
                         className="absolute -top-0.5 -right-0.5 h-5 w-5 flex items-center justify-center text-[10px] font-bold rounded-full bg-accent text-accent-foreground"
                       >
-                        {itemCount > 9 ? '9+' : itemCount}
+                        {itemCount > 9 ? "9+" : itemCount}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -230,7 +235,6 @@ export function Header() {
               </Link>
             </motion.div>
 
-            {/* User Menu */}
             {user ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -242,63 +246,102 @@ export function Header() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full hover:bg-muted/50"
+                      className="h-10 w-10 rounded-full hover:bg-accent/10 transition-colors"
                     >
-                      <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/20">
                         <span className="text-sm font-semibold text-accent">
                           {user.name?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl">
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                      <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                        <span className="text-base font-semibold text-accent">
+
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={8}
+                    className="w-64 p-2 rounded-2xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl"
+                  >
+                    {/* User Info Header */}
+                    <div className="flex items-center gap-3 p-3 mb-2 rounded-xl bg-muted/30">
+                      <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/20">
+                        <span className="text-base font-bold text-accent-foreground">
                           {user.name?.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <div className="flex flex-col">
-                        <p className="font-semibold text-sm">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <div className="flex flex-col overflow-hidden">
+                        <p className="font-bold text-sm truncate text-foreground">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate italic">
+                          {user.email}
+                        </p>
                       </div>
                     </div>
-                    <DropdownMenuSeparator className="my-2" />
-                    <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                      <Link href="/profile" className="flex items-center gap-3 p-2.5">
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                          <User className="h-4 w-4" />
-                        </div>
-                        <span className="font-medium">{t('nav.profile')}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                      <Link href="/orders" className="flex items-center gap-3 p-2.5">
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                          <Package className="h-4 w-4" />
-                        </div>
-                        <span className="font-medium">{t('nav.orders')}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
-                      <Link href="/recipients" className="flex items-center gap-3 p-2.5">
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                          <MapPin className="h-4 w-4" />
-                        </div>
-                        <span className="font-medium">{t('nav.recipients')}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="my-2" />
+
+                    <DropdownMenuSeparator className="opacity-50" />
+
+                    <div className="space-y-1 mt-1">
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/profile"
+                          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
+                        >
+                          <User className="h-4 w-4 opacity-70 group-hover:scale-110 transition-transform" />
+                          <span className="font-medium text-sm">
+                            {t("nav.profile")}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/orders"
+                          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
+                        >
+                          <Package className="h-4 w-4 opacity-70 group-hover:scale-110 transition-transform" />
+                          <span className="font-medium text-sm">
+                            {t("nav.orders")}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      {user.role === "admin" && (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/admin"
+                            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-primary/10 text-primary group"
+                          >
+                            <Shield className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                            <span className="font-bold text-sm">
+                              {t("admin.dashboard")}
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/recipients"
+                          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
+                        >
+                          <MapPin className="h-4 w-4 opacity-70 group-hover:scale-110 transition-transform" />
+                          <span className="font-medium text-sm">
+                            {t("nav.recipients")}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
+
+                    <DropdownMenuSeparator className="my-2 opacity-50" />
+
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="rounded-xl cursor-pointer text-destructive focus:text-destructive"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive group"
                     >
-                      <div className="flex items-center gap-3 p-2.5">
-                        <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center">
-                          <LogOut className="h-4 w-4" />
-                        </div>
-                        <span className="font-medium">{t('nav.logout')}</span>
-                      </div>
+                      <LogOut className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <span className="font-bold text-sm">
+                        {t("nav.logout")}
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -313,14 +356,14 @@ export function Header() {
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="h-10 px-5 rounded-full font-medium hover:bg-muted/50"
+                    className="h-10 px-5 rounded-full font-medium"
                   >
-                    {t('nav.login')}
+                    {t("nav.login")}
                   </Button>
                 </Link>
                 <Link href="/register">
                   <Button className="h-10 px-5 rounded-full font-medium bg-accent text-accent-foreground hover:bg-accent/90 btn-shine">
-                    {t('nav.register')}
+                    {t("nav.register")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -333,7 +376,7 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden h-10 w-10 rounded-full hover:bg-muted/50"
+                  className="lg:hidden h-10 w-10 rounded-full"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -346,16 +389,16 @@ export function Header() {
                   {/* Mobile Header */}
                   <div className="flex items-center justify-between p-6 border-b">
                     <Image
-                      src="/negativo.png"
+                      src="/logo-email.png"
                       alt="Saklayyo"
-                      width={100}
+                      width={35}
                       height={35}
                       className="hidden dark:block"
                     />
                     <Image
                       src="/favicon.png"
                       alt="Saklayyo"
-                      width={100}
+                      width={35}
                       height={35}
                       className="dark:hidden"
                     />
@@ -367,7 +410,7 @@ export function Header() {
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="search"
-                        placeholder={t('common.search')}
+                        placeholder={t("common.search")}
                         className="h-12 pl-12 pr-4 bg-muted/50 border-0 rounded-2xl"
                       />
                     </div>
@@ -386,10 +429,10 @@ export function Header() {
                           href={link.href}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={cn(
-                            'flex items-center justify-between px-4 py-4 rounded-2xl text-base font-medium transition-all',
+                            "flex items-center justify-between px-4 py-4 rounded-2xl text-base font-medium transition-all",
                             pathname === link.href
-                              ? 'bg-accent text-accent-foreground'
-                              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground  hover:text-foreground",
                           )}
                         >
                           {link.label}
@@ -402,17 +445,23 @@ export function Header() {
                   {/* Footer Actions */}
                   {!user && (
                     <div className="p-6 pt-4 border-t space-y-3">
-                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link
+                        href="/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
                         <Button
                           variant="outline"
                           className="w-full h-12 rounded-2xl font-medium"
                         >
-                          {t('nav.login')}
+                          {t("nav.login")}
                         </Button>
                       </Link>
-                      <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-2xl font-medium bg-accent text-accent-foreground hover:bg-accent/90">
-                          {t('nav.register')}
+                      <Link
+                        href="/register"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Button className="w-full h-12 rounded-2xl font-medium bg-accent text-accent-foreground hover:bg-accent/90 mt-2">
+                          {t("nav.register")}
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>
@@ -425,5 +474,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

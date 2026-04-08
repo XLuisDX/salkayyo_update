@@ -28,6 +28,9 @@ export interface Product {
   images: string[]
   categoryId: string
   stock: number
+  reference?: string
+  tags?: string[]
+  isActive?: boolean
   featured?: boolean
   createdAt: Date
   updatedAt?: Date
@@ -40,6 +43,9 @@ export interface ProductCreateData {
   images: string[]
   categoryId: string
   stock: number
+  reference?: string
+  tags?: string[]
+  isActive?: boolean
   featured?: boolean
 }
 
