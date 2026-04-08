@@ -71,7 +71,7 @@
     "newArrivals": "Nuevos Productos",
     "all": "Todos los Productos",
     "price": "Precio",
-    "addToCart": "Agregar al Carrito",
+    "addToCart": "Carrito",
     "addedToCart": "Agregado al carrito",
     "outOfStock": "Agotado",
     "inStock": "En Stock",
@@ -91,7 +91,7 @@
     "quickAdd": "Agregar",
     "inCart": "En Carrito",
     "left": "disponibles",
-    "viewDetails": "Ver Detalles"
+    "viewDetails": "Detalles"
   },
   "categories": {
     "title": "Categorías",
@@ -110,7 +110,7 @@
     "checkout": "Finalizar Compra",
     "remove": "Eliminar",
     "updateQuantity": "Actualizar Cantidad",
-    "addedToCart": "Agregado al carrito",
+    "addedToCart": "Agregar",
     "removedFromCart": "Eliminado del carrito",
     "itemCount": "{count} artículo(s)",
     "clearCart": "Vaciar Carrito"

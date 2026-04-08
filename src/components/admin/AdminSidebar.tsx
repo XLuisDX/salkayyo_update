@@ -47,61 +47,18 @@ function NavContent({ onClose, user, pathname, t, logout }: NavContentProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 lg:p-6">
-        <div className="flex items-center justify-between">
-          <Link href="/admin" className="flex items-center gap-3" onClick={onClose}>
-            <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-              <Image
-                src="/favicon.png"
-                alt="Saklayyo"
-                width={24}
-                height={24}
-                className="dark:hidden"
-              />
-              <Image
-                src="/logo-email.png"
-                alt="Saklayyo"
-                width={24}
-                height={24}
-                className="hidden dark:block"
-              />
-            </div>
-            <div className="hidden lg:block">
-              <p className="font-bold text-sm">Saklayyo</p>
-              <p className="text-xs text-muted-foreground">Admin Panel</p>
-            </div>
-          </Link>
-          {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden">
-              <X className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* User Info */}
-      <div className="px-4 lg:px-6 mb-6">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-          <div className="h-9 w-9 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-bold">
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-          </div>
-        </div>
-      </div>
 
       {/* Navigation */}
       <div className="flex-1 px-3 lg:px-4">
-        <p className="px-3 mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <p className="px-3 my-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
           Menu
         </p>
         <nav className="space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href ||
-              (item.href !== '/admin' && pathname.startsWith(item.href))
-            const Icon = item.icon
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/admin" && pathname.startsWith(item.href));
+            const Icon = item.icon;
 
             return (
               <Link
@@ -109,16 +66,16 @@ function NavContent({ onClose, user, pathname, t, logout }: NavContentProps) {
                 href={item.href}
                 onClick={onClose}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                   isActive
-                    ? 'bg-accent text-accent-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <Icon className="h-4 w-4" />
                 <span>{t(item.labelKey)}</span>
               </Link>
-            )
+            );
           })}
         </nav>
       </div>
@@ -126,9 +83,13 @@ function NavContent({ onClose, user, pathname, t, logout }: NavContentProps) {
       {/* Footer */}
       <div className="p-3 lg:p-4 border-t mt-auto">
         <Link href="/" onClick={onClose}>
-          <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          >
             <Home className="h-4 w-4" />
-            <span>{t('backToHome')}</span>
+            <span>{t("backToHome")}</span>
           </Button>
         </Link>
         <Button
@@ -142,14 +103,14 @@ function NavContent({ onClose, user, pathname, t, logout }: NavContentProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 export function AdminSidebar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const t = useTranslations('admin')
-  const pathname = usePathname()
-  const { user, logout } = useAuth()
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations("admin");
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <>
@@ -181,7 +142,7 @@ export function AdminSidebar() {
         </Link>
 
         <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 mt-2" />
         </Button>
       </div>
 
@@ -204,5 +165,5 @@ export function AdminSidebar() {
         </div>
       )}
     </>
-  )
+  );
 }

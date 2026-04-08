@@ -246,7 +246,7 @@ export function Header() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full hover:bg-accent/10 transition-colors"
+                      className="h-10 w-10 rounded-full hover:bg-accent/10 transition-colors mr-2"
                     >
                       <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/20">
                         <span className="text-sm font-semibold text-accent">
