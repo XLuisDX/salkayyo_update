@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getAdminDb } from '@/firebase/admin'
 import { CartItem, RecipientData } from '@/types'
+import { getErrorMessage } from '@/lib/utils'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -108,10 +109,10 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ checkoutUrl: session.url, orderId: orderRef.id })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Stripe checkout error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

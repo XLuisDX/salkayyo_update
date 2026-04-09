@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { getErrorMessage } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -72,10 +73,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, messageId: data?.id })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to send email' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

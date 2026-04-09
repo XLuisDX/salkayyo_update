@@ -48,7 +48,7 @@ export default function WholesalePage() {
     },
   })
 
-  const onSubmit = async (data: WholesaleFormValues) => {
+  const onSubmit = async () => {
     setLoading(true)
 
     // Simulate API call

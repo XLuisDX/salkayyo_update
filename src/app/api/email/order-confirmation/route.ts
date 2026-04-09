@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { getAdminDb } from '@/firebase/admin'
+import { OrderItem } from '@/types'
+import { getErrorMessage } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     const itemsHtml = orderData.items
       .map(
-        (item: any) => `
+        (item: OrderItem) => `
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">
             ${item.title}
@@ -139,10 +141,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, messageId: data?.id })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to send email' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

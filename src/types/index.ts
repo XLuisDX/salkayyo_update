@@ -127,6 +127,7 @@ export interface Recipient {
   id: string
   userId: string
   fullName: string
+  reference?: string
   address: string
   city: string
   state: string
@@ -139,6 +140,7 @@ export interface Recipient {
 
 export interface RecipientCreateData {
   fullName: string
+  reference?: string
   address: string
   city: string
   state: string

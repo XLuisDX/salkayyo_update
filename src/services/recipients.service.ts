@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore'
@@ -19,19 +18,20 @@ const COLLECTION_NAME = 'recipients'
 
 export class RecipientsService {
   static async getByUserId(userId: string): Promise<Recipient[]> {
+    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     )
     const snapshot = await getDocs(q)
 
-    return snapshot.docs.map((doc) => {
+    const recipients = snapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
         userId: data.userId,
         fullName: data.fullName,
+        reference: data.reference || '',
         address: data.address,
         city: data.city,
         state: data.state,
@@ -42,6 +42,9 @@ export class RecipientsService {
         createdAt: data.createdAt?.toDate() || new Date(),
       }
     })
+
+    // Sort by createdAt desc in client
+    return recipients.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
   static async getById(id: string): Promise<Recipient | null> {
@@ -55,6 +58,7 @@ export class RecipientsService {
       id: docSnap.id,
       userId: data.userId,
       fullName: data.fullName,
+      reference: data.reference || '',
       address: data.address,
       city: data.city,
       state: data.state,
@@ -76,12 +80,13 @@ export class RecipientsService {
 
     if (snapshot.empty) return null
 
-    const doc = snapshot.docs[0]
-    const data = doc.data()
+    const docSnap = snapshot.docs[0]
+    const data = docSnap.data()
     return {
-      id: doc.id,
+      id: docSnap.id,
       userId: data.userId,
       fullName: data.fullName,
+      reference: data.reference || '',
       address: data.address,
       city: data.city,
       state: data.state,

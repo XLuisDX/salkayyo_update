@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { Category, Product } from '@/types'
 import { CategoriesService } from '@/services/categories.service'
@@ -15,7 +14,6 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function CategoryPage() {
   const params = useParams()
-  const t = useTranslations('categories')
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { getErrorMessage } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -48,9 +49,9 @@ export function ForgotPasswordForm() {
       await resetPassword(data.email)
       setSent(true)
       toast.success(t('passwordResetSent'))
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Reset password error:', error)
-      toast.error(error.message || 'Failed to send reset email')
+      toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
     }

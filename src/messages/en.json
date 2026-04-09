@@ -153,6 +153,7 @@
     "setDefault": "Set as Default",
     "default": "Default",
     "fullName": "Full Name",
+    "reference": "ID (11 digits)",
     "address": "Address",
     "city": "City",
     "state": "State",

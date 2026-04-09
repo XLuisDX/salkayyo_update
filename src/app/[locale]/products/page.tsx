@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Product, Category, ProductFilters as Filters } from '@/types'
 import { ProductsService } from '@/services/products.service'
@@ -51,8 +51,8 @@ export default function ProductsPage() {
     }
   }, [])
 
-  const debouncedLoadProducts = useCallback(
-    debounce((filters: Filters) => {
+  const debouncedLoadProducts = useMemo(
+    () => debounce((filters: Filters) => {
       loadProducts(filters)
     }, 300),
     [loadProducts]

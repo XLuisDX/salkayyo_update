@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { getErrorMessage } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Mail, Loader2, CheckCircle } from 'lucide-react'
 import { Link } from '@/i18n/routing'
@@ -22,8 +23,8 @@ export default function VerifyEmailPage() {
       await resendVerification()
       setSent(true)
       toast.success(t('verificationSent'))
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send verification email')
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
     }

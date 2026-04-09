@@ -7,6 +7,7 @@ import {
   useState,
   ReactNode,
   useCallback,
+  startTransition,
 } from 'react'
 import { Product, CartItem, Cart } from '@/types'
 import { calculateTax, calculateTotal } from '@/lib/utils'
@@ -42,12 +43,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart)
-        setCart(parsedCart)
+        startTransition(() => {
+          setCart(parsedCart)
+        })
       } catch (error) {
         console.error('Error parsing cart from localStorage:', error)
       }
     }
-    setIsInitialized(true)
+    startTransition(() => {
+      setIsInitialized(true)
+    })
   }, [])
 
   useEffect(() => {

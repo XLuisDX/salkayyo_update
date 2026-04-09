@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { getErrorMessage } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -80,8 +81,8 @@ export default function ProfilePage() {
     try {
       await updateProfile({ name: data.name })
       toast.success(t('updateSuccess'))
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile')
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error))
     } finally {
       setProfileLoading(false)
     }
@@ -93,8 +94,8 @@ export default function ProfilePage() {
       await changePassword(data.currentPassword, data.newPassword)
       toast.success(t('passwordChanged'))
       passwordForm.reset()
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to change password')
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error))
     } finally {
       setPasswordLoading(false)
     }

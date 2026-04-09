@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
-import { Minus, Plus, Trash2, X } from 'lucide-react'
+import { Minus, Plus, X } from 'lucide-react'
 import { CartItem as CartItemType } from '@/types'
 import { useCart } from '@/context/CartContext'
 import { Button } from '@/components/ui/button'

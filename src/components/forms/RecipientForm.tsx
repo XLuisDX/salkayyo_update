@@ -6,10 +6,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { Loader2, MapPin, User, Phone, Home, ArrowRight } from 'lucide-react'
+import { Loader2, MapPin, User, Phone, Home, ArrowRight, Tag } from 'lucide-react'
 import { useRouter } from '@/i18n/routing'
 import { useAuth } from '@/context/AuthContext'
-import { Recipient, RecipientCreateData } from '@/types'
+import { Recipient } from '@/types'
+import { getErrorMessage } from '@/lib/utils'
 import { RecipientsService } from '@/services/recipients.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,6 +27,10 @@ import { toast } from 'sonner'
 
 const recipientSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  reference: z.string()
+    .min(11, 'ID must be exactly 11 digits')
+    .max(11, 'ID must be exactly 11 digits')
+    .regex(/^\d{11}$/, 'ID must be exactly 11 digits (numbers only)'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
   city: z.string().min(2, 'City must be at least 2 characters'),
   state: z.string().min(2, 'State must be at least 2 characters'),
@@ -55,6 +60,7 @@ export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
     resolver: zodResolver(recipientSchema),
     defaultValues: {
       fullName: recipient?.fullName || '',
+      reference: recipient?.reference || '',
       address: recipient?.address || '',
       city: recipient?.city || '',
       state: recipient?.state || '',
@@ -84,9 +90,9 @@ export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
       } else {
         router.push('/recipients')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Recipient error:', error)
-      toast.error(error.message || 'Failed to save address')
+      toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -114,27 +120,51 @@ export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Full Name */}
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">{t('fullName')}</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="John Doe"
-                        className="h-12 pl-12 rounded-xl bg-muted/50 border-0 focus-visible:ring-accent"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Full Name & Reference */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">{t('fullName')}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="John Doe"
+                          className="h-12 pl-12 rounded-xl bg-muted/50 border-0 focus-visible:ring-accent"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="reference"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">{t('reference')}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="12345678901"
+                          maxLength={11}
+                          className="h-12 pl-12 rounded-xl bg-muted/50 border-0 focus-visible:ring-accent"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Address */}
             <FormField

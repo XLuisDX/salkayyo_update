@@ -10,8 +10,6 @@ import {
   where,
   orderBy,
   limit,
-  startAfter,
-  DocumentSnapshot,
   serverTimestamp,
   QueryConstraint,
 } from 'firebase/firestore'

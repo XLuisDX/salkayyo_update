@@ -1,91 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight, Grid3X3 } from 'lucide-react'
+import { ArrowUpRight, Grid3X3 } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { Category } from '@/types'
 import { CategoriesService } from '@/services/categories.service'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-
-// Mock data for visualization
-const MOCK_CATEGORIES: Category[] = [
-  {
-    id: '1',
-    name: 'Electronics',
-    slug: 'electronics',
-    description: 'Latest gadgets and tech',
-    image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&q=80',
-    createdAt: new Date(),
-  },
-  {
-    id: '2',
-    name: 'Fashion',
-    slug: 'fashion',
-    description: 'Trending styles',
-    image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&q=80',
-    createdAt: new Date(),
-  },
-  {
-    id: '3',
-    name: 'Home & Living',
-    slug: 'home-living',
-    description: 'Decor and essentials',
-    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&q=80',
-    createdAt: new Date(),
-  },
-  {
-    id: '4',
-    name: 'Accessories',
-    slug: 'accessories',
-    description: 'Complete your look',
-    image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&q=80',
-    createdAt: new Date(),
-  },
-  {
-    id: '5',
-    name: 'Sports',
-    slug: 'sports',
-    description: 'Gear up for action',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80',
-    createdAt: new Date(),
-  },
-  {
-    id: '6',
-    name: 'Beauty',
-    slug: 'beauty',
-    description: 'Skincare and makeup',
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&q=80',
-    createdAt: new Date(),
-  },
-]
 
 export function CategoriesSection() {
   const t = useTranslations('categories')
-  const tCommon = useTranslations('common')
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const data = await CategoriesService.getAll()
-        // Use mock data if no categories returned
-        setCategories(data.length > 0 ? data.slice(0, 6) : MOCK_CATEGORIES)
-      } catch (error) {
-        console.error('Error loading categories:', error)
-        // Use mock data on error
-        setCategories(MOCK_CATEGORIES)
-      } finally {
-        setLoading(false)
-      }
+  const loadCategories = useCallback(async () => {
+    try {
+      const data = await CategoriesService.getAll()
+      setCategories(data)
+    } catch (error) {
+      console.error('Error loading categories:', error)
+    } finally {
+      setLoading(false)
     }
-
-    loadCategories()
   }, [])
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
 
   return (
     <section className="relative py-20 md:py-28 bg-muted/30 overflow-hidden">
@@ -190,57 +133,50 @@ export function CategoriesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+          className="text-center mb-12"
         >
-          <div>
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-2 mb-4"
-            >
-              <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/5 text-foreground text-sm font-medium">
-                <Grid3X3 className="h-3.5 w-3.5" />
-                {t('shopByCategory')}
-              </span>
-            </motion.div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">
-              {t('title')}
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-md">
-              {t('subtitle')}
-            </p>
-          </div>
-          <Link href="/categories">
-            <Button
-              variant="outline"
-              className="group gap-2 h-12 px-6 rounded-full border-border hover:border-accent hover:bg-accent hover:text-accent-foreground transition-all duration-300"
-            >
-              {tCommon('viewAll')}
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
-          </Link>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex items-center justify-center gap-2 mb-4"
+          >
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/5 text-foreground text-sm font-medium">
+              <Grid3X3 className="h-3.5 w-3.5" />
+              {t('shopByCategory')}
+            </span>
+          </motion.div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">
+            {t('title')}
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            {t('subtitle')}
+          </p>
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-[4/5] rounded-2xl" />
+              <Skeleton key={i} className="aspect-square rounded-2xl" />
             ))}
           </div>
+        ) : categories.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">{t('noCategories')}</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3) }}
               >
                 <Link href={`/categories/${category.slug}`}>
-                  <div className="group relative aspect-[4/5] rounded-2xl overflow-hidden bg-card border border-border hover:border-accent/50 transition-all duration-500 card-hover">
+                  <div className="group relative aspect-square rounded-2xl overflow-hidden bg-card border border-border hover:border-accent/50 transition-all duration-500 card-hover">
                     {/* Background */}
                     <div className="absolute inset-0">
                       {category.image ? (
@@ -252,28 +188,28 @@ export function CategoriesSection() {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-accent/20 via-accent/10 to-transparent flex items-center justify-center">
-                          <span className="text-6xl font-bold text-accent/30">
+                          <span className="text-5xl md:text-6xl font-bold text-accent/30">
                             {category.name.charAt(0)}
                           </span>
                         </div>
                       )}
                       {/* Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                     </div>
 
                     {/* Content */}
-                    <div className="relative h-full flex flex-col justify-end p-5">
-                      <div className="flex items-end justify-between">
-                        <div>
-                          <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-accent transition-colors">
+                    <div className="relative h-full flex flex-col justify-end p-4 md:p-5">
+                      <div className="flex items-end justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-semibold text-sm md:text-base lg:text-lg mb-0.5 truncate group-hover:text-accent transition-colors">
                             {category.name}
                           </h3>
-                          <p className="text-white/60 text-sm">
+                          <p className="text-white/60 text-xs md:text-sm hidden sm:block">
                             {t('viewProducts')}
                           </p>
                         </div>
-                        <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                          <ArrowUpRight className="h-4 w-4 text-white" />
+                        <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                          <ArrowUpRight className="h-3.5 w-3.5 md:h-4 md:w-4 text-white" />
                         </div>
                       </div>
                     </div>

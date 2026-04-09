@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/firebase/admin'
 import { Resend } from 'resend'
 import { CartItem, RecipientData } from '@/types'
+import { getErrorMessage } from '@/lib/utils'
 
 const PAYPAL_API_URL = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
@@ -153,10 +154,10 @@ export async function POST(request: NextRequest) {
       orderId: orderRef.id,
       captureId: captureData.id,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PayPal capture error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to process payment' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

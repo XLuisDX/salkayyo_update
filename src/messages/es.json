@@ -153,6 +153,7 @@
     "setDefault": "Establecer como Predeterminada",
     "default": "Predeterminada",
     "fullName": "Nombre Completo",
+    "reference": "ID (11 dígitos)",
     "address": "Dirección",
     "city": "Ciudad",
     "state": "Estado/Provincia",

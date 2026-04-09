@@ -9,7 +9,6 @@ import {
   Menu,
   LogOut,
   Home,
-  X,
 } from 'lucide-react'
 import Image from 'next/image'
 import { Link, usePathname } from '@/i18n/routing'
@@ -37,13 +36,12 @@ const navItems = [
 
 interface NavContentProps {
   onClose?: () => void
-  user: { name?: string; email?: string } | null
   pathname: string
   t: (key: string) => string
   logout: () => void
 }
 
-function NavContent({ onClose, user, pathname, t, logout }: NavContentProps) {
+function NavContent({ onClose, pathname, t, logout }: NavContentProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -110,13 +108,13 @@ export function AdminSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const t = useTranslations("admin");
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 lg:z-50 bg-card border-r">
-        <NavContent user={user} pathname={pathname} t={t} logout={logout} />
+        <NavContent pathname={pathname} t={t} logout={logout} />
       </aside>
 
       {/* Mobile Header */}
@@ -156,7 +154,6 @@ export function AdminSidebar() {
           <div className="absolute right-0 top-0 bottom-0 w-72 bg-card shadow-2xl animate-in slide-in-from-right duration-300">
             <NavContent
               onClose={() => setMobileOpen(false)}
-              user={user}
               pathname={pathname}
               t={t}
               logout={logout}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getAdminDb } from '@/firebase/admin'
 import { Resend } from 'resend'
+import { getErrorMessage } from '@/lib/utils'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -28,10 +29,11 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
-  } catch (error: any) {
-    console.error('Webhook signature verification failed:', error.message)
+  } catch (error: unknown) {
+    const message = getErrorMessage(error)
+    console.error('Webhook signature verification failed:', message)
     return NextResponse.json(
-      { error: `Webhook Error: ${error.message}` },
+      { error: `Webhook Error: ${message}` },
       { status: 400 }
     )
   }
@@ -136,10 +138,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ received: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Webhook handler error:', error)
     return NextResponse.json(
-      { error: error.message || 'Webhook handler failed' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

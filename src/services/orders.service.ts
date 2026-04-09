@@ -7,9 +7,10 @@ import {
   updateDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
   Timestamp,
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { Order, OrderCreateData, OrderStatus } from '@/types'
@@ -18,21 +19,24 @@ const COLLECTION_NAME = 'orders'
 
 export class OrdersService {
   static async getAll(): Promise<Order[]> {
-    const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'))
-    const snapshot = await getDocs(q)
+    const snapshot = await getDocs(collection(db, COLLECTION_NAME))
+    const orders = snapshot.docs.map((doc) => this.mapDocToOrder(doc))
 
-    return snapshot.docs.map((doc) => this.mapDocToOrder(doc))
+    // Sort by createdAt desc in client
+    return orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
   static async getByUserId(userId: string): Promise<Order[]> {
+    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     )
     const snapshot = await getDocs(q)
+    const orders = snapshot.docs.map((doc) => this.mapDocToOrder(doc))
 
-    return snapshot.docs.map((doc) => this.mapDocToOrder(doc))
+    // Sort by createdAt desc in client
+    return orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
   static async getById(id: string): Promise<Order | null> {
@@ -93,28 +97,30 @@ export class OrdersService {
   }
 
   static async getByStatus(status: OrderStatus): Promise<Order[]> {
+    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('status', '==', status),
-      orderBy('createdAt', 'desc')
+      where('status', '==', status)
     )
     const snapshot = await getDocs(q)
+    const orders = snapshot.docs.map((doc) => this.mapDocToOrder(doc))
 
-    return snapshot.docs.map((doc) => this.mapDocToOrder(doc))
+    // Sort by createdAt desc in client
+    return orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }
 
   static async getRecentOrders(limitCount: number = 10): Promise<Order[]> {
-    const q = query(
-      collection(db, COLLECTION_NAME),
-      orderBy('createdAt', 'desc')
-    )
-    const snapshot = await getDocs(q)
+    const snapshot = await getDocs(collection(db, COLLECTION_NAME))
+    const orders = snapshot.docs.map((doc) => this.mapDocToOrder(doc))
 
-    return snapshot.docs.slice(0, limitCount).map((doc) => this.mapDocToOrder(doc))
+    // Sort by createdAt desc and limit in client
+    return orders
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limitCount)
   }
 
-  private static mapDocToOrder(doc: any): Order {
-    const data = doc.data()
+  private static mapDocToOrder(doc: DocumentSnapshot | QueryDocumentSnapshot): Order {
+    const data = doc.data()!
     return {
       id: doc.id,
       userId: data.userId,

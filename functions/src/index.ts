@@ -5,6 +5,16 @@ import { Resend } from 'resend'
 
 admin.initializeApp()
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return 'An unknown error occurred'
+}
+
 const db = admin.firestore()
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia',
@@ -28,9 +38,10 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET || ''
     )
-  } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message)
-    res.status(400).send(`Webhook Error: ${err.message}`)
+  } catch (err: unknown) {
+    const message = getErrorMessage(err)
+    console.error('Webhook signature verification failed:', message)
+    res.status(400).send(`Webhook Error: ${message}`)
     return
   }
 
@@ -73,9 +84,9 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
     }
 
     res.status(200).json({ received: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Webhook handler error:', error)
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: getErrorMessage(error) })
   }
 })
 
@@ -192,7 +203,7 @@ export const cleanupPendingOrders = functions.pubsub
 // Welcome email on new user creation
 export const onUserCreated = functions.firestore
   .document('users/{userId}')
-  .onCreate(async (snapshot, context) => {
+  .onCreate(async (snapshot) => {
     const userData = snapshot.data()
 
     if (userData?.email) {

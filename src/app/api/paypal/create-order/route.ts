@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getErrorMessage } from '@/lib/utils'
 
 const PAYPAL_API_URL = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
@@ -74,10 +75,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ orderId: order.id })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PayPal create order error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to create PayPal order' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     )
   }

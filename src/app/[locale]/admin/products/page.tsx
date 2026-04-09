@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import {
@@ -53,7 +53,6 @@ import { cn } from '@/lib/utils'
 export default function AdminProductsPage() {
   const t = useTranslations("admin");
   const tCommon = useTranslations("common");
-  const tProducts = useTranslations("products");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -65,11 +64,7 @@ export default function AdminProductsPage() {
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [productsData, categoriesData] = await Promise.all([
         ProductsService.getAll({ limit: 100 }),
@@ -83,7 +78,11 @@ export default function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tCommon]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleCreate = async (data: ProductCreateData) => {
     try {

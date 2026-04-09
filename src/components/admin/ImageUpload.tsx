@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, X, Loader2, ImageIcon } from 'lucide-react'
+import { Upload, X, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -30,7 +30,10 @@ export function ImageUpload({
   const t = useTranslations('admin')
   const [isUploading, setIsUploading] = useState(false)
 
-  const images = Array.isArray(value) ? value : value ? [value] : []
+  const images = useMemo(
+    () => Array.isArray(value) ? value : value ? [value] : [],
+    [value]
+  )
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {

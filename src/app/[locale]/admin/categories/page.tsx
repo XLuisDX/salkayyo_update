@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import {
@@ -42,11 +42,7 @@ export default function AdminCategoriesPage() {
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const data = await CategoriesService.getAll()
       setCategories(data)
@@ -56,7 +52,11 @@ export default function AdminCategoriesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [tCommon])
+
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
 
   const handleCreate = async (data: CategoryCreateData) => {
     try {

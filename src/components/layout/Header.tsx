@@ -7,7 +7,6 @@ import {
   ShoppingCart,
   User,
   Menu,
-  Search,
   Sun,
   Moon,
   LogOut,
@@ -29,8 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from '@/lib/utils'
 import { LocaleSwitcher } from './LocaleSwitcher'
 
@@ -150,34 +148,9 @@ export function Header() {
                   exit={{ width: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="hidden md:block overflow-hidden"
-                >
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder={t("common.search")}
-                      className="h-10 pl-10 pr-4 bg-muted/50 border-0 rounded-full focus-visible:ring-accent"
-                      autoFocus
-                    />
-                  </div>
-                </motion.div>
+                ></motion.div>
               )}
             </AnimatePresence>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="hidden md:flex h-10 w-10 rounded-full"
-              >
-                <Search className="h-[18px] w-[18px]" />
-              </Button>
-            </motion.div>
 
             {/* Locale Switcher */}
             <motion.div
@@ -402,18 +375,6 @@ export function Header() {
                       height={35}
                       className="dark:hidden"
                     />
-                  </div>
-
-                  {/* Search */}
-                  <div className="p-6 pb-4">
-                    <div className="relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder={t("common.search")}
-                        className="h-12 pl-12 pr-4 bg-muted/50 border-0 rounded-2xl"
-                      />
-                    </div>
                   </div>
 
                   {/* Navigation */}

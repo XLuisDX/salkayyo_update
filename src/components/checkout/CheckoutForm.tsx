@@ -100,7 +100,7 @@ export function CheckoutForm() {
     }
   }
 
-  const handlePayPalApprove = async (data: any) => {
+  const handlePayPalApprove = async (data: { orderID: string }) => {
     if (!user || !selectedRecipient) return
 
     setLoading(true)
