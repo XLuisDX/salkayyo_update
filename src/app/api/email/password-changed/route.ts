@@ -1,29 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendVerificationEmail } from '@/services/email.service'
+import { sendPasswordChangedEmail } from '@/services/email.service'
 import { getErrorMessage } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, name, verificationLink } = body
+    const { email, name, ipAddress } = body
 
-    if (!email || !verificationLink) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Missing email or verification link' },
+        { error: 'Missing email' },
         { status: 400 }
       )
     }
 
-    const { data, error } = await sendVerificationEmail(
+    const changedAt = new Date().toLocaleString('en-US', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+    })
+
+    const { data, error } = await sendPasswordChangedEmail(
       email,
       name || 'there',
-      verificationLink
+      changedAt,
+      ipAddress
     )
 
     if (error) {
       console.error('Email error:', error)
       return NextResponse.json(
-        { error: 'Failed to send verification email' },
+        { error: 'Failed to send password changed email' },
         { status: 500 }
       )
     }

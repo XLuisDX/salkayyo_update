@@ -2,6 +2,13 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import Stripe from 'stripe'
 import { Resend } from 'resend'
+import {
+  welcomeEmailTemplate,
+  orderConfirmationTemplate,
+  orderShippedTemplate,
+  orderDeliveredTemplate,
+  orderCancelledTemplate,
+} from './email-templates'
 
 admin.initializeApp()
 
@@ -20,6 +27,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia',
 })
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+const APP_URL = process.env.APP_URL || 'https://saklayyo.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@saklayyo.com'
 
 // Stripe Webhook Handler
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
@@ -106,19 +116,41 @@ export const onOrderPaid = functions.firestore
         const userData = userDoc.data()
 
         if (userData?.email) {
+          // Send confirmation email to customer
           await resend.emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
-            subject: `Order Confirmation #${orderId.slice(0, 8)}`,
-            html: `
-              <h1>Thank you for your order!</h1>
-              <p>Your order #${orderId.slice(0, 8)} has been confirmed.</p>
-              <p><strong>Total:</strong> $${afterData.total.toFixed(2)}</p>
-              <p>We'll notify you when your order ships.</p>
-            `,
+            subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
+            html: orderConfirmationTemplate(
+              orderId,
+              afterData.recipientData.fullName,
+              afterData.items,
+              afterData.subtotal,
+              afterData.tax,
+              afterData.total,
+              afterData.recipientData,
+              afterData.paymentMethod || 'stripe',
+              APP_URL
+            ),
           })
 
           console.log(`Confirmation email sent for order ${orderId}`)
+
+          // Notify admin about new order
+          await resend.emails.send({
+            from: 'Saklayyo Store <orders@saklayyo.com>',
+            to: ADMIN_EMAIL,
+            subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${afterData.total.toFixed(2)}`,
+            html: `
+              <h1>New Order Received!</h1>
+              <p><strong>Order #:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
+              <p><strong>Customer:</strong> ${afterData.recipientData.fullName}</p>
+              <p><strong>Email:</strong> ${userData.email}</p>
+              <p><strong>Total:</strong> $${afterData.total.toFixed(2)}</p>
+              <p><strong>Items:</strong> ${afterData.items.length}</p>
+              <p><a href="${APP_URL}/admin/orders/${orderId}">View in Admin</a></p>
+            `,
+          })
         }
 
         // Update product stock
@@ -152,23 +184,98 @@ export const onOrderShipped = functions.firestore
           await resend.emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
-            subject: `Your Order #${orderId.slice(0, 8)} Has Shipped!`,
-            html: `
-              <h1>Your order is on its way!</h1>
-              <p>Order #${orderId.slice(0, 8)} has been shipped.</p>
-              <p>Shipping to:</p>
-              <p>
-                ${afterData.recipientData.fullName}<br>
-                ${afterData.recipientData.address}<br>
-                ${afterData.recipientData.city}, ${afterData.recipientData.state} ${afterData.recipientData.zipCode}
-              </p>
-            `,
+            subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Shipped! 📦`,
+            html: orderShippedTemplate(
+              orderId,
+              afterData.recipientData.fullName,
+              afterData.recipientData,
+              afterData.trackingNumber,
+              afterData.carrier,
+              afterData.estimatedDelivery,
+              APP_URL
+            ),
           })
 
           console.log(`Shipping notification sent for order ${orderId}`)
         }
       } catch (error) {
         console.error('Error sending shipping notification:', error)
+      }
+    }
+  })
+
+// Send delivery notification when order status changes to 'delivered'
+export const onOrderDelivered = functions.firestore
+  .document('orders/{orderId}')
+  .onUpdate(async (change, context) => {
+    const beforeData = change.before.data()
+    const afterData = change.after.data()
+    const orderId = context.params.orderId
+
+    if (beforeData.status !== 'delivered' && afterData.status === 'delivered') {
+      try {
+        const userDoc = await db.collection('users').doc(afterData.userId).get()
+        const userData = userDoc.data()
+
+        if (userData?.email) {
+          const deliveredAt = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+
+          await resend.emails.send({
+            from: 'Saklayyo Store <orders@saklayyo.com>',
+            to: userData.email,
+            subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Been Delivered! 🎉`,
+            html: orderDeliveredTemplate(
+              orderId,
+              afterData.recipientData.fullName,
+              deliveredAt,
+              APP_URL
+            ),
+          })
+
+          console.log(`Delivery notification sent for order ${orderId}`)
+        }
+      } catch (error) {
+        console.error('Error sending delivery notification:', error)
+      }
+    }
+  })
+
+// Send cancellation notification when order status changes to 'cancelled'
+export const onOrderCancelled = functions.firestore
+  .document('orders/{orderId}')
+  .onUpdate(async (change, context) => {
+    const beforeData = change.before.data()
+    const afterData = change.after.data()
+    const orderId = context.params.orderId
+
+    if (beforeData.status !== 'cancelled' && afterData.status === 'cancelled') {
+      try {
+        const userDoc = await db.collection('users').doc(afterData.userId).get()
+        const userData = userDoc.data()
+
+        if (userData?.email) {
+          await resend.emails.send({
+            from: 'Saklayyo Store <orders@saklayyo.com>',
+            to: userData.email,
+            subject: `Order #${orderId.slice(0, 8).toUpperCase()} Has Been Cancelled`,
+            html: orderCancelledTemplate(
+              orderId,
+              afterData.recipientData.fullName,
+              afterData.total,
+              afterData.cancellationReason,
+              APP_URL
+            ),
+          })
+
+          console.log(`Cancellation notification sent for order ${orderId}`)
+        }
+      } catch (error) {
+        console.error('Error sending cancellation notification:', error)
       }
     }
   })
@@ -191,6 +298,7 @@ export const cleanupPendingOrders = functions.pubsub
     pendingOrders.docs.forEach((doc) => {
       batch.update(doc.ref, {
         status: 'cancelled',
+        cancellationReason: 'Payment timeout',
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       })
     })
@@ -211,18 +319,8 @@ export const onUserCreated = functions.firestore
         await resend.emails.send({
           from: 'Saklayyo Store <welcome@saklayyo.com>',
           to: userData.email,
-          subject: 'Welcome to Saklayyo Store!',
-          html: `
-            <h1>Welcome to Saklayyo Store!</h1>
-            <p>Hi ${userData.name || 'there'},</p>
-            <p>Thank you for creating an account with us. We're excited to have you!</p>
-            <p>Start shopping now and discover amazing products at great prices.</p>
-            <p>
-              <a href="${process.env.APP_URL}/products" style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
-                Start Shopping
-              </a>
-            </p>
-          `,
+          subject: 'Welcome to Saklayyo Store! 🎉',
+          html: welcomeEmailTemplate(userData.name || 'there', APP_URL),
         })
 
         console.log(`Welcome email sent to ${userData.email}`)

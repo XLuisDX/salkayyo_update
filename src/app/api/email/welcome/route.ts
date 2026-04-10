@@ -1,29 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendVerificationEmail } from '@/services/email.service'
+import { sendWelcomeEmail } from '@/services/email.service'
 import { getErrorMessage } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, name, verificationLink } = body
+    const { email, name } = body
 
-    if (!email || !verificationLink) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Missing email or verification link' },
+        { error: 'Missing email' },
         { status: 400 }
       )
     }
 
-    const { data, error } = await sendVerificationEmail(
-      email,
-      name || 'there',
-      verificationLink
-    )
+    const { data, error } = await sendWelcomeEmail(email, name || 'there')
 
     if (error) {
       console.error('Email error:', error)
       return NextResponse.json(
-        { error: 'Failed to send verification email' },
+        { error: 'Failed to send welcome email' },
         { status: 500 }
       )
     }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/firebase/admin'
-import { sendOrderConfirmationEmail, sendNewOrderAdminNotification } from '@/services/email.service'
+import { sendOrderDeliveredEmail } from '@/services/email.service'
 import { getErrorMessage } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
@@ -26,45 +26,26 @@ export async function POST(request: NextRequest) {
     }
 
     const orderData = orderDoc.data()!
+    const deliveredAt = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
 
-    // Send confirmation to customer
-    const { data, error } = await sendOrderConfirmationEmail(
+    const { data, error } = await sendOrderDeliveredEmail(
       email,
       orderId,
       orderData.recipientData.fullName,
-      orderData.items,
-      orderData.subtotal,
-      orderData.tax,
-      orderData.total,
-      orderData.recipientData,
-      orderData.paymentMethod || 'stripe'
+      deliveredAt
     )
 
     if (error) {
       console.error('Email error:', error)
       return NextResponse.json(
-        { error: 'Failed to send email' },
+        { error: 'Failed to send delivery notification' },
         { status: 500 }
       )
-    }
-
-    // Also notify admin about new order
-    try {
-      await sendNewOrderAdminNotification(
-        orderId,
-        orderData.recipientData.fullName,
-        email,
-        orderData.items,
-        orderData.subtotal,
-        orderData.tax,
-        orderData.total,
-        orderData.recipientData,
-        orderData.paymentMethod || 'stripe',
-        new Date(orderData.createdAt?.toDate?.() || Date.now()).toLocaleString()
-      )
-    } catch (adminError) {
-      // Don't fail the request if admin notification fails
-      console.error('Admin notification error:', adminError)
     }
 
     return NextResponse.json({ success: true, messageId: data?.id })

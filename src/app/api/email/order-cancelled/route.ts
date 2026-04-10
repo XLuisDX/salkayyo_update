@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/firebase/admin'
-import { sendOrderConfirmationEmail, sendNewOrderAdminNotification } from '@/services/email.service'
+import { sendOrderCancelledEmail } from '@/services/email.service'
 import { getErrorMessage } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { orderId, email } = body
+    const { orderId, email, reason, refundStatus } = body
 
     if (!orderId || !email) {
       return NextResponse.json(
@@ -27,44 +27,22 @@ export async function POST(request: NextRequest) {
 
     const orderData = orderDoc.data()!
 
-    // Send confirmation to customer
-    const { data, error } = await sendOrderConfirmationEmail(
+    const { data, error } = await sendOrderCancelledEmail(
       email,
       orderId,
       orderData.recipientData.fullName,
       orderData.items,
-      orderData.subtotal,
-      orderData.tax,
       orderData.total,
-      orderData.recipientData,
-      orderData.paymentMethod || 'stripe'
+      reason,
+      refundStatus
     )
 
     if (error) {
       console.error('Email error:', error)
       return NextResponse.json(
-        { error: 'Failed to send email' },
+        { error: 'Failed to send cancellation notification' },
         { status: 500 }
       )
-    }
-
-    // Also notify admin about new order
-    try {
-      await sendNewOrderAdminNotification(
-        orderId,
-        orderData.recipientData.fullName,
-        email,
-        orderData.items,
-        orderData.subtotal,
-        orderData.tax,
-        orderData.total,
-        orderData.recipientData,
-        orderData.paymentMethod || 'stripe',
-        new Date(orderData.createdAt?.toDate?.() || Date.now()).toLocaleString()
-      )
-    } catch (adminError) {
-      // Don't fail the request if admin notification fails
-      console.error('Admin notification error:', adminError)
     }
 
     return NextResponse.json({ success: true, messageId: data?.id })
