@@ -25,22 +25,24 @@ import {
 } from '@/components/ui/form'
 import { toast } from 'sonner'
 
-const recipientSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  reference: z.string()
-    .min(11, 'ID must be exactly 11 digits')
-    .max(11, 'ID must be exactly 11 digits')
-    .regex(/^\d{11}$/, 'ID must be exactly 11 digits (numbers only)'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
-  city: z.string().min(2, 'City must be at least 2 characters'),
-  state: z.string().min(2, 'State must be at least 2 characters'),
-  zipCode: z.string().min(3, 'ZIP code must be at least 3 characters'),
-  country: z.string().min(2, 'Country must be at least 2 characters'),
-  phone: z.string().min(7, 'Phone must be at least 7 characters'),
-  isDefault: z.boolean(),
-})
+function createRecipientSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    fullName: z.string().min(2, tv('minLength', { min: 2 })),
+    reference: z.string()
+      .min(11, tv('idExactDigits', { count: 11 }))
+      .max(11, tv('idExactDigits', { count: 11 }))
+      .regex(/^\d{11}$/, tv('idDigitsOnly', { count: 11 })),
+    address: z.string().min(5, tv('minLength', { min: 5 })),
+    city: z.string().min(2, tv('minLength', { min: 2 })),
+    state: z.string().min(2, tv('minLength', { min: 2 })),
+    zipCode: z.string().min(3, tv('minLength', { min: 3 })),
+    country: z.string().min(2, tv('minLength', { min: 2 })),
+    phone: z.string().min(7, tv('minLength', { min: 7 })),
+    isDefault: z.boolean(),
+  })
+}
 
-type RecipientFormValues = z.input<typeof recipientSchema>
+type RecipientFormValues = z.input<ReturnType<typeof createRecipientSchema>>
 
 interface RecipientFormProps {
   recipient?: Recipient
@@ -50,6 +52,7 @@ interface RecipientFormProps {
 export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
   const t = useTranslations('recipients')
   const tCommon = useTranslations('common')
+  const tv = useTranslations('validation')
   const router = useRouter()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -57,7 +60,7 @@ export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
   const isEditing = !!recipient
 
   const form = useForm<RecipientFormValues>({
-    resolver: zodResolver(recipientSchema),
+    resolver: zodResolver(createRecipientSchema(tv)),
     defaultValues: {
       fullName: recipient?.fullName || '',
       reference: recipient?.reference || '',
@@ -113,7 +116,7 @@ export function RecipientForm({ recipient, onSuccess }: RecipientFormProps) {
           <div>
             <h2 className="text-xl font-semibold">{isEditing ? t('edit') : t('add')}</h2>
             <p className="text-sm text-muted-foreground">
-              {isEditing ? 'Update shipping address details' : 'Add a new shipping address'}
+              {isEditing ? t('updateAddressDetails') : t('addNewAddressDetails')}
             </p>
           </div>
         </div>

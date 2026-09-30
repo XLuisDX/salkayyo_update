@@ -11,6 +11,7 @@ import { CategoriesService } from '@/services/categories.service'
 import { Card, CardContent } from '@/components/ui/card'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Skeleton } from '@/components/ui/skeleton'
+import { LogoWatermarks } from '@/components/common/LogoWatermarks'
 
 export default function CategoriesPage() {
   const t = useTranslations('categories')
@@ -33,10 +34,12 @@ export default function CategoriesPage() {
   }, [])
 
   return (
-    <div className="container py-8">
+    <div className="relative overflow-hidden">
+      <LogoWatermarks />
+      <div className="container relative z-10 py-8">
       <PageHeader
         title={t('all')}
-        description="Browse products by category"
+        description={t('pageSubtitle')}
       />
 
       {loading ? (
@@ -62,6 +65,7 @@ export default function CategoriesPage() {
                         src={category.image}
                         alt={category.name}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
@@ -93,6 +97,7 @@ export default function CategoriesPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

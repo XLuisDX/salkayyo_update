@@ -34,6 +34,7 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
+  const tCategories = useTranslations('categories')
 
   const handleSearchChange = (value: string) => {
     onFilterChange({ ...filters, search: value, page: 1 })
@@ -96,7 +97,7 @@ export function ProductFilters({
             <SelectValue placeholder={t('category')} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="all" className="rounded-lg">All Categories</SelectItem>
+            <SelectItem value="all" className="rounded-lg">{tCategories('all')}</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id} className="rounded-lg">
                 {category.name}
@@ -129,7 +130,7 @@ export function ProductFilters({
               className="h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-0 bg-muted/50 hover:bg-accent hover:text-accent-foreground"
             >
               <SlidersHorizontal className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Filters</span>
+              <span className="hidden sm:inline">{t('filters')}</span>
             </Button>
           </SheetTrigger>
           <SheetContent className="w-full sm:w-[400px] border-0">
@@ -142,7 +143,7 @@ export function ProductFilters({
                 <Label className="text-base font-semibold">{t('price')}</Label>
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <Label className="text-xs text-muted-foreground mb-2 block">Minimum</Label>
+                    <Label className="text-xs text-muted-foreground mb-2 block">{t('minimum')}</Label>
                     <Input
                       type="number"
                       placeholder="$0"
@@ -157,7 +158,7 @@ export function ProductFilters({
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-xs text-muted-foreground mb-2 block">Maximum</Label>
+                    <Label className="text-xs text-muted-foreground mb-2 block">{t('maximum')}</Label>
                     <Input
                       type="number"
                       placeholder="$999"
@@ -182,7 +183,7 @@ export function ProductFilters({
                   className="w-full h-12 rounded-xl gap-2"
                 >
                   <X className="h-4 w-4" />
-                  Clear all filters
+                  {t('clearAllFilters')}
                 </Button>
               )}
             </div>
@@ -195,7 +196,7 @@ export function ProductFilters({
         <div className="flex flex-wrap gap-2">
           {filters.search && (
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm">
-              Search: {filters.search}
+              {tCommon('search')}: {filters.search}
               <button onClick={() => handleSearchChange('')}>
                 <X className="h-3 w-3" />
               </button>

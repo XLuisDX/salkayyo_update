@@ -45,8 +45,8 @@ export function CartSummary() {
             <span className="font-medium">{formatPrice(cart.tax)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Shipping</span>
-            <span className="text-accent font-medium">Free</span>
+            <span className="text-muted-foreground">{t('shipping')}</span>
+            <span className="text-accent font-medium">{t('free')}</span>
           </div>
         </div>
 
@@ -83,11 +83,11 @@ export function CartSummary() {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              <span>Secure checkout</span>
+              <span>{t('secureCheckout')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Truck className="h-4 w-4" />
-              <span>Fast shipping</span>
+              <span>{t('fastShipping')}</span>
             </div>
           </div>
         </div>

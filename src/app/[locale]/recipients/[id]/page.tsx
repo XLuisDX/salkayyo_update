@@ -50,9 +50,9 @@ export default function EditRecipientPage() {
   if (!recipient) {
     return (
       <div className="container py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Address not found</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('notFound')}</h1>
         <Link href="/recipients">
-          <Button>Back to Addresses</Button>
+          <Button>{t('backToAddresses')}</Button>
         </Link>
       </div>
     )
@@ -63,7 +63,7 @@ export default function EditRecipientPage() {
       <Link href="/recipients">
         <Button variant="ghost" className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Back to Addresses
+          {t('backToAddresses')}
         </Button>
       </Link>
 

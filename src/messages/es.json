@@ -22,7 +22,9 @@
     "close": "Cerrar",
     "confirm": "Confirmar",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "changeLanguage": "Cambiar idioma",
+    "toggleTheme": "Cambiar tema"
   },
   "nav": {
     "home": "Inicio",
@@ -35,7 +37,9 @@
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "logout": "Cerrar Sesión",
-    "recipients": "Direcciones"
+    "recipients": "Direcciones",
+    "wishlist": "Favoritos",
+    "contact": "Contacto"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -63,7 +67,21 @@
     "registerSuccess": "Registro exitoso. Por favor verifica tu email.",
     "logoutSuccess": "Sesión cerrada exitosamente",
     "invalidCredentials": "Email o contraseña inválidos",
-    "emailNotVerified": "Por favor verifica tu email primero"
+    "emailNotVerified": "Por favor verifica tu email primero",
+    "enterCredentials": "Ingresa tus credenciales para continuar",
+    "enterPasswordPlaceholder": "Ingresa tu contraseña",
+    "createAccountSubtitle": "Crea una cuenta para empezar a comprar",
+    "emailAlreadyInUse": "El correo ya está en uso",
+    "checkEmailForReset": "Revisa tu correo para el enlace de restablecimiento",
+    "resetLinkSentDescription": "Hemos enviado un enlace de restablecimiento a tu correo electrónico.",
+    "enterEmailForReset": "Ingresa tu correo para recibir un enlace de restablecimiento",
+    "emailVerified": "¡Correo Verificado!",
+    "emailVerifiedDescription": "Tu correo ha sido verificado exitosamente.",
+    "verificationLinkSentTo": "Hemos enviado un enlace de verificación a {email}",
+    "goToHome": "Ir al Inicio",
+    "checkVerificationInstructions": "Haz clic en el enlace de tu correo para verificar tu cuenta. Si no lo ves, revisa tu carpeta de spam.",
+    "verificationEmailSentCheckInbox": "¡Correo de verificación enviado! Revisa tu bandeja de entrada.",
+    "sending": "Enviando..."
   },
   "products": {
     "title": "Productos",
@@ -91,14 +109,31 @@
     "quickAdd": "Agregar",
     "inCart": "En Carrito",
     "left": "disponibles",
-    "viewDetails": "Detalles"
+    "viewDetails": "Detalles",
+    "notFound": "Producto no encontrado",
+    "backToProducts": "Volver a Productos",
+    "noImage": "Sin imagen",
+    "noReviewsYet": "Aún no hay reseñas.",
+    "allSubtitle": "Explora nuestra colección completa de productos",
+    "noProductsFound": "No se encontraron productos",
+    "filters": "Filtros",
+    "minimum": "Mínimo",
+    "maximum": "Máximo",
+    "clearAllFilters": "Limpiar todos los filtros",
+    "linkCopied": "Enlace copiado al portapapeles",
+    "shareError": "No se pudo compartir este producto"
   },
   "categories": {
     "title": "Categorías",
     "all": "Todas las Categorías",
     "viewProducts": "Ver Productos",
     "shopByCategory": "Comprar por Categoría",
-    "subtitle": "Explora nuestras colecciones organizadas por categoría."
+    "subtitle": "Explora nuestras colecciones organizadas por categoría.",
+    "noCategories": "No hay categorías disponibles",
+    "notFound": "Categoría no encontrada",
+    "backToCategories": "Volver a Categorías",
+    "browseAllInCategory": "Explora todos los productos en {name}",
+    "pageSubtitle": "Explora los productos por categoría"
   },
   "cart": {
     "title": "Carrito de Compras",
@@ -113,7 +148,21 @@
     "addedToCart": "Agregar",
     "removedFromCart": "Eliminado del carrito",
     "itemCount": "{count} artículo(s)",
-    "clearCart": "Vaciar Carrito"
+    "clearCart": "Vaciar Carrito",
+    "emptyDescription": "Agrega productos a tu carrito para verlos aquí",
+    "shipping": "Envío",
+    "free": "Gratis",
+    "secureCheckout": "Compra segura",
+    "fastShipping": "Envío rápido"
+  },
+  "wishlist": {
+    "title": "Favoritos",
+    "empty": "Tu lista de favoritos está vacía",
+    "emptyDescription": "Guarda los productos que te gusten tocando el ícono de corazón.",
+    "continueShopping": "Seguir Comprando",
+    "clearWishlist": "Vaciar Favoritos",
+    "added": "Agregado a favoritos",
+    "removed": "Eliminado de favoritos"
   },
   "checkout": {
     "title": "Finalizar Compra",
@@ -127,7 +176,10 @@
     "payWithPayPal": "Pagar con PayPal",
     "processing": "Procesando pago...",
     "orderPlaced": "¡Pedido realizado exitosamente!",
-    "orderFailed": "El pedido falló. Por favor intenta de nuevo."
+    "orderFailed": "El pedido falló. Por favor intenta de nuevo.",
+    "loginRequired": "Por favor inicia sesión para continuar",
+    "emptyCartDescription": "Agrega productos a tu carrito para continuar",
+    "selectAddressError": "Por favor selecciona una dirección de envío"
   },
   "orders": {
     "title": "Mis Pedidos",
@@ -143,7 +195,17 @@
     "shipped": "Enviado",
     "delivered": "Entregado",
     "cancelled": "Cancelado",
-    "trackOrder": "Rastrear Pedido"
+    "trackOrder": "Rastrear Pedido",
+    "subtitle": "Ve y rastrea tus pedidos",
+    "emptyDescription": "Empieza a comprar para ver tus pedidos aquí",
+    "browseProducts": "Ver Productos",
+    "notFound": "Pedido no encontrado",
+    "backToOrders": "Volver a Pedidos",
+    "shippingAddress": "Dirección de Envío",
+    "paymentInformation": "Información de Pago",
+    "method": "Método",
+    "paymentId": "ID de Pago",
+    "qty": "Cant"
   },
   "recipients": {
     "title": "Direcciones Guardadas",
@@ -164,7 +226,15 @@
     "confirmDelete": "¿Estás seguro de que quieres eliminar esta dirección?",
     "addSuccess": "Dirección agregada exitosamente",
     "updateSuccess": "Dirección actualizada exitosamente",
-    "deleteSuccess": "Dirección eliminada exitosamente"
+    "deleteSuccess": "Dirección eliminada exitosamente",
+    "notFound": "Dirección no encontrada",
+    "backToAddresses": "Volver a Direcciones",
+    "emptyDescription": "Agrega una dirección de envío para agilizar el checkout",
+    "deleteError": "Error al eliminar la dirección",
+    "defaultUpdated": "Dirección predeterminada actualizada",
+    "defaultUpdateError": "Error al actualizar la dirección predeterminada",
+    "updateAddressDetails": "Actualiza los detalles de la dirección de envío",
+    "addNewAddressDetails": "Agrega una nueva dirección de envío"
   },
   "profile": {
     "title": "Mi Perfil",
@@ -177,13 +247,68 @@
     "updateSuccess": "Perfil actualizado exitosamente",
     "passwordChanged": "Contraseña cambiada exitosamente"
   },
+  "contact": {
+    "subtitle": "¿Tienes una pregunta o necesitas ayuda? Envíanos un mensaje y te responderemos pronto.",
+    "getInTouch": "Contáctanos",
+    "getInTouchDescription": "Escríbenos sobre pedidos, productos, mayoreo o cualquier otra duda.",
+    "emailUs": "Escríbenos",
+    "supportEmail": "support@saklayyo.com",
+    "responseTime": "Tiempo de Respuesta",
+    "responseTimeValue": "En 24-48 horas",
+    "sendMessage": "Envíanos un Mensaje",
+    "name": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "subject": "Asunto",
+    "subjectPlaceholder": "¿En qué podemos ayudarte?",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntanos más...",
+    "send": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "success": "¡Mensaje enviado! Te responderemos pronto.",
+    "error": "No se pudo enviar tu mensaje. Intenta de nuevo."
+  },
+  "legal": {
+    "lastUpdated": "Última actualización: {date}"
+  },
   "wholesale": {
     "title": "Mayoreo",
     "subtitle": "Precios especiales para pedidos al por mayor",
     "minOrder": "Pedido Mínimo",
     "contact": "Contáctanos",
     "requestQuote": "Solicitar Cotización",
-    "description": "Obtén precios especiales para pedidos al por mayor. Contáctanos para cotizaciones personalizadas y oportunidades de mayoreo."
+    "description": "Obtén precios especiales para pedidos al por mayor. Contáctanos para cotizaciones personalizadas y oportunidades de mayoreo.",
+    "whyPartner": "¿Por qué asociarte con nosotros?",
+    "benefitBulkTitle": "Descuentos por Volumen",
+    "benefitBulkDescription": "Obtén descuentos significativos en pedidos grandes",
+    "benefitSupportTitle": "Soporte Empresarial",
+    "benefitSupportDescription": "Gerente de cuenta dedicado para tu negocio",
+    "benefitQuotesTitle": "Cotizaciones Personalizadas",
+    "benefitQuotesDescription": "Precios adaptados a tus necesidades",
+    "benefitPriorityTitle": "Soporte Prioritario",
+    "benefitPriorityDescription": "Soporte al cliente 24/7 para socios mayoristas",
+    "standardProducts": "Productos Estándar",
+    "customProducts": "Productos Personalizados",
+    "mixedOrders": "Pedidos Mixtos",
+    "standardUnits": "50+ unidades",
+    "customUnits": "100+ unidades",
+    "mixedValue": "$1,000+ en valor",
+    "requestSubmitted": "¡Solicitud Enviada!",
+    "requestSubmittedDescription": "Nos pondremos en contacto contigo dentro de 24-48 horas con una cotización personalizada.",
+    "submitAnother": "Enviar Otra Solicitud",
+    "companyName": "Nombre de la Empresa",
+    "companyNamePlaceholder": "Tu Empresa S.A.",
+    "contactName": "Nombre de Contacto",
+    "contactNamePlaceholder": "Juan Pérez",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "tu@empresa.com",
+    "phone": "Teléfono",
+    "phonePlaceholder": "+1 234 567 8900",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntanos sobre tus necesidades, requisitos de cantidad y productos específicos que te interesen...",
+    "submitting": "Enviando...",
+    "quoteSubmitted": "¡Solicitud de cotización enviada exitosamente!"
   },
   "footer": {
     "rights": "Todos los derechos reservados",
@@ -210,7 +335,12 @@
     "minLength": "Debe tener al menos {min} caracteres",
     "maxLength": "Debe tener como máximo {max} caracteres",
     "passwordMatch": "Las contraseñas no coinciden",
-    "phone": "Por favor ingresa un número de teléfono válido"
+    "phone": "Por favor ingresa un número de teléfono válido",
+    "priceGreaterThanZero": "El precio debe ser mayor a 0",
+    "nonNegative": "No puede ser negativo",
+    "atLeastOneImage": "Se requiere al menos una imagen",
+    "idExactDigits": "La identificación debe tener exactamente {count} dígitos",
+    "idDigitsOnly": "La identificación debe tener exactamente {count} dígitos (solo números)"
   },
   "theme": {
     "light": "Claro",
@@ -218,6 +348,7 @@
     "system": "Sistema"
   },
   "hero": {
+    "productShowcaseAlt": "Muestra de Producto",
     "badge": "Nueva Colección 2024",
     "title1": "Descubre",
     "title2": "Productos",
@@ -318,6 +449,29 @@
     "backToHome": "Volver al Inicio",
     "saving": "Guardando...",
     "deleting": "Eliminando...",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "noOrdersYet": "No hay pedidos aún",
+    "enterProductTitlePlaceholder": "Ingresa el título del producto",
+    "enterProductDescriptionPlaceholder": "Ingresa la descripción del producto",
+    "enterCategoryNamePlaceholder": "Ingresa el nombre de la categoría",
+    "enterCategoryDescriptionPlaceholder": "Ingresa la descripción de la categoría",
+    "tryDifferentSearch": "Intenta con otro término de búsqueda",
+    "createFirstCategory": "Crea tu primera categoría para empezar",
+    "totalRevenue": "Ingresos Totales",
+    "lowStockProducts": "Productos con Poco Stock",
+    "lowStockAlert": "{count} producto(s) con poco stock",
+    "noLowStock": "Todos los productos tienen buen stock",
+    "salesOverview": "Ventas (últimos 14 días)",
+    "manageOrders": "Gestionar Pedidos",
+    "searchOrders": "Buscar por ID de pedido o cliente...",
+    "allStatuses": "Todos los Estados",
+    "customer": "Cliente",
+    "viewOrder": "Ver Pedido",
+    "statusUpdated": "Estado del pedido actualizado",
+    "orderId": "ID de Pedido"
+  },
+  "seo": {
+    "siteDescription": "Compra productos de calidad en línea en Saklayyo Store. Envío rápido, pago seguro y un catálogo curado para cada necesidad.",
+    "keywords": "tienda online, ecommerce, compras, saklayyo, productos de calidad, envío rápido"
   }
 }

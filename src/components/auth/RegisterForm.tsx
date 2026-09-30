@@ -21,27 +21,31 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { toast } from 'sonner'
+import { isExpectedAuthError } from '@/lib/utils'
 
-const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
+function createRegisterSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    name: z.string().min(2, tv('minLength', { min: 2 })),
+    email: z.string().email(tv('email')),
+    password: z.string().min(6, tv('minLength', { min: 6 })),
+    confirmPassword: z.string(),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: tv('passwordMatch'),
+    path: ['confirmPassword'],
+  })
+}
 
-type RegisterFormValues = z.infer<typeof registerSchema>
+type RegisterFormValues = z.infer<ReturnType<typeof createRegisterSchema>>
 
 export function RegisterForm() {
   const t = useTranslations('auth')
+  const tv = useTranslations('validation')
   const router = useRouter()
   const { register: registerUser } = useAuth()
   const [loading, setLoading] = useState(false)
 
   const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(tv)),
     defaultValues: {
       name: '',
       email: '',
@@ -62,10 +66,12 @@ export function RegisterForm() {
       toast.success(t('registerSuccess'))
       router.push('/verify-email')
     } catch (error) {
-      console.error('Register error:', error)
+      if (!isExpectedAuthError(error)) {
+        console.error('Register error:', error)
+      }
       const firebaseError = error as { code?: string; message?: string }
       if (firebaseError.code === 'auth/email-already-in-use') {
-        toast.error('Email is already in use')
+        toast.error(t('emailAlreadyInUse'))
       } else {
         toast.error(firebaseError.message || 'Registration failed')
       }
@@ -87,15 +93,15 @@ export function RegisterForm() {
             <Image
               src="/favicon.png"
               alt="Saklayyo"
-              width={120}
-              height={50}
+              width={48}
+              height={48}
               className="dark:hidden mx-auto"
             />
             <Image
               src="/logo-email.png"
               alt="Saklayyo"
-              width={120}
-              height={40}
+              width={48}
+              height={48}
               className="hidden dark:block mx-auto"
             />
           </Link>
@@ -103,7 +109,7 @@ export function RegisterForm() {
             {t('register')}
           </h1>
           <p className="text-muted-foreground text-lg">
-            Create an account to start shopping
+            {t('createAccountSubtitle')}
           </p>
         </motion.div>
 

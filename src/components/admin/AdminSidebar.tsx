@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Package,
   FolderTree,
+  ShoppingCart,
   Menu,
   LogOut,
   Home,
@@ -31,6 +32,11 @@ const navItems = [
     href: '/admin/categories',
     labelKey: 'categories',
     icon: FolderTree,
+  },
+  {
+    href: '/admin/orders',
+    labelKey: 'orders',
+    icon: ShoppingCart,
   },
 ] as const
 

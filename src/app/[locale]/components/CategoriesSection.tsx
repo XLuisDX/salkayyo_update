@@ -9,6 +9,7 @@ import { Link } from '@/i18n/routing'
 import { Category } from '@/types'
 import { CategoriesService } from '@/services/categories.service'
 import { Skeleton } from '@/components/ui/skeleton'
+import { LogoWatermarks } from '@/components/common/LogoWatermarks'
 
 export function CategoriesSection() {
   const t = useTranslations('categories')
@@ -33,25 +34,8 @@ export function CategoriesSection() {
   return (
     <section className="relative py-20 md:py-28 bg-muted/30 overflow-hidden">
       {/* Animated Background Elements */}
+      <LogoWatermarks />
       <div className="absolute inset-0 pointer-events-none">
-        {/* Logo Watermarks */}
-        <motion.div
-          className="absolute top-[5%] right-[10%] opacity-[0.03] dark:opacity-[0.02]"
-          animate={{ rotate: [0, 3, 0], scale: [1, 1.02, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Image src="/favicon.png" alt="" width={200} height={70} className="select-none dark:hidden" />
-          <Image src="/negativo.png" alt="" width={200} height={70} className="select-none hidden dark:block" />
-        </motion.div>
-        <motion.div
-          className="absolute bottom-[10%] left-[5%] opacity-[0.02] dark:opacity-[0.015]"
-          animate={{ rotate: [0, -2, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Image src="/favicon.png" alt="" width={150} height={50} className="select-none dark:hidden" />
-          <Image src="/negativo.png" alt="" width={150} height={50} className="select-none hidden dark:block" />
-        </motion.div>
-
         {/* Floating Circles */}
         <motion.div
           className="absolute top-[20%] left-[15%] w-64 h-64 rounded-full bg-accent/5 blur-3xl"
@@ -156,7 +140,10 @@ export function CategoriesSection() {
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          <div
+            className="grid justify-center gap-4 md:gap-6"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 200px))' }}
+          >
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="aspect-square rounded-2xl" />
             ))}
@@ -166,7 +153,10 @@ export function CategoriesSection() {
             <p className="text-muted-foreground">{t('noCategories')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          <div
+            className="grid justify-center gap-4 md:gap-6"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 200px))' }}
+          >
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}
@@ -184,6 +174,7 @@ export function CategoriesSection() {
                           src={category.image}
                           alt={category.name}
                           fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                       ) : (

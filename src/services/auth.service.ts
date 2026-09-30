@@ -2,7 +2,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendPasswordResetEmail,
   sendEmailVerification,
   updateProfile,
   User as FirebaseUser,
@@ -14,6 +13,18 @@ import {
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 import { User, UserCreateData } from '@/types'
+
+function toDate(value: unknown): Date {
+  if (value && typeof (value as { toDate?: () => Date }).toDate === 'function') {
+    return (value as { toDate: () => Date }).toDate()
+  }
+  if (value instanceof Date) return value
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value)
+    if (!isNaN(parsed.getTime())) return parsed
+  }
+  return new Date()
+}
 
 export class AuthService {
   static async register(data: UserCreateData): Promise<User> {
@@ -69,7 +80,7 @@ export class AuthService {
       name: userData.name,
       email: userData.email,
       verified: userData.verified,
-      createdAt: userData.createdAt?.toDate() || new Date(),
+      createdAt: toDate(userData.createdAt),
       role: userData.role || 'user',
     }
   }
@@ -79,7 +90,20 @@ export class AuthService {
   }
 
   static async resetPassword(email: string): Promise<void> {
-    await sendPasswordResetEmail(auth, email)
+    const response = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      const { error } = await response.json()
+      const err = new Error(error?.message || 'Failed to send reset email') as Error & {
+        code?: string
+      }
+      err.code = error?.code
+      throw err
+    }
   }
 
   static async resendVerificationEmail(): Promise<void> {
@@ -103,7 +127,7 @@ export class AuthService {
       name: userData.name,
       email: userData.email,
       verified: userData.verified,
-      createdAt: userData.createdAt?.toDate() || new Date(),
+      createdAt: toDate(userData.createdAt),
       role: userData.role || 'user',
     }
   }

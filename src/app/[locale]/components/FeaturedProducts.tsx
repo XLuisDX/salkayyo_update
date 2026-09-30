@@ -9,6 +9,7 @@ import { Product } from "@/types";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { ProductsService } from "@/services/products.service";
+import { LogoWatermarks } from "@/components/common/LogoWatermarks";
 
 export function FeaturedProducts() {
   const t = useTranslations("products");
@@ -32,8 +33,9 @@ export function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="py-20 md:py-28">
-      <div className="container">
+    <section className="relative py-20 md:py-28 overflow-hidden">
+      <LogoWatermarks />
+      <div className="container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

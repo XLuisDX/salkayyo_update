@@ -32,6 +32,7 @@ export default function OrderDetailPage() {
   const params = useParams()
   const t = useTranslations('orders')
   const tCart = useTranslations('cart')
+  const tProducts = useTranslations('products')
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
@@ -66,9 +67,9 @@ export default function OrderDetailPage() {
   if (!order) {
     return (
       <div className="container py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Order not found</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('notFound')}</h1>
         <Link href="/orders">
-          <Button>Back to Orders</Button>
+          <Button>{t('backToOrders')}</Button>
         </Link>
       </div>
     )
@@ -81,7 +82,7 @@ export default function OrderDetailPage() {
       <Link href="/orders">
         <Button variant="ghost" className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Back to Orders
+          {t('backToOrders')}
         </Button>
       </Link>
 
@@ -159,18 +160,19 @@ export default function OrderDetailPage() {
                         src={item.image}
                         alt={item.title}
                         fill
+                        sizes="80px"
                         className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                        No image
+                        {tProducts('noImage')}
                       </div>
                     )}
                   </div>
                   <div className="flex-1">
                     <h4 className="font-medium">{item.title}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Qty: {item.quantity} x {formatPrice(item.price)}
+                      {t('qty')}: {item.quantity} x {formatPrice(item.price)}
                     </p>
                   </div>
                   <div className="font-semibold">
@@ -206,7 +208,7 @@ export default function OrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Shipping Address
+                {t('shippingAddress')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -228,17 +230,17 @@ export default function OrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Payment Information
+                {t('paymentInformation')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Method</span>
+                  <span className="text-muted-foreground">{t('method')}</span>
                   <span className="font-medium capitalize">{order.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Payment ID</span>
+                  <span className="text-muted-foreground">{t('paymentId')}</span>
                   <span className="font-medium text-sm">{order.paymentId?.slice(0, 20)}...</span>
                 </div>
                 <div className="flex justify-between">

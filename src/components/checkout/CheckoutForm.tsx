@@ -65,7 +65,7 @@ export function CheckoutForm() {
 
   const handleStripeCheckout = async () => {
     if (!user || !selectedRecipient) {
-      toast.error('Please select a shipping address')
+      toast.error(t('selectAddressError'))
       return
     }
 
@@ -139,7 +139,7 @@ export function CheckoutForm() {
     return (
       <Card>
         <CardContent className="py-8 text-center">
-          <p className="text-muted-foreground">Please login to checkout</p>
+          <p className="text-muted-foreground">{t('loginRequired')}</p>
         </CardContent>
       </Card>
     )

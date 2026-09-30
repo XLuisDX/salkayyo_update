@@ -287,6 +287,36 @@ export async function sendNewsletterWelcomeEmail(email: string) {
 }
 
 // ============================================
+// CONTACT FORM
+// ============================================
+
+export async function sendContactFormEmail(
+  name: string,
+  email: string,
+  subject: string,
+  message: string
+) {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #101820;">New Contact Form Message</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <p style="white-space: pre-wrap; background: #f5f5f5; padding: 16px; border-radius: 8px;">${message}</p>
+    </div>
+  `
+
+  return resend.emails.send({
+    from: FROM_ADDRESSES.support,
+    to: ADMIN_EMAIL,
+    replyTo: email,
+    subject: `Contact Form: ${subject}`,
+    html,
+  })
+}
+
+// ============================================
 // UTILITY EXPORTS
 // ============================================
 
@@ -305,6 +335,8 @@ export const emailService = {
   sendNewOrderAdminNotification,
   // Marketing
   sendNewsletterWelcomeEmail,
+  // Contact
+  sendContactFormEmail,
 }
 
 export default emailService

@@ -10,6 +10,7 @@ import { Link } from '@/i18n/routing'
 import { Product } from '@/types'
 import { ProductsService } from '@/services/products.service'
 import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -23,7 +24,9 @@ export default function ProductDetailPage() {
   const params = useParams()
   const t = useTranslations('products')
   const tCart = useTranslations('cart')
+  const tWishlist = useTranslations('wishlist')
   const { addToCart } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
   const [product, setProduct] = useState<Product | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,6 +62,25 @@ export default function ProductDetailPage() {
     }
   }
 
+  const handleToggleWishlist = () => {
+    if (!product) return
+    const wasLiked = isInWishlist(product.id)
+    toggleWishlist(product.id)
+    toast.success(wasLiked ? tWishlist('removed') : tWishlist('added'))
+  }
+
+  const handleShare = async () => {
+    if (!product) return
+
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success(t('linkCopied'))
+    } catch (error) {
+      console.error('Error copying product link:', error)
+      toast.error(t('shareError'))
+    }
+  }
+
   const handlePrevImage = () => {
     setSelectedImageIndex((prev) =>
       prev === 0 ? (product?.images.length || 1) - 1 : prev - 1
@@ -78,9 +100,9 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="container py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Product not found</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('notFound')}</h1>
         <Link href="/products">
-          <Button>Back to Products</Button>
+          <Button>{t('backToProducts')}</Button>
         </Link>
       </div>
     )
@@ -111,12 +133,13 @@ export default function ProductDetailPage() {
                     src={product.images[selectedImageIndex]}
                     alt={product.title}
                     fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
                     priority
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-muted-foreground">No image</span>
+                    <span className="text-muted-foreground">{t('noImage')}</span>
                   </div>
                 )}
               </motion.div>
@@ -160,6 +183,7 @@ export default function ProductDetailPage() {
                     src={image}
                     alt={`${product.title} ${index + 1}`}
                     fill
+                    sizes="80px"
                     className="object-cover"
                   />
                 </button>
@@ -231,10 +255,18 @@ export default function ProductDetailPage() {
                   <ShoppingCart className="h-5 w-5" />
                   {t('addToCart')}
                 </Button>
-                <Button size="lg" variant="outline">
-                  <Heart className="h-5 w-5" />
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={handleToggleWishlist}
+                >
+                  <Heart
+                    className={`h-5 w-5 ${
+                      isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''
+                    }`}
+                  />
                 </Button>
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" onClick={handleShare}>
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>
@@ -269,7 +301,7 @@ export default function ProductDetailPage() {
               </div>
             </TabsContent>
             <TabsContent value="reviews" className="pt-4">
-              <p className="text-muted-foreground">No reviews yet.</p>
+              <p className="text-muted-foreground">{t('noReviewsYet')}</p>
             </TabsContent>
           </Tabs>
         </motion.div>

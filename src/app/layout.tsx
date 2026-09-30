@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
 import { Sora, DM_Sans } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/context/ThemeContext'
 import '@/app/globals.css'
 
@@ -23,11 +25,13 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html suppressHydrationWarning>
+    <html suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${sora.variable} ${dmSans.variable} font-sans antialiased`}>
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

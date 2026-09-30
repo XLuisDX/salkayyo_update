@@ -45,11 +45,12 @@ export function CartItem({ item }: CartItemProps) {
     >
       {/* Product Image */}
       <div className="relative w-28 h-28 rounded-xl overflow-hidden bg-muted flex-shrink-0">
-        {item.product.images && item.product.images.length > 0 ? (
+        {item.product.images?.[0] ? (
           <Image
             src={item.product.images[0]}
             alt={item.product.title}
             fill
+            sizes="112px"
             className="object-cover"
           />
         ) : (

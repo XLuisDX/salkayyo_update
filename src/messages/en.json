@@ -22,7 +22,9 @@
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "changeLanguage": "Change language",
+    "toggleTheme": "Toggle theme"
   },
   "nav": {
     "home": "Home",
@@ -35,7 +37,9 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-    "recipients": "Recipients"
+    "recipients": "Recipients",
+    "wishlist": "Wishlist",
+    "contact": "Contact"
   },
   "auth": {
     "login": "Login",
@@ -63,7 +67,21 @@
     "registerSuccess": "Registration successful. Please verify your email.",
     "logoutSuccess": "Logged out successfully",
     "invalidCredentials": "Invalid email or password",
-    "emailNotVerified": "Please verify your email first"
+    "emailNotVerified": "Please verify your email first",
+    "enterCredentials": "Enter your credentials to continue",
+    "enterPasswordPlaceholder": "Enter your password",
+    "createAccountSubtitle": "Create an account to start shopping",
+    "emailAlreadyInUse": "Email is already in use",
+    "checkEmailForReset": "Check your email for a password reset link",
+    "resetLinkSentDescription": "We've sent a password reset link to your email address.",
+    "enterEmailForReset": "Enter your email to receive a password reset link",
+    "emailVerified": "Email Verified!",
+    "emailVerifiedDescription": "Your email has been verified successfully.",
+    "verificationLinkSentTo": "We've sent a verification link to {email}",
+    "goToHome": "Go to Home",
+    "checkVerificationInstructions": "Click the link in your email to verify your account. If you don't see it, check your spam folder.",
+    "verificationEmailSentCheckInbox": "Verification email sent! Check your inbox.",
+    "sending": "Sending..."
   },
   "products": {
     "title": "Products",
@@ -91,14 +109,31 @@
     "quickAdd": "Quick Add",
     "inCart": "In Cart",
     "left": "left",
-    "viewDetails": "Details"
+    "viewDetails": "Details",
+    "notFound": "Product not found",
+    "backToProducts": "Back to Products",
+    "noImage": "No image",
+    "noReviewsYet": "No reviews yet.",
+    "allSubtitle": "Browse our complete collection of products",
+    "noProductsFound": "No products found",
+    "filters": "Filters",
+    "minimum": "Minimum",
+    "maximum": "Maximum",
+    "clearAllFilters": "Clear all filters",
+    "linkCopied": "Link copied to clipboard",
+    "shareError": "Couldn't share this product"
   },
   "categories": {
     "title": "Categories",
     "all": "All Categories",
     "viewProducts": "View Products",
     "shopByCategory": "Shop by Category",
-    "subtitle": "Browse our curated collections organized by category."
+    "subtitle": "Browse our curated collections organized by category.",
+    "noCategories": "No categories available",
+    "notFound": "Category not found",
+    "backToCategories": "Back to Categories",
+    "browseAllInCategory": "Browse all products in {name}",
+    "pageSubtitle": "Browse products by category"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -113,7 +148,21 @@
     "addedToCart": "Added to cart",
     "removedFromCart": "Removed from cart",
     "itemCount": "{count} item(s)",
-    "clearCart": "Clear Cart"
+    "clearCart": "Clear Cart",
+    "emptyDescription": "Add some products to your cart to see them here",
+    "shipping": "Shipping",
+    "free": "Free",
+    "secureCheckout": "Secure checkout",
+    "fastShipping": "Fast shipping"
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty",
+    "emptyDescription": "Save products you love by tapping the heart icon.",
+    "continueShopping": "Continue Shopping",
+    "clearWishlist": "Clear Wishlist",
+    "added": "Added to wishlist",
+    "removed": "Removed from wishlist"
   },
   "checkout": {
     "title": "Checkout",
@@ -127,7 +176,10 @@
     "payWithPayPal": "Pay with PayPal",
     "processing": "Processing payment...",
     "orderPlaced": "Order placed successfully!",
-    "orderFailed": "Order failed. Please try again."
+    "orderFailed": "Order failed. Please try again.",
+    "loginRequired": "Please login to checkout",
+    "emptyCartDescription": "Add some products to your cart to checkout",
+    "selectAddressError": "Please select a shipping address"
   },
   "orders": {
     "title": "My Orders",
@@ -143,7 +195,17 @@
     "shipped": "Shipped",
     "delivered": "Delivered",
     "cancelled": "Cancelled",
-    "trackOrder": "Track Order"
+    "trackOrder": "Track Order",
+    "subtitle": "View and track your orders",
+    "emptyDescription": "Start shopping to see your orders here",
+    "browseProducts": "Browse Products",
+    "notFound": "Order not found",
+    "backToOrders": "Back to Orders",
+    "shippingAddress": "Shipping Address",
+    "paymentInformation": "Payment Information",
+    "method": "Method",
+    "paymentId": "Payment ID",
+    "qty": "Qty"
   },
   "recipients": {
     "title": "Saved Addresses",
@@ -164,7 +226,15 @@
     "confirmDelete": "Are you sure you want to delete this address?",
     "addSuccess": "Address added successfully",
     "updateSuccess": "Address updated successfully",
-    "deleteSuccess": "Address deleted successfully"
+    "deleteSuccess": "Address deleted successfully",
+    "notFound": "Address not found",
+    "backToAddresses": "Back to Addresses",
+    "emptyDescription": "Add a shipping address to speed up checkout",
+    "deleteError": "Failed to delete address",
+    "defaultUpdated": "Default address updated",
+    "defaultUpdateError": "Failed to update default address",
+    "updateAddressDetails": "Update shipping address details",
+    "addNewAddressDetails": "Add a new shipping address"
   },
   "profile": {
     "title": "My Profile",
@@ -177,13 +247,68 @@
     "updateSuccess": "Profile updated successfully",
     "passwordChanged": "Password changed successfully"
   },
+  "contact": {
+    "subtitle": "Have a question or need help? Send us a message and we'll get back to you soon.",
+    "getInTouch": "Get in Touch",
+    "getInTouchDescription": "Reach out with questions about orders, products, wholesale, or anything else.",
+    "emailUs": "Email Us",
+    "supportEmail": "support@saklayyo.com",
+    "responseTime": "Response Time",
+    "responseTimeValue": "Within 24-48 hours",
+    "sendMessage": "Send us a Message",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "How can we help?",
+    "message": "Message",
+    "messagePlaceholder": "Tell us more...",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent! We'll get back to you soon.",
+    "error": "Couldn't send your message. Please try again."
+  },
+  "legal": {
+    "lastUpdated": "Last updated: {date}"
+  },
   "wholesale": {
     "title": "Wholesale",
     "subtitle": "Special prices for bulk orders",
     "minOrder": "Minimum Order",
     "contact": "Contact Us",
     "requestQuote": "Request Quote",
-    "description": "Get special pricing for bulk orders. Contact us for custom quotes and wholesale opportunities."
+    "description": "Get special pricing for bulk orders. Contact us for custom quotes and wholesale opportunities.",
+    "whyPartner": "Why Partner With Us?",
+    "benefitBulkTitle": "Bulk Discounts",
+    "benefitBulkDescription": "Get significant discounts on large orders",
+    "benefitSupportTitle": "Business Support",
+    "benefitSupportDescription": "Dedicated account manager for your business",
+    "benefitQuotesTitle": "Custom Quotes",
+    "benefitQuotesDescription": "Tailored pricing based on your needs",
+    "benefitPriorityTitle": "Priority Support",
+    "benefitPriorityDescription": "24/7 customer support for wholesale partners",
+    "standardProducts": "Standard Products",
+    "customProducts": "Custom Products",
+    "mixedOrders": "Mixed Orders",
+    "standardUnits": "50+ units",
+    "customUnits": "100+ units",
+    "mixedValue": "$1,000+ value",
+    "requestSubmitted": "Request Submitted!",
+    "requestSubmittedDescription": "We'll get back to you within 24-48 hours with a custom quote.",
+    "submitAnother": "Submit Another Request",
+    "companyName": "Company Name",
+    "companyNamePlaceholder": "Your Company Inc.",
+    "contactName": "Contact Name",
+    "contactNamePlaceholder": "John Doe",
+    "email": "Email",
+    "emailPlaceholder": "you@company.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 234 567 8900",
+    "message": "Message",
+    "messagePlaceholder": "Tell us about your needs, quantity requirements, and any specific products you're interested in...",
+    "submitting": "Submitting...",
+    "quoteSubmitted": "Quote request submitted successfully!"
   },
   "footer": {
     "rights": "All rights reserved",
@@ -210,7 +335,12 @@
     "minLength": "Must be at least {min} characters",
     "maxLength": "Must be at most {max} characters",
     "passwordMatch": "Passwords do not match",
-    "phone": "Please enter a valid phone number"
+    "phone": "Please enter a valid phone number",
+    "priceGreaterThanZero": "Price must be greater than 0",
+    "nonNegative": "Cannot be negative",
+    "atLeastOneImage": "At least one image is required",
+    "idExactDigits": "ID must be exactly {count} digits",
+    "idDigitsOnly": "ID must be exactly {count} digits (numbers only)"
   },
   "theme": {
     "light": "Light",
@@ -218,6 +348,7 @@
     "system": "System"
   },
   "hero": {
+    "productShowcaseAlt": "Product Showcase",
     "badge": "New Collection 2024",
     "title1": "Discover",
     "title2": "Premium",
@@ -318,6 +449,29 @@
     "backToHome": "Back to Home",
     "saving": "Saving...",
     "deleting": "Deleting...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "noOrdersYet": "No orders yet",
+    "enterProductTitlePlaceholder": "Enter product title",
+    "enterProductDescriptionPlaceholder": "Enter product description",
+    "enterCategoryNamePlaceholder": "Enter category name",
+    "enterCategoryDescriptionPlaceholder": "Enter category description",
+    "tryDifferentSearch": "Try a different search term",
+    "createFirstCategory": "Create your first category to get started",
+    "totalRevenue": "Total Revenue",
+    "lowStockProducts": "Low Stock Products",
+    "lowStockAlert": "{count} product(s) running low on stock",
+    "noLowStock": "All products are well stocked",
+    "salesOverview": "Sales (last 14 days)",
+    "manageOrders": "Manage Orders",
+    "searchOrders": "Search by order ID or customer...",
+    "allStatuses": "All Statuses",
+    "customer": "Customer",
+    "viewOrder": "View Order",
+    "statusUpdated": "Order status updated",
+    "orderId": "Order ID"
+  },
+  "seo": {
+    "siteDescription": "Shop quality products online at Saklayyo Store. Fast shipping, secure checkout, and a curated catalog for every need.",
+    "keywords": "online store, ecommerce, shopping, saklayyo, quality products, fast shipping"
   }
 }

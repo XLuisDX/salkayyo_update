@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { AuthProvider } from './AuthContext'
 import { CartProvider } from './CartContext'
+import { WishlistProvider } from './WishlistContext'
 import { Toaster } from '@/components/ui/sonner'
 
 interface ProvidersProps {
@@ -13,8 +14,10 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <AuthProvider>
       <CartProvider>
-        {children}
-        <Toaster position="top-right" richColors />
+        <WishlistProvider>
+          {children}
+          <Toaster position="top-right" richColors />
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   )

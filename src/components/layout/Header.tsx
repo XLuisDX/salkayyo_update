@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ShoppingCart,
+  Heart,
   User,
   Menu,
   Sun,
@@ -20,6 +21,7 @@ import { useTheme } from 'next-themes'
 import { Link, usePathname } from '@/i18n/routing'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -36,6 +38,7 @@ export function Header() {
   const t = useTranslations()
   const { user, logout } = useAuth()
   const { getItemCount } = useCart()
+  const { getWishlistCount } = useWishlist()
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -55,6 +58,7 @@ export function Header() {
     { href: '/products', label: t('nav.products') },
     { href: '/categories', label: t('nav.categories') },
     { href: '/wholesale', label: t('nav.wholesale') },
+    { href: '/contact', label: t('nav.contact') },
   ]
 
   const handleLogout = async () => {
@@ -62,6 +66,7 @@ export function Header() {
   }
 
   const itemCount = getItemCount()
+  const wishlistCount = getWishlistCount()
 
   return (
     <header
@@ -175,8 +180,37 @@ export function Header() {
               >
                 <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
+                <span className="sr-only">{t('common.toggleTheme')}</span>
               </Button>
+            </motion.div>
+
+            {/* Wishlist */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.32 }}
+            >
+              <Link href="/wishlist" className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full"
+                >
+                  <Heart className="h-[18px] w-[18px]" />
+                  <AnimatePresence>
+                    {wishlistCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute -top-0.5 -right-0.5 h-5 w-5 flex items-center justify-center text-[10px] font-bold rounded-full bg-accent text-accent-foreground"
+                      >
+                        {wishlistCount > 9 ? "9+" : wishlistCount}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Cart */}

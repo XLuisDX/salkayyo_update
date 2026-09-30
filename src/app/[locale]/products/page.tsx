@@ -8,6 +8,7 @@ import { CategoriesService } from '@/services/categories.service'
 import { ProductGrid } from '@/components/products/ProductGrid'
 import { ProductFilters } from '@/components/products/ProductFilters'
 import { PageHeader } from '@/components/common/PageHeader'
+import { LogoWatermarks } from '@/components/common/LogoWatermarks'
 import { debounce } from '@/lib/utils'
 
 export default function ProductsPage() {
@@ -71,21 +72,24 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="container py-8">
-      <PageHeader
-        title={t('all')}
-        description="Browse our complete collection of products"
-      />
-
-      <div className="mb-8">
-        <ProductFilters
-          filters={filters}
-          categories={categories}
-          onFilterChange={handleFilterChange}
+    <div className="relative overflow-hidden">
+      <LogoWatermarks />
+      <div className="container relative z-10 py-8">
+        <PageHeader
+          title={t('all')}
+          description={t('allSubtitle')}
         />
-      </div>
 
-      <ProductGrid products={products} loading={loading} />
+        <div className="mb-8">
+          <ProductFilters
+            filters={filters}
+            categories={categories}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
+
+        <ProductGrid products={products} loading={loading} />
+      </div>
     </div>
   )
 }

@@ -31,20 +31,22 @@ import { Product, ProductCreateData, Category } from '@/types'
 import { StorageService } from '@/services/storage.service'
 import { CategoriesService } from '@/services/categories.service'
 
-const productSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  price: z.number().min(0.01, 'Price must be greater than 0'),
-  stock: z.number().min(0, 'Stock cannot be negative'),
-  categoryId: z.string().min(1, 'Category is required'),
-  images: z.array(z.string()).min(1, 'At least one image is required'),
-  reference: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  isActive: z.boolean().optional(),
-  featured: z.boolean().optional(),
-})
+function createProductSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    title: z.string().min(1, tv('required')),
+    description: z.string().min(1, tv('required')),
+    price: z.number().min(0.01, tv('priceGreaterThanZero')),
+    stock: z.number().min(0, tv('nonNegative')),
+    categoryId: z.string().min(1, tv('required')),
+    images: z.array(z.string()).min(1, tv('atLeastOneImage')),
+    reference: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    isActive: z.boolean().optional(),
+    featured: z.boolean().optional(),
+  })
+}
 
-type ProductFormData = z.infer<typeof productSchema>
+type ProductFormData = z.infer<ReturnType<typeof createProductSchema>>
 
 interface ProductFormProps {
   open: boolean
@@ -61,6 +63,7 @@ export function ProductForm({
 }: ProductFormProps) {
   const t = useTranslations('admin')
   const tCommon = useTranslations('common')
+  const tv = useTranslations('validation')
 
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
@@ -74,7 +77,7 @@ export function ProductForm({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(createProductSchema(tv)),
     defaultValues: {
       title: '',
       description: '',
@@ -174,6 +177,7 @@ export function ProductForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="!max-w-6xl !p-0 overflow-hidden"
+        aria-describedby={undefined}
         style={{
           width: '95vw',
           height: '95vh',
@@ -229,7 +233,7 @@ export function ProductForm({
               <Input
                 id="title"
                 {...register('title')}
-                placeholder="Enter product title"
+                placeholder={t('enterProductTitlePlaceholder')}
               />
               {errors.title && (
                 <p className="text-sm text-destructive">{errors.title.message}</p>
@@ -251,7 +255,7 @@ export function ProductForm({
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Enter product description"
+              placeholder={t('enterProductDescriptionPlaceholder')}
               rows={4}
             />
             {errors.description && (

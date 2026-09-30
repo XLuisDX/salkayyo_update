@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
@@ -8,6 +7,7 @@ import { ShoppingCart, Heart, Check, Eye } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { Product } from '@/types'
 import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatPrice } from '@/lib/utils'
@@ -15,12 +15,15 @@ import { toast } from 'sonner'
 
 interface ProductCardProps {
   product: Product
+  priority?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, priority = false }: ProductCardProps) {
   const t = useTranslations('products')
+  const tWishlist = useTranslations('wishlist')
   const { addToCart, isInCart } = useCart()
-  const [isLiked, setIsLiked] = useState(false)
+  const { toggleWishlist, isInWishlist } = useWishlist()
+  const isLiked = isInWishlist(product.id)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -32,7 +35,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsLiked(!isLiked)
+    toggleWishlist(product.id)
+    toast.success(isLiked ? tWishlist('removed') : tWishlist('added'))
   }
 
   const inCart = isInCart(product.id)
@@ -50,13 +54,14 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Image Container - Clickable */}
         <Link href={`/products/${product.id}`} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-            {product.images && product.images.length > 0 ? (
+            {product.images?.[0] ? (
               <Image
                 src={product.images[0]}
                 alt={product.title}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority={priority}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">

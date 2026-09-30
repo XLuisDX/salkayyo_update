@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { getErrorMessage } from '@/lib/utils'
+import { getErrorMessage, isExpectedAuthError } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -23,20 +23,24 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
-})
+function createForgotPasswordSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    email: z.string().email(tv('email')),
+  })
+}
 
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+type ForgotPasswordFormValues = z.infer<ReturnType<typeof createForgotPasswordSchema>>
 
 export function ForgotPasswordForm() {
   const t = useTranslations('auth')
+  const tCommon = useTranslations('common')
+  const tv = useTranslations('validation')
   const { resetPassword } = useAuth()
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
 
   const form = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
+    resolver: zodResolver(createForgotPasswordSchema(tv)),
     defaultValues: {
       email: '',
     },
@@ -50,7 +54,9 @@ export function ForgotPasswordForm() {
       setSent(true)
       toast.success(t('passwordResetSent'))
     } catch (error: unknown) {
-      console.error('Reset password error:', error)
+      if (!isExpectedAuthError(error)) {
+        console.error('Reset password error:', error)
+      }
       toast.error(getErrorMessage(error))
     } finally {
       setLoading(false)
@@ -68,12 +74,12 @@ export function ForgotPasswordForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">{t('resetPassword')}</CardTitle>
             <CardDescription>
-              Check your email for a password reset link
+              {t('checkEmailForReset')}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-muted-foreground mb-4">
-              We&apos;ve sent a password reset link to your email address.
+              {t('resetLinkSentDescription')}
             </p>
             <Link href="/login">
               <Button variant="outline">
@@ -97,7 +103,7 @@ export function ForgotPasswordForm() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{t('resetPassword')}</CardTitle>
           <CardDescription>
-            Enter your email to receive a password reset link
+            {t('enterEmailForReset')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -129,7 +135,7 @@ export function ForgotPasswordForm() {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    {tCommon('loading')}
                   </>
                 ) : (
                   t('sendResetLink')

@@ -21,22 +21,26 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { toast } from 'sonner'
+import { isExpectedAuthError } from '@/lib/utils'
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
+function createLoginSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    email: z.string().email(tv('email')),
+    password: z.string().min(6, tv('minLength', { min: 6 })),
+  })
+}
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>
 
 export function LoginForm() {
   const t = useTranslations('auth')
+  const tv = useTranslations('validation')
   const router = useRouter()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(tv)),
     defaultValues: {
       email: '',
       password: '',
@@ -51,7 +55,9 @@ export function LoginForm() {
       toast.success(t('loginSuccess'))
       router.push('/')
     } catch (error) {
-      console.error('Login error:', error)
+      if (!isExpectedAuthError(error)) {
+        console.error('Login error:', error)
+      }
       const firebaseError = error as { code?: string; message?: string }
       if (firebaseError.code === 'auth/invalid-credential') {
         toast.error(t('invalidCredentials'))
@@ -76,15 +82,15 @@ export function LoginForm() {
             <Image
               src="/favicon.png"
               alt="Saklayyo"
-              width={120}
-              height={50}
+              width={48}
+              height={48}
               className="dark:hidden mx-auto"
             />
             <Image
               src="/logo-email.png"
               alt="Saklayyo"
-              width={120}
-              height={40}
+              width={48}
+              height={48}
               className="hidden dark:block mx-auto"
             />
           </Link>
@@ -92,7 +98,7 @@ export function LoginForm() {
             {t('login')}
           </h1>
           <p className="text-muted-foreground text-lg">
-            Enter your credentials to continue
+            {t('enterCredentials')}
           </p>
         </motion.div>
 
@@ -144,7 +150,7 @@ export function LoginForm() {
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           type="password"
-                          placeholder="Enter your password"
+                          placeholder={t('enterPasswordPlaceholder')}
                           className="h-13 pl-12 pr-4 rounded-xl bg-muted/50 border-0 focus-visible:ring-accent"
                           {...field}
                         />

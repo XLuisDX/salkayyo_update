@@ -27,38 +27,43 @@ import {
 } from '@/components/ui/form'
 import { toast } from 'sonner'
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-})
+function createProfileSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    name: z.string().min(2, tv('minLength', { min: 2 })),
+  })
+}
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(6, 'Password must be at least 6 characters'),
-  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
+function createPasswordSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    currentPassword: z.string().min(6, tv('minLength', { min: 6 })),
+    newPassword: z.string().min(6, tv('minLength', { min: 6 })),
+    confirmPassword: z.string(),
+  }).refine((data) => data.newPassword === data.confirmPassword, {
+    message: tv('passwordMatch'),
+    path: ['confirmPassword'],
+  })
+}
 
-type ProfileFormValues = z.infer<typeof profileSchema>
-type PasswordFormValues = z.infer<typeof passwordSchema>
+type ProfileFormValues = z.infer<ReturnType<typeof createProfileSchema>>
+type PasswordFormValues = z.infer<ReturnType<typeof createPasswordSchema>>
 
 export default function ProfilePage() {
   const t = useTranslations('profile')
+  const tv = useTranslations('validation')
   const router = useRouter()
   const { user, loading: authLoading, updateProfile, changePassword } = useAuth()
   const [profileLoading, setProfileLoading] = useState(false)
   const [passwordLoading, setPasswordLoading] = useState(false)
 
   const profileForm = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(createProfileSchema(tv)),
     defaultValues: {
       name: '',
     },
   })
 
   const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(createPasswordSchema(tv)),
     defaultValues: {
       currentPassword: '',
       newPassword: '',

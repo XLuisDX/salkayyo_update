@@ -66,17 +66,17 @@ export default function OrdersPage() {
     <div className="container py-8">
       <PageHeader
         title={t('title')}
-        description="View and track your orders"
+        description={t('subtitle')}
       />
 
       {orders.length === 0 ? (
         <EmptyState
           icon={Package}
           title={t('noOrders')}
-          description="Start shopping to see your orders here"
+          description={t('emptyDescription')}
           action={
             <Link href="/products">
-              <Button>Browse Products</Button>
+              <Button>{t('browseProducts')}</Button>
             </Link>
           }
         />

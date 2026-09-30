@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { Package, Mail, Phone, Building, Loader2, CheckCircle } from 'lucide-react'
 import { PageHeader } from '@/components/common/PageHeader'
+import { LogoWatermarks } from '@/components/common/LogoWatermarks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,23 +23,26 @@ import {
 } from '@/components/ui/form'
 import { toast } from 'sonner'
 
-const wholesaleSchema = z.object({
-  companyName: z.string().min(2, 'Company name is required'),
-  contactName: z.string().min(2, 'Contact name is required'),
-  email: z.string().email('Valid email is required'),
-  phone: z.string().min(7, 'Valid phone is required'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-})
+function createWholesaleSchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    companyName: z.string().min(2, tv('required')),
+    contactName: z.string().min(2, tv('required')),
+    email: z.string().email(tv('email')),
+    phone: z.string().min(7, tv('phone')),
+    message: z.string().min(10, tv('minLength', { min: 10 })),
+  })
+}
 
-type WholesaleFormValues = z.infer<typeof wholesaleSchema>
+type WholesaleFormValues = z.infer<ReturnType<typeof createWholesaleSchema>>
 
 export default function WholesalePage() {
   const t = useTranslations('wholesale')
+  const tv = useTranslations('validation')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const form = useForm<WholesaleFormValues>({
-    resolver: zodResolver(wholesaleSchema),
+    resolver: zodResolver(createWholesaleSchema(tv)),
     defaultValues: {
       companyName: '',
       contactName: '',
@@ -54,7 +58,7 @@ export default function WholesalePage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    toast.success('Quote request submitted successfully!')
+    toast.success(t('quoteSubmitted'))
     setSubmitted(true)
     setLoading(false)
   }
@@ -62,28 +66,30 @@ export default function WholesalePage() {
   const benefits = [
     {
       icon: Package,
-      title: 'Bulk Discounts',
-      description: 'Get significant discounts on large orders',
+      title: t('benefitBulkTitle'),
+      description: t('benefitBulkDescription'),
     },
     {
       icon: Building,
-      title: 'Business Support',
-      description: 'Dedicated account manager for your business',
+      title: t('benefitSupportTitle'),
+      description: t('benefitSupportDescription'),
     },
     {
       icon: Mail,
-      title: 'Custom Quotes',
-      description: 'Tailored pricing based on your needs',
+      title: t('benefitQuotesTitle'),
+      description: t('benefitQuotesDescription'),
     },
     {
       icon: Phone,
-      title: 'Priority Support',
-      description: '24/7 customer support for wholesale partners',
+      title: t('benefitPriorityTitle'),
+      description: t('benefitPriorityDescription'),
     },
   ]
 
   return (
-    <div className="container py-8">
+    <div className="relative overflow-hidden">
+      <LogoWatermarks />
+      <div className="container relative z-10 py-8">
       <PageHeader
         title={t('title')}
         description={t('subtitle')}
@@ -97,7 +103,7 @@ export default function WholesalePage() {
           className="space-y-8"
         >
           <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border p-8">
-            <h2 className="text-2xl font-bold mb-4">Why Partner With Us?</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('whyPartner')}</h2>
             <p className="text-muted-foreground mb-8">{t('description')}</p>
 
             <div className="grid sm:grid-cols-2 gap-6">
@@ -130,16 +136,16 @@ export default function WholesalePage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b">
-                  <span>Standard Products</span>
-                  <span className="font-semibold">50+ units</span>
+                  <span>{t('standardProducts')}</span>
+                  <span className="font-semibold">{t('standardUnits')}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b">
-                  <span>Custom Products</span>
-                  <span className="font-semibold">100+ units</span>
+                  <span>{t('customProducts')}</span>
+                  <span className="font-semibold">{t('customUnits')}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span>Mixed Orders</span>
-                  <span className="font-semibold">$1,000+ value</span>
+                  <span>{t('mixedOrders')}</span>
+                  <span className="font-semibold">{t('mixedValue')}</span>
                 </div>
               </div>
             </CardContent>
@@ -163,9 +169,9 @@ export default function WholesalePage() {
                   className="text-center py-12"
                 >
                   <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Request Submitted!</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t('requestSubmitted')}</h3>
                   <p className="text-muted-foreground">
-                    We&apos;ll get back to you within 24-48 hours with a custom quote.
+                    {t('requestSubmittedDescription')}
                   </p>
                   <Button
                     variant="outline"
@@ -175,7 +181,7 @@ export default function WholesalePage() {
                       form.reset()
                     }}
                   >
-                    Submit Another Request
+                    {t('submitAnother')}
                   </Button>
                 </motion.div>
               ) : (
@@ -186,9 +192,9 @@ export default function WholesalePage() {
                       name="companyName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company Name</FormLabel>
+                          <FormLabel>{t('companyName')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your Company Inc." {...field} />
+                            <Input placeholder={t('companyNamePlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -200,9 +206,9 @@ export default function WholesalePage() {
                       name="contactName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contact Name</FormLabel>
+                          <FormLabel>{t('contactName')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" {...field} />
+                            <Input placeholder={t('contactNamePlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -215,9 +221,9 @@ export default function WholesalePage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{t('email')}</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="you@company.com" {...field} />
+                              <Input type="email" placeholder={t('emailPlaceholder')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -229,9 +235,9 @@ export default function WholesalePage() {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone</FormLabel>
+                            <FormLabel>{t('phone')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="+1 234 567 8900" {...field} />
+                              <Input placeholder={t('phonePlaceholder')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -244,10 +250,10 @@ export default function WholesalePage() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Message</FormLabel>
+                          <FormLabel>{t('message')}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Tell us about your needs, quantity requirements, and any specific products you're interested in..."
+                              placeholder={t('messagePlaceholder')}
                               rows={5}
                               {...field}
                             />
@@ -261,7 +267,7 @@ export default function WholesalePage() {
                       {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Submitting...
+                          {t('submitting')}
                         </>
                       ) : (
                         t('requestQuote')
@@ -273,6 +279,7 @@ export default function WholesalePage() {
             </CardContent>
           </Card>
         </motion.div>
+      </div>
       </div>
     </div>
   )

@@ -19,6 +19,7 @@ export function ProductGrid({
   skeletonCount = 8,
 }: ProductGridProps) {
   const t = useTranslations('common')
+  const tProducts = useTranslations('products')
 
   if (loading) {
     return (
@@ -47,7 +48,7 @@ export function ProductGrid({
         <div className="h-20 w-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
           <Package className="h-10 w-10 text-muted-foreground/50" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">No products found</h3>
+        <h3 className="text-xl font-semibold mb-2">{tProducts('noProductsFound')}</h3>
         <p className="text-muted-foreground">{t('noResults')}</p>
       </motion.div>
     )
@@ -67,7 +68,7 @@ export function ProductGrid({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05, duration: 0.4 }}
         >
-          <ProductCard product={product} />
+          <ProductCard product={product} priority={index < 4} />
         </motion.div>
       ))}
     </motion.div>

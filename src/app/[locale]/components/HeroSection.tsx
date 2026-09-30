@@ -139,7 +139,7 @@ export function HeroSection() {
               >
                 <Image
                   src={images[currentIndex]}
-                  alt="Product Showcase"
+                  alt={t("hero.productShowcaseAlt")}
                   width={600}
                   height={1200}
                   className="w-full h-auto object-contain rounded-md"

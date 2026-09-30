@@ -11,11 +11,14 @@ interface HomePageProps {
 
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'common' })
+  const t = await getTranslations({ locale, namespace: 'seo' })
 
   return {
-    title: t('appName'),
-    description: 'Your trusted e-commerce destination for quality products',
+    title: {
+      absolute: 'Saklayyo Store',
+    },
+    description: t('siteDescription'),
+    alternates: { canonical: `/${locale}` },
   }
 }
 

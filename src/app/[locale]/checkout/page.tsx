@@ -43,7 +43,7 @@ export default function CheckoutPage() {
         <EmptyState
           icon={ShoppingCart}
           title={tCart('empty')}
-          description="Add some products to your cart to checkout"
+          description={t('emptyCartDescription')}
           action={
             <Link href="/products">
               <Button>{tCart('continueShopping')}</Button>

@@ -1,19 +1,17 @@
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, setRequestLocale } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { locales, Locale } from '@/i18n/config'
+import { SITE_URL } from '@/lib/seo'
 import { Providers } from '@/context/Providers'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Saklayyo Store',
-    template: '%s | Saklayyo Store',
-  },
-  description: 'Your trusted e-commerce destination for quality products',
+const ogLocales: Record<Locale, string> = {
+  en: 'en_US',
+  es: 'es_ES',
 }
 
 interface LocaleLayoutProps {
@@ -23,6 +21,60 @@ interface LocaleLayoutProps {
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
+}
+
+export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'seo' })
+
+  const languages: Record<string, string> = {}
+  for (const l of locales) {
+    languages[l] = `/${l}`
+  }
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: 'Saklayyo Store',
+      template: '%s | Saklayyo Store',
+    },
+    description: t('siteDescription'),
+    keywords: t('keywords').split(',').map((k) => k.trim()),
+    alternates: {
+      canonical: `/${locale}`,
+      languages,
+    },
+    icons: {
+      icon: '/favicon.png',
+      shortcut: '/favicon.png',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: 'Saklayyo Store',
+      title: {
+        default: 'Saklayyo Store',
+        template: '%s | Saklayyo Store',
+      },
+      description: t('siteDescription'),
+      locale: ogLocales[locale as Locale] ?? 'en_US',
+      images: ['/logo-email.png'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Saklayyo Store',
+      description: t('siteDescription'),
+      images: ['/logo-email.png'],
+    },
+  }
 }
 
 export default async function LocaleLayout({
@@ -39,9 +91,21 @@ export default async function LocaleLayout({
 
   const messages = await getMessages()
 
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'OnlineStore',
+    name: 'Saklayyo Store',
+    url: `${SITE_URL}/${locale}`,
+    logo: `${SITE_URL}/logo-email.png`,
+  }
+
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Providers>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">{children}</main>

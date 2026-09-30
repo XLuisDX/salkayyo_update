@@ -29,6 +29,7 @@ import { toast } from 'sonner'
 
 export default function RecipientsPage() {
   const t = useTranslations('recipients')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [recipients, setRecipients] = useState<Recipient[]>([])
@@ -64,7 +65,7 @@ export default function RecipientsPage() {
       toast.success(t('deleteSuccess'))
     } catch (error) {
       console.error('Error deleting recipient:', error)
-      toast.error('Failed to delete address')
+      toast.error(t('deleteError'))
     }
   }
 
@@ -77,10 +78,10 @@ export default function RecipientsPage() {
           isDefault: r.id === id,
         }))
       )
-      toast.success('Default address updated')
+      toast.success(t('defaultUpdated'))
     } catch (error) {
       console.error('Error setting default:', error)
-      toast.error('Failed to update default address')
+      toast.error(t('defaultUpdateError'))
     }
   }
 
@@ -110,7 +111,7 @@ export default function RecipientsPage() {
         <EmptyState
           icon={MapPin}
           title={t('noRecipients')}
-          description="Add a shipping address to speed up checkout"
+          description={t('emptyDescription')}
           action={
             <Link href="/recipients/new">
               <Button className="gap-2">
@@ -179,12 +180,12 @@ export default function RecipientsPage() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(recipient.id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Delete
+                              {tCommon('delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

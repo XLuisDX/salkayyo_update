@@ -179,7 +179,7 @@ export default function AdminCategoriesPage() {
           </div>
           <h3 className="font-semibold text-lg">{t('noCategories')}</h3>
           <p className="text-muted-foreground mt-1 text-sm max-w-xs">
-            {searchTerm ? 'Try a different search term' : 'Create your first category to get started'}
+            {searchTerm ? t('tryDifferentSearch') : t('createFirstCategory')}
           </p>
           {!searchTerm && (
             <Button onClick={() => setFormOpen(true)} className="mt-4 gap-2">
@@ -232,6 +232,7 @@ export default function AdminCategoriesPage() {
                           src={category.image}
                           alt={category.name}
                           fill
+                          sizes="56px"
                           className="object-cover"
                         />
                       ) : (

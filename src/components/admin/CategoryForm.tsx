@@ -20,14 +20,16 @@ import { ImageUpload } from '@/components/admin/ImageUpload'
 import { Category, CategoryCreateData } from '@/types'
 import { StorageService } from '@/services/storage.service'
 
-const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  slug: z.string().min(1, 'Slug is required'),
-  description: z.string().optional(),
-  image: z.string().optional(),
-})
+function createCategorySchema(tv: ReturnType<typeof useTranslations>) {
+  return z.object({
+    name: z.string().min(1, tv('required')),
+    slug: z.string().min(1, tv('required')),
+    description: z.string().optional(),
+    image: z.string().optional(),
+  })
+}
 
-type CategoryFormData = z.infer<typeof categorySchema>
+type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>
 
 interface CategoryFormProps {
   open: boolean
@@ -53,6 +55,7 @@ export function CategoryForm({
 }: CategoryFormProps) {
   const t = useTranslations('admin')
   const tCommon = useTranslations('common')
+  const tv = useTranslations('validation')
 
   const {
     register,
@@ -62,7 +65,7 @@ export function CategoryForm({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
+    resolver: zodResolver(createCategorySchema(tv)),
     defaultValues: {
       name: '',
       slug: '',
@@ -111,7 +114,7 @@ export function CategoryForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
             {category ? t('editCategory') : t('newCategory')}
@@ -135,7 +138,7 @@ export function CategoryForm({
             <Input
               id="name"
               {...register('name')}
-              placeholder="Enter category name"
+              placeholder={t('enterCategoryNamePlaceholder')}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -161,7 +164,7 @@ export function CategoryForm({
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Enter category description"
+              placeholder={t('enterCategoryDescriptionPlaceholder')}
               rows={3}
             />
           </div>

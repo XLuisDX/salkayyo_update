@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { Category, Product } from '@/types'
 import { CategoriesService } from '@/services/categories.service'
@@ -14,6 +15,7 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function CategoryPage() {
   const params = useParams()
+  const t = useTranslations('categories')
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,9 +49,9 @@ export default function CategoryPage() {
   if (!category) {
     return (
       <div className="container py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Category not found</h1>
+        <h1 className="text-2xl font-bold mb-4">{t('notFound')}</h1>
         <Link href="/categories">
-          <Button>Back to Categories</Button>
+          <Button>{t('backToCategories')}</Button>
         </Link>
       </div>
     )
@@ -60,13 +62,13 @@ export default function CategoryPage() {
       <Link href="/categories">
         <Button variant="ghost" className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" />
-          All Categories
+          {t('all')}
         </Button>
       </Link>
 
       <PageHeader
         title={category.name}
-        description={category.description || `Browse all products in ${category.name}`}
+        description={category.description || t('browseAllInCategory', { name: category.name })}
       />
 
       <ProductGrid products={products} />

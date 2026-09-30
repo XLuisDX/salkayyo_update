@@ -230,11 +230,12 @@ export default function AdminProductsPage() {
               >
                 {/* Square Image Section */}
                 <div className="aspect-square relative overflow-hidden bg-zinc-50 dark:bg-zinc-900">
-                  {product.images && product.images.length > 0 ? (
+                  {product.images?.[0] ? (
                     <Image
                       src={product.images[0]}
                       alt={product.title}
                       fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
@@ -247,7 +248,7 @@ export default function AdminProductsPage() {
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                     {product.featured && (
                       <Badge className="bg-amber-400 hover:bg-amber-400 text-black border-none rounded-full px-3">
-                        <Star className="h-3 w-3 fill-current mr-1" /> Destacado
+                        <Star className="h-3 w-3 fill-current mr-1" /> {t('productFeatured')}
                       </Badge>
                     )}
                     <Badge
@@ -340,6 +341,7 @@ export default function AdminProductsPage() {
                               src={product.images[0]}
                               alt={product.title}
                               fill
+                              sizes="48px"
                               className="object-cover"
                             />
                           ) : (

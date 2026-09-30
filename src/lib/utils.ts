@@ -66,3 +66,22 @@ export function getErrorMessage(error: unknown): string {
   }
   return 'An unknown error occurred'
 }
+
+// Firebase Auth error codes caused by normal user mistakes (wrong password, taken
+// email, etc.), not application bugs. Used to avoid logging them as console errors.
+const EXPECTED_AUTH_ERROR_CODES = new Set([
+  'auth/invalid-credential',
+  'auth/wrong-password',
+  'auth/user-not-found',
+  'auth/invalid-email',
+  'auth/missing-password',
+  'auth/email-already-in-use',
+  'auth/weak-password',
+  'auth/too-many-requests',
+  'auth/user-disabled',
+])
+
+export function isExpectedAuthError(error: unknown): boolean {
+  const code = (error as { code?: string })?.code
+  return !!code && EXPECTED_AUTH_ERROR_CODES.has(code)
+}

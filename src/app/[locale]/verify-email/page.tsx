@@ -49,29 +49,28 @@ export default function VerifyEmailPage() {
               )}
             </div>
             <CardTitle className="text-2xl">
-              {isVerified ? 'Email Verified!' : t('verifyEmail')}
+              {isVerified ? t('emailVerified') : t('verifyEmail')}
             </CardTitle>
             <CardDescription>
               {isVerified
-                ? 'Your email has been verified successfully.'
-                : `We've sent a verification link to ${user?.email || 'your email'}`}
+                ? t('emailVerifiedDescription')
+                : t('verificationLinkSentTo', { email: user?.email || t('email') })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isVerified ? (
               <Link href="/" className="block">
-                <Button className="w-full">Go to Home</Button>
+                <Button className="w-full">{t('goToHome')}</Button>
               </Link>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground text-center">
-                  Click the link in your email to verify your account.
-                  If you don&apos;t see it, check your spam folder.
+                  {t('checkVerificationInstructions')}
                 </p>
 
                 {sent ? (
                   <div className="text-center text-sm text-green-600 dark:text-green-400">
-                    Verification email sent! Check your inbox.
+                    {t('verificationEmailSentCheckInbox')}
                   </div>
                 ) : (
                   <Button
@@ -83,7 +82,7 @@ export default function VerifyEmailPage() {
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending...
+                        {t('sending')}
                       </>
                     ) : (
                       t('resendVerification')
