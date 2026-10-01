@@ -34,7 +34,7 @@ export function CategoriesSection() {
   return (
     <section className="relative py-20 md:py-28 bg-muted/30 overflow-hidden">
       {/* Animated Background Elements */}
-      <LogoWatermarks />
+      <LogoWatermarks priority />
       <div className="absolute inset-0 pointer-events-none">
         {/* Floating Circles */}
         <motion.div
@@ -140,10 +140,7 @@ export function CategoriesSection() {
         </motion.div>
 
         {loading ? (
-          <div
-            className="grid justify-center gap-4 md:gap-6"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 200px))' }}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="aspect-square rounded-2xl" />
             ))}
@@ -153,10 +150,7 @@ export function CategoriesSection() {
             <p className="text-muted-foreground">{t('noCategories')}</p>
           </div>
         ) : (
-          <div
-            className="grid justify-center gap-4 md:gap-6"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 200px))' }}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}

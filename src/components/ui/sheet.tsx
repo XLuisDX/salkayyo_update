@@ -69,6 +69,7 @@ const SheetContent = React.forwardRef<
     >
       <VisuallyHidden.Root>
         <SheetPrimitive.Title>Menu</SheetPrimitive.Title>
+        <SheetPrimitive.Description>Navigation menu content</SheetPrimitive.Description>
       </VisuallyHidden.Root>
       {children}
       {!hideCloseButton && (

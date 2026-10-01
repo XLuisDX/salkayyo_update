@@ -16,6 +16,10 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    function isEmailVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+
     // Users collection
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
@@ -40,7 +44,7 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow read: if isAuthenticated() &&
         (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isAuthenticated() &&
+      allow create: if isEmailVerified() &&
         request.resource.data.userId == request.auth.uid;
       allow update: if isAdmin() ||
         (isOwner(resource.data.userId) &&
@@ -56,6 +60,11 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAuthenticated() &&
         resource.data.userId == request.auth.uid;
+    }
+
+    // Wishlists collection (one doc per user, doc ID == userId)
+    match /wishlists/{userId} {
+      allow read, write: if isOwner(userId);
     }
 
     // Default deny

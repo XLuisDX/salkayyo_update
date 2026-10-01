@@ -24,9 +24,18 @@ function getErrorMessage(error: unknown): string {
 
 const db = admin.firestore()
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2023-10-16',
 })
-const resend = new Resend(process.env.RESEND_API_KEY)
+
+// Lazily constructed: avoids crashing Firebase's static source analysis
+// (which requires this module without the real env/secrets present).
+let resendClient: Resend | null = null
+function getResend(): Resend {
+  if (!resendClient) {
+    resendClient = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resendClient
+}
 
 const APP_URL = process.env.APP_URL || 'https://saklayyo.com'
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@saklayyo.com'
@@ -117,7 +126,7 @@ export const onOrderPaid = functions.firestore
 
         if (userData?.email) {
           // Send confirmation email to customer
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
             subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
@@ -137,7 +146,7 @@ export const onOrderPaid = functions.firestore
           console.log(`Confirmation email sent for order ${orderId}`)
 
           // Notify admin about new order
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: ADMIN_EMAIL,
             subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${afterData.total.toFixed(2)}`,
@@ -181,7 +190,7 @@ export const onOrderShipped = functions.firestore
         const userData = userDoc.data()
 
         if (userData?.email) {
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Shipped! 📦`,
@@ -225,7 +234,7 @@ export const onOrderDelivered = functions.firestore
             day: 'numeric',
           })
 
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Been Delivered! 🎉`,
@@ -259,7 +268,7 @@ export const onOrderCancelled = functions.firestore
         const userData = userDoc.data()
 
         if (userData?.email) {
-          await resend.emails.send({
+          await getResend().emails.send({
             from: 'Saklayyo Store <orders@saklayyo.com>',
             to: userData.email,
             subject: `Order #${orderId.slice(0, 8).toUpperCase()} Has Been Cancelled`,
@@ -316,7 +325,7 @@ export const onUserCreated = functions.firestore
 
     if (userData?.email) {
       try {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'Saklayyo Store <welcome@saklayyo.com>',
           to: userData.email,
           subject: 'Welcome to Saklayyo Store! 🎉',

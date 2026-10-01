@@ -52,15 +52,28 @@ export default function WholesalePage() {
     },
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: WholesaleFormValues) => {
     setLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const response = await fetch('/api/email/wholesale-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
 
-    toast.success(t('quoteSubmitted'))
-    setSubmitted(true)
-    setLoading(false)
+      if (!response.ok) {
+        throw new Error('Failed to submit wholesale request')
+      }
+
+      toast.success(t('quoteSubmitted'))
+      setSubmitted(true)
+    } catch (error) {
+      console.error('Wholesale request error:', error)
+      toast.error(t('requestError'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   const benefits = [

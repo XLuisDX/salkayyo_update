@@ -150,6 +150,26 @@ export interface RecipientCreateData {
   isDefault?: boolean
 }
 
+// Wholesale Types
+export interface WholesaleRequest {
+  id: string
+  companyName: string
+  contactName: string
+  email: string
+  phone: string
+  message: string
+  status: 'new' | 'contacted' | 'closed'
+  createdAt: Date
+}
+
+export interface WholesaleRequestCreateData {
+  companyName: string
+  contactName: string
+  email: string
+  phone: string
+  message: string
+}
+
 // Cart Types
 export interface CartItem {
   product: Product
@@ -169,14 +189,6 @@ export interface ApiResponse<T> {
   data?: T
   error?: string
   message?: string
-}
-
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
 }
 
 // Email Types

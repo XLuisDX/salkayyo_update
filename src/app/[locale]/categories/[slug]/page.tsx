@@ -27,7 +27,9 @@ export default function CategoryPage() {
         setCategory(categoryData)
 
         if (categoryData) {
-          const productsData = await ProductsService.getByCategory(categoryData.id)
+          // No "Load more" control on this page yet — bounded to a generous cap
+          // instead of an unlimited fetch. See progress.md for the follow-up.
+          const productsData = await ProductsService.getByCategory(categoryData.id, 60)
           setProducts(productsData)
         }
       } catch (error) {

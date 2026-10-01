@@ -15,6 +15,7 @@
     "sortBy": "Sort by",
     "noResults": "No results found",
     "viewAll": "View all",
+    "loadMore": "Load More",
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
@@ -24,7 +25,8 @@
     "yes": "Yes",
     "no": "No",
     "changeLanguage": "Change language",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "backToHome": "Back to home"
   },
   "nav": {
     "home": "Home",
@@ -62,6 +64,9 @@
     "resendVerification": "Resend Verification",
     "enterCode": "Enter verification code",
     "verify": "Verify",
+    "verificationCode": "Verification Code",
+    "verificationCodePlaceholder": "Paste the code from your email",
+    "invalidVerificationCode": "Invalid or expired code. Please request a new one.",
     "passwordResetSent": "Password reset email sent",
     "loginSuccess": "Login successful",
     "registerSuccess": "Registration successful. Please verify your email.",
@@ -77,9 +82,9 @@
     "enterEmailForReset": "Enter your email to receive a password reset link",
     "emailVerified": "Email Verified!",
     "emailVerifiedDescription": "Your email has been verified successfully.",
-    "verificationLinkSentTo": "We've sent a verification link to {email}",
+    "verificationLinkSentTo": "We've sent a verification code to {email}",
     "goToHome": "Go to Home",
-    "checkVerificationInstructions": "Click the link in your email to verify your account. If you don't see it, check your spam folder.",
+    "checkVerificationInstructions": "Enter the code from your email below to verify your account. If you don't see it, check your spam folder.",
     "verificationEmailSentCheckInbox": "Verification email sent! Check your inbox.",
     "sending": "Sending..."
   },
@@ -308,7 +313,8 @@
     "message": "Message",
     "messagePlaceholder": "Tell us about your needs, quantity requirements, and any specific products you're interested in...",
     "submitting": "Submitting...",
-    "quoteSubmitted": "Quote request submitted successfully!"
+    "quoteSubmitted": "Quote request submitted successfully!",
+    "requestError": "Something went wrong submitting your request. Please try again."
   },
   "footer": {
     "rights": "All rights reserved",
@@ -444,6 +450,7 @@
     "status": "Status",
     "createdAt": "Created At",
     "updatedAt": "Updated At",
+    "orderDetailsDescription": "View and update the status of this order.",
     "accessDenied": "Access Denied",
     "accessDeniedMessage": "You don't have permission to access this area.",
     "backToHome": "Back to Home",

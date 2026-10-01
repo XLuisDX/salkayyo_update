@@ -2,7 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendEmailVerification,
+  applyActionCode,
   updateProfile,
   User as FirebaseUser,
   onAuthStateChanged,
@@ -48,7 +48,7 @@ export class AuthService {
       createdAt: serverTimestamp(),
     })
 
-    await sendEmailVerification(firebaseUser)
+    await AuthService.sendVerificationEmail(email)
 
     return {
       id: firebaseUser.uid,
@@ -108,10 +108,40 @@ export class AuthService {
 
   static async resendVerificationEmail(): Promise<void> {
     const user = auth.currentUser
-    if (!user) {
+    if (!user?.email) {
       throw new Error('No user logged in')
     }
-    await sendEmailVerification(user)
+    await AuthService.sendVerificationEmail(user.email)
+  }
+
+  static async sendVerificationEmail(email: string): Promise<void> {
+    const response = await fetch('/api/auth/send-verification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      const { error } = await response.json()
+      throw new Error(error?.message || 'Failed to send verification email')
+    }
+  }
+
+  static async verifyEmailCode(code: string): Promise<void> {
+    // The code is a long opaque Firebase token (~50+ chars) copy-pasted from an
+    // email — some email clients wrap it visually and the paste can pick up a
+    // stray space/line break in the middle. Strip all whitespace to recover it.
+    const cleanCode = code.replace(/\s+/g, '')
+    await applyActionCode(auth, cleanCode)
+
+    const user = auth.currentUser
+    if (user) {
+      await user.reload()
+      // Force a fresh ID token so the new email_verified claim is immediately
+      // available to Firestore security rules (e.g. the checkout order-create rule).
+      await user.getIdToken(true)
+      await updateDoc(doc(db, 'users', user.uid), { verified: true })
+    }
   }
 
   static async getCurrentUser(): Promise<User | null> {

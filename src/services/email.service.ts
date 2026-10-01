@@ -12,6 +12,8 @@ import {
   OrderCancelledEmail,
   NewOrderAdminEmail,
   NewsletterWelcomeEmail,
+  WholesaleRequestAdminEmail,
+  WholesaleRequestConfirmationEmail,
 } from '@/emails'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -61,9 +63,9 @@ export async function sendWelcomeEmail(email: string, name: string) {
 export async function sendVerificationEmail(
   email: string,
   name: string,
-  verificationLink: string
+  code: string
 ) {
-  const html = await render(VerifyEmail({ name, verificationLink }))
+  const html = await render(VerifyEmail({ name, code }))
 
   return resend.emails.send({
     from: FROM_ADDRESSES.noreply,
@@ -288,6 +290,56 @@ export async function sendNewsletterWelcomeEmail(email: string) {
 }
 
 // ============================================
+// WHOLESALE
+// ============================================
+
+export async function sendWholesaleRequestAdminEmail(
+  companyName: string,
+  contactName: string,
+  email: string,
+  phone: string,
+  message: string
+) {
+  const html = await render(
+    WholesaleRequestAdminEmail({
+      companyName,
+      contactName,
+      email,
+      phone,
+      message,
+      appUrl: APP_URL,
+    })
+  )
+
+  return resend.emails.send({
+    from: FROM_ADDRESSES.support,
+    to: ADMIN_EMAIL,
+    replyTo: email,
+    subject: `🏢 New Wholesale Request - ${companyName}`,
+    html,
+  })
+}
+
+export async function sendWholesaleRequestConfirmationEmail(
+  email: string,
+  contactName: string
+) {
+  const html = await render(
+    WholesaleRequestConfirmationEmail({
+      contactName,
+      appUrl: APP_URL,
+    })
+  )
+
+  return resend.emails.send({
+    from: FROM_ADDRESSES.support,
+    to: email,
+    subject: "We've Received Your Wholesale Request - Saklayyo Store",
+    html,
+  })
+}
+
+// ============================================
 // CONTACT FORM
 // ============================================
 
@@ -336,6 +388,9 @@ export const emailService = {
   sendNewOrderAdminNotification,
   // Marketing
   sendNewsletterWelcomeEmail,
+  // Wholesale
+  sendWholesaleRequestAdminEmail,
+  sendWholesaleRequestConfirmationEmail,
   // Contact
   sendContactFormEmail,
 }

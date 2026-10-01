@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { getAdminDb } from '@/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/firebase/admin'
 import { CartItem, RecipientData } from '@/types'
 import { getErrorMessage } from '@/lib/utils'
 
@@ -28,6 +28,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing recipient data or user ID' },
         { status: 400 }
+      )
+    }
+
+    const userRecord = await getAdminAuth().getUser(userId)
+    if (!userRecord.emailVerified) {
+      return NextResponse.json(
+        { error: 'Please verify your email before placing an order' },
+        { status: 403 }
       )
     }
 

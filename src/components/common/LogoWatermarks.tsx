@@ -5,9 +5,10 @@ import { motion } from 'framer-motion'
 
 interface LogoWatermarksProps {
   className?: string
+  priority?: boolean
 }
 
-export function LogoWatermarks({ className = '' }: LogoWatermarksProps) {
+export function LogoWatermarks({ className = '', priority = false }: LogoWatermarksProps) {
   return (
     <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
       <motion.div
@@ -15,16 +16,16 @@ export function LogoWatermarks({ className = '' }: LogoWatermarksProps) {
         animate={{ rotate: [0, 3, 0], scale: [1, 1.02, 1] }}
         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <Image src="/favicon.png" alt="" width={200} height={200} className="select-none dark:hidden" />
-        <Image src="/negativo.png" alt="" width={200} height={200} className="select-none hidden dark:block" />
+        <Image src="/favicon.png" alt="" width={200} height={200} className="select-none dark:hidden" priority={priority} />
+        <Image src="/negativo.png" alt="" width={200} height={200} className="select-none hidden dark:block" priority={priority} />
       </motion.div>
       <motion.div
         className="absolute bottom-[10%] left-[5%] opacity-[0.02] dark:opacity-[0.015]"
         animate={{ rotate: [0, -2, 0] }}
         transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <Image src="/favicon.png" alt="" width={150} height={150} className="select-none dark:hidden" />
-        <Image src="/negativo.png" alt="" width={150} height={150} className="select-none hidden dark:block" />
+        <Image src="/favicon.png" alt="" width={150} height={150} className="select-none dark:hidden" priority={priority} />
+        <Image src="/negativo.png" alt="" width={150} height={150} className="select-none hidden dark:block" priority={priority} />
       </motion.div>
     </div>
   )

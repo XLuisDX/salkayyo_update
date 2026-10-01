@@ -20,6 +20,7 @@ interface AuthContextType {
   logout: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
   resendVerification: () => Promise<void>
+  verifyEmailCode: (code: string) => Promise<void>
   updateProfile: (data: Partial<User>) => Promise<void>
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
@@ -79,6 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await AuthService.resendVerificationEmail()
   }
 
+  const verifyEmailCode = async (code: string): Promise<void> => {
+    await AuthService.verifyEmailCode(code)
+    setUser((prev) => (prev ? { ...prev, verified: true } : prev))
+  }
+
   const updateProfile = async (data: Partial<User>): Promise<void> => {
     if (!user) throw new Error('No user logged in')
     await AuthService.updateUserProfile(user.id, data)
@@ -103,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         resetPassword,
         resendVerification,
+        verifyEmailCode,
         updateProfile,
         changePassword,
       }}

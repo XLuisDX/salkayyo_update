@@ -438,7 +438,54 @@ export function Header() {
                   </nav>
 
                   {/* Footer Actions */}
-                  {!user && (
+                  {user ? (
+                    <div className="px-6 pb-6 pt-2 border-t space-y-1">
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+                      >
+                        <User className="h-4 w-4" />
+                        {t("nav.profile")}
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+                      >
+                        <Package className="h-4 w-4" />
+                        {t("nav.orders")}
+                      </Link>
+                      <Link
+                        href="/recipients"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+                      >
+                        <MapPin className="h-4 w-4" />
+                        {t("nav.recipients")}
+                      </Link>
+                      {user.role === "admin" && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-bold text-primary hover:bg-primary/10 transition-all"
+                        >
+                          <Shield className="h-4 w-4" />
+                          {t("admin.dashboard")}
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          handleLogout()
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 rounded-2xl text-base font-bold text-destructive hover:bg-destructive/10 transition-all"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        {t("nav.logout")}
+                      </button>
+                    </div>
+                  ) : (
                     <div className="p-6 pt-4 border-t space-y-3">
                       <Link
                         href="/login"

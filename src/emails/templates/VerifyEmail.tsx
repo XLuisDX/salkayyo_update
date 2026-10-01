@@ -5,19 +5,19 @@ import {
   Text,
 } from '@react-email/components'
 import * as React from 'react'
-import { EmailBase, EmailButton } from '../components'
+import { EmailBase } from '../components'
 
 interface VerifyEmailProps {
   name: string
-  verificationLink: string
+  code: string
 }
 
 export const VerifyEmail = ({
   name,
-  verificationLink,
+  code,
 }: VerifyEmailProps) => {
   return (
-    <EmailBase preview="Verify your email address for Saklayyo Store">
+    <EmailBase preview={`Your Saklayyo verification code: ${code}`}>
       {/* Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>📧 Email Verification</Text>
@@ -33,34 +33,24 @@ export const VerifyEmail = ({
       </Text>
 
       <Text style={paragraph}>
-        Thanks for signing up for Saklayyo Store! Please verify your email
-        address to complete your registration and unlock all features.
+        Thanks for signing up for Saklayyo Store! Enter this code on the
+        verification page to complete your registration and unlock all features.
       </Text>
 
-      {/* CTA */}
-      <Section style={ctaSection}>
-        <EmailButton href={verificationLink}>
-          Verify Email Address
-        </EmailButton>
+      {/* Code */}
+      <Section style={codeBox}>
+        <Text style={codeLabel}>YOUR VERIFICATION CODE</Text>
+        <Text style={codeText}>{code}</Text>
       </Section>
-
-      <Hr style={divider} />
-
-      {/* Alternative Link */}
-      <Text style={smallText}>
-        If the button doesn&apos;t work, copy and paste this link into your browser:
-      </Text>
-      <Text style={linkText}>
-        {verificationLink}
-      </Text>
 
       <Hr style={divider} />
 
       {/* Security Notice */}
       <Section style={noticeBox}>
         <Text style={noticeText}>
-          🔒 This link will expire in 24 hours. If you didn&apos;t create an account
-          with Saklayyo Store, you can safely ignore this email.
+          🔒 This code is only valid for a short time. If it doesn&apos;t work,
+          request a new one from the verification page. If you didn&apos;t create
+          an account with Saklayyo Store, you can safely ignore this email.
         </Text>
       </Section>
     </EmailBase>
@@ -101,31 +91,37 @@ const paragraph = {
   margin: '0 0 16px 0',
 }
 
-const ctaSection = {
-  textAlign: 'center' as const,
-  margin: '32px 0',
-}
-
 const divider = {
   borderColor: '#262626',
   margin: '32px 0',
 }
 
-const smallText = {
-  color: '#666666',
-  fontSize: '13px',
-  lineHeight: '20px',
-  margin: '0 0 8px 0',
+const codeBox = {
+  backgroundColor: '#0a0a0a',
+  padding: '32px',
+  borderRadius: '16px',
+  border: '2px solid #99FF00',
   textAlign: 'center' as const,
+  margin: '32px 0',
 }
 
-const linkText = {
+const codeLabel = {
   color: '#99FF00',
-  fontSize: '12px',
-  lineHeight: '20px',
+  fontSize: '11px',
+  fontWeight: '700',
+  letterSpacing: '2px',
+  margin: '0 0 12px 0',
+}
+
+const codeText = {
+  color: '#ffffff',
+  fontSize: '18px',
+  fontFamily: 'monospace',
+  fontWeight: '700',
+  letterSpacing: '0.5px',
   margin: '0',
-  textAlign: 'center' as const,
   wordBreak: 'break-all' as const,
+  lineHeight: '26px',
 }
 
 const noticeBox = {

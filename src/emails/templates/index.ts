@@ -15,3 +15,7 @@ export { NewOrderAdminEmail } from './NewOrderAdminEmail'
 
 // Marketing Emails
 export { NewsletterWelcomeEmail } from './NewsletterWelcomeEmail'
+
+// Wholesale Emails
+export { WholesaleRequestAdminEmail } from './WholesaleRequestAdminEmail'
+export { WholesaleRequestConfirmationEmail } from './WholesaleRequestConfirmationEmail'

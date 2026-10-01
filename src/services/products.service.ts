@@ -3,21 +3,33 @@ import {
   doc,
   getDoc,
   getDocs,
+  getCountFromServer,
   addDoc,
   updateDoc,
   deleteDoc,
   query,
   where,
+  orderBy,
   limit,
+  startAfter,
   serverTimestamp,
   QueryConstraint,
+  QueryDocumentSnapshot,
   DocumentData,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { Product, ProductCreateData, ProductFilters, PaginatedResponse } from '@/types'
+import { Product, ProductCreateData, ProductFilters } from '@/types'
 
 const COLLECTION_NAME = 'products'
 const PAGE_SIZE = 12
+const RELATED_PRODUCTS_LIMIT = 24
+
+export interface ProductsPage {
+  items: Product[]
+  total: number
+  nextCursor: QueryDocumentSnapshot<DocumentData> | null
+  hasMore: boolean
+}
 
 // Firestore stores images as an ordered array of objects, not plain URL strings.
 interface FirestoreProductImage {
@@ -84,59 +96,81 @@ function mapProductToFirestoreData(data: Partial<ProductCreateData>) {
   return firestoreData
 }
 
+// Firestore requires the first orderBy() to match the field used in an inequality
+// (>=, <=) filter. A price range filter therefore forces sorting by price —
+// sorting by date while range-filtering by a different field isn't supported.
+function resolveSort(filters?: ProductFilters): { field: 'pricePerUnit' | 'createdAt'; direction: 'asc' | 'desc' } {
+  const hasPriceFilter = filters?.minPrice !== undefined || filters?.maxPrice !== undefined
+
+  if (hasPriceFilter) {
+    return { field: 'pricePerUnit', direction: filters?.sortBy === 'price-desc' ? 'desc' : 'asc' }
+  }
+
+  switch (filters?.sortBy) {
+    case 'price-asc':
+      return { field: 'pricePerUnit', direction: 'asc' }
+    case 'price-desc':
+      return { field: 'pricePerUnit', direction: 'desc' }
+    case 'oldest':
+      return { field: 'createdAt', direction: 'asc' }
+    case 'newest':
+    default:
+      return { field: 'createdAt', direction: 'desc' }
+  }
+}
+
+function buildWhereConstraints(filters?: ProductFilters): QueryConstraint[] {
+  const constraints: QueryConstraint[] = []
+
+  if (filters?.categoryId) {
+    constraints.push(where('categoryId', '==', filters.categoryId))
+  }
+  if (filters?.minPrice !== undefined) {
+    constraints.push(where('pricePerUnit', '>=', filters.minPrice))
+  }
+  if (filters?.maxPrice !== undefined) {
+    constraints.push(where('pricePerUnit', '<=', filters.maxPrice))
+  }
+
+  return constraints
+}
+
 export class ProductsService {
-  static async getAll(filters?: ProductFilters): Promise<PaginatedResponse<Product>> {
-    // Only equality/range `where` constraints are applied server-side. Sorting and
-    // pagination happen client-side to avoid requiring Firestore composite indexes
-    // for every filter + sort combination (see getByCategory/getFeatured).
-    const constraints: QueryConstraint[] = []
-
-    if (filters?.categoryId) {
-      constraints.push(where('categoryId', '==', filters.categoryId))
-    }
-
-    if (filters?.minPrice !== undefined) {
-      constraints.push(where('pricePerUnit', '>=', filters.minPrice))
-    }
-
-    if (filters?.maxPrice !== undefined) {
-      constraints.push(where('pricePerUnit', '<=', filters.maxPrice))
-    }
-
-    const q = query(collection(db, COLLECTION_NAME), ...constraints)
-    const snapshot = await getDocs(q)
-
-    const allProducts = snapshot.docs.map((docSnap) =>
-      mapDocToProduct(docSnap.id, docSnap.data())
-    )
-
-    switch (filters?.sortBy) {
-      case 'price-asc':
-        allProducts.sort((a, b) => a.price - b.price)
-        break
-      case 'price-desc':
-        allProducts.sort((a, b) => b.price - a.price)
-        break
-      case 'oldest':
-        allProducts.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-        break
-      case 'newest':
-      default:
-        allProducts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        break
-    }
-
+  /**
+   * Server-side paginated product listing. Only equality (categoryId) and price
+   * range filters are applied in Firestore; sorting follows resolveSort() so the
+   * query never mixes an inequality filter with an orderBy on a different field
+   * (a hard Firestore constraint, not a choice).
+   */
+  static async getAll(
+    filters?: ProductFilters,
+    cursor?: QueryDocumentSnapshot<DocumentData> | null
+  ): Promise<ProductsPage> {
+    const whereConstraints = buildWhereConstraints(filters)
+    const { field, direction } = resolveSort(filters)
     const pageSize = filters?.limit || PAGE_SIZE
-    const page = filters?.page || 1
-    const total = allProducts.length
-    const products = allProducts.slice((page - 1) * pageSize, page * pageSize)
+
+    const pageConstraints: QueryConstraint[] = [
+      ...whereConstraints,
+      orderBy(field, direction),
+    ]
+    if (cursor) pageConstraints.push(startAfter(cursor))
+    // Fetch one extra document to know whether another page exists.
+    pageConstraints.push(limit(pageSize + 1))
+
+    const [snapshot, countSnapshot] = await Promise.all([
+      getDocs(query(collection(db, COLLECTION_NAME), ...pageConstraints)),
+      getCountFromServer(query(collection(db, COLLECTION_NAME), ...whereConstraints)),
+    ])
+
+    const hasMore = snapshot.docs.length > pageSize
+    const pageDocs = snapshot.docs.slice(0, pageSize)
 
     return {
-      items: products,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+      items: pageDocs.map((docSnap) => mapDocToProduct(docSnap.id, docSnap.data())),
+      total: countSnapshot.data().count,
+      nextCursor: pageDocs.length > 0 ? pageDocs[pageDocs.length - 1] : null,
+      hasMore,
     }
   }
 
@@ -149,40 +183,45 @@ export class ProductsService {
     return mapDocToProduct(docSnap.id, docSnap.data())
   }
 
-  static async getByCategory(categoryId: string): Promise<Product[]> {
-    // Query without orderBy to avoid requiring composite index
+  /**
+   * Bounded, server-sorted category listing (used by the category page and
+   * "related products"). Not cursor-paginated: a limit comfortably above any
+   * real category size keeps this a single cheap read without needing a
+   * "Load more" control on every category page.
+   */
+  static async getByCategory(
+    categoryId: string,
+    limitCount: number = RELATED_PRODUCTS_LIMIT
+  ): Promise<Product[]> {
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('categoryId', '==', categoryId)
+      where('categoryId', '==', categoryId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
     )
     const snapshot = await getDocs(q)
 
-    const products = snapshot.docs.map((docSnap) =>
-      mapDocToProduct(docSnap.id, docSnap.data())
-    )
-
-    // Sort by createdAt desc in client
-    return products.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    return snapshot.docs.map((docSnap) => mapDocToProduct(docSnap.id, docSnap.data()))
   }
 
   static async getFeatured(limitCount: number = 8): Promise<Product[]> {
-    // Query without orderBy to avoid requiring composite index
     const q = query(
       collection(db, COLLECTION_NAME),
-      where('featured', '==', true)
+      where('featured', '==', true),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
     )
     const snapshot = await getDocs(q)
 
-    const products = snapshot.docs.map((docSnap) =>
-      mapDocToProduct(docSnap.id, docSnap.data())
-    )
-
-    // Sort by createdAt desc in client and limit
-    return products
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, limitCount)
+    return snapshot.docs.map((docSnap) => mapDocToProduct(docSnap.id, docSnap.data()))
   }
 
+  /**
+   * Substring search across title/description. Firestore has no native
+   * full-text search, so this still reads a bounded batch and filters in
+   * memory — a dedicated search index (e.g. Algolia/Typesense) is the real
+   * fix if the catalog outgrows this cap, out of scope here.
+   */
   static async search(searchTerm: string): Promise<Product[]> {
     const q = query(
       collection(db, COLLECTION_NAME),
@@ -235,5 +274,26 @@ export class ProductsService {
       stockQuantity: newStock,
       updatedAt: serverTimestamp(),
     })
+  }
+
+  /** Bounded low-stock lookup for the admin dashboard — never reads the full catalog. */
+  static async getLowStock(threshold: number = 5, limitCount: number = 20): Promise<Product[]> {
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('stockQuantity', '>', 0),
+      where('stockQuantity', '<=', threshold),
+      limit(limitCount)
+    )
+    const snapshot = await getDocs(q)
+
+    return snapshot.docs
+      .map((docSnap) => mapDocToProduct(docSnap.id, docSnap.data()))
+      .filter((product) => product.isActive !== false)
+  }
+
+  /** Cheap server-side count, no document reads — used for dashboard stat cards. */
+  static async getTotalCount(): Promise<number> {
+    const snapshot = await getCountFromServer(collection(db, COLLECTION_NAME))
+    return snapshot.data().count
   }
 }

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Heart, Share2, Minus, Plus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ShoppingCart, Heart, Share2, Minus, Plus, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { Product } from '@/types'
 import { ProductsService } from '@/services/products.service'
@@ -112,6 +112,13 @@ export default function ProductDetailPage() {
 
   return (
     <div className="container py-8">
+      <Link href="/products">
+        <Button variant="ghost" className="mb-4 gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          {t('backToProducts')}
+        </Button>
+      </Link>
+
       <div className="grid lg:grid-cols-2 gap-12 mb-16">
         {/* Product Images */}
         <motion.div

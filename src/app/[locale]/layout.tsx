@@ -8,6 +8,7 @@ import { SITE_URL } from '@/lib/seo'
 import { Providers } from '@/context/Providers'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { BackToHomeButton } from '@/components/layout/BackToHomeButton'
 
 const ogLocales: Record<Locale, string> = {
   en: 'en_US',
@@ -110,6 +111,7 @@ export default async function LocaleLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <BackToHomeButton />
         </div>
       </Providers>
     </NextIntlClientProvider>

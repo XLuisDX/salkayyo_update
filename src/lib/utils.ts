@@ -91,6 +91,8 @@ const EXPECTED_AUTH_ERROR_CODES = new Set([
   'auth/weak-password',
   'auth/too-many-requests',
   'auth/user-disabled',
+  'auth/invalid-action-code',
+  'auth/expired-action-code',
 ])
 
 export function isExpectedAuthError(error: unknown): boolean {

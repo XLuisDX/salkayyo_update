@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminDb } from '@/firebase/admin'
+import { getAdminAuth, getAdminDb } from '@/firebase/admin'
 import { Resend } from 'resend'
 import { CartItem, RecipientData } from '@/types'
 import { getErrorMessage } from '@/lib/utils'
@@ -43,6 +43,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      )
+    }
+
+    const userRecord = await getAdminAuth().getUser(userId)
+    if (!userRecord.emailVerified) {
+      return NextResponse.json(
+        { error: 'Please verify your email before placing an order' },
+        { status: 403 }
       )
     }
 

@@ -15,6 +15,7 @@
     "sortBy": "Ordenar por",
     "noResults": "No se encontraron resultados",
     "viewAll": "Ver todo",
+    "loadMore": "Cargar Más",
     "back": "Volver",
     "next": "Siguiente",
     "previous": "Anterior",
@@ -24,7 +25,8 @@
     "yes": "Sí",
     "no": "No",
     "changeLanguage": "Cambiar idioma",
-    "toggleTheme": "Cambiar tema"
+    "toggleTheme": "Cambiar tema",
+    "backToHome": "Volver al inicio"
   },
   "nav": {
     "home": "Inicio",
@@ -62,6 +64,9 @@
     "resendVerification": "Reenviar Verificación",
     "enterCode": "Ingresa el código de verificación",
     "verify": "Verificar",
+    "verificationCode": "Código de Verificación",
+    "verificationCodePlaceholder": "Pega el código de tu correo",
+    "invalidVerificationCode": "Código inválido o expirado. Por favor solicita uno nuevo.",
     "passwordResetSent": "Email de restablecimiento enviado",
     "loginSuccess": "Inicio de sesión exitoso",
     "registerSuccess": "Registro exitoso. Por favor verifica tu email.",
@@ -77,9 +82,9 @@
     "enterEmailForReset": "Ingresa tu correo para recibir un enlace de restablecimiento",
     "emailVerified": "¡Correo Verificado!",
     "emailVerifiedDescription": "Tu correo ha sido verificado exitosamente.",
-    "verificationLinkSentTo": "Hemos enviado un enlace de verificación a {email}",
+    "verificationLinkSentTo": "Hemos enviado un código de verificación a {email}",
     "goToHome": "Ir al Inicio",
-    "checkVerificationInstructions": "Haz clic en el enlace de tu correo para verificar tu cuenta. Si no lo ves, revisa tu carpeta de spam.",
+    "checkVerificationInstructions": "Ingresa el código de tu correo abajo para verificar tu cuenta. Si no lo ves, revisa tu carpeta de spam.",
     "verificationEmailSentCheckInbox": "¡Correo de verificación enviado! Revisa tu bandeja de entrada.",
     "sending": "Enviando..."
   },
@@ -308,7 +313,8 @@
     "message": "Mensaje",
     "messagePlaceholder": "Cuéntanos sobre tus necesidades, requisitos de cantidad y productos específicos que te interesen...",
     "submitting": "Enviando...",
-    "quoteSubmitted": "¡Solicitud de cotización enviada exitosamente!"
+    "quoteSubmitted": "¡Solicitud de cotización enviada exitosamente!",
+    "requestError": "Algo salió mal al enviar tu solicitud. Por favor intenta de nuevo."
   },
   "footer": {
     "rights": "Todos los derechos reservados",
@@ -444,6 +450,7 @@
     "status": "Estado",
     "createdAt": "Creado",
     "updatedAt": "Actualizado",
+    "orderDetailsDescription": "Consulta y actualiza el estado de este pedido.",
     "accessDenied": "Acceso Denegado",
     "accessDeniedMessage": "No tienes permiso para acceder a esta área.",
     "backToHome": "Volver al Inicio",

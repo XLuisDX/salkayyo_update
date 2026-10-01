@@ -46,6 +46,7 @@ interface DashboardStats {
 const REVENUE_STATUSES: OrderStatus[] = ['paid', 'shipped', 'delivered']
 const LOW_STOCK_THRESHOLD = 5
 const SALES_CHART_DAYS = 14
+const RECENT_ORDERS_COUNT = 5
 
 const statusConfig: Record<OrderStatus, { color: string; bg: string }> = {
   pending: { color: "text-amber-500", bg: "bg-amber-500/10" },
@@ -92,29 +93,24 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [products, categories, allOrders] = await Promise.all([
-          ProductsService.getAll({ limit: 1000 }),
-          CategoriesService.getAll(),
-          OrdersService.getAll(),
-        ])
-
-        const totalRevenue = allOrders
-          .filter((o) => REVENUE_STATUSES.includes(o.status))
-          .reduce((sum, o) => sum + o.total, 0)
-
-        const lowStockProducts = products.items
-          .filter((p) => p.isActive !== false && p.stock > 0 && p.stock <= LOW_STOCK_THRESHOLD)
-          .sort((a, b) => a.stock - b.stock)
-          .slice(0, 5)
+        const [totalProducts, categories, revenueStats, recentOrders, lowStockProducts, recentDaysOrders] =
+          await Promise.all([
+            ProductsService.getTotalCount(),
+            CategoriesService.getAll(),
+            OrdersService.getRevenueStats(),
+            OrdersService.getRecentOrders(RECENT_ORDERS_COUNT),
+            ProductsService.getLowStock(LOW_STOCK_THRESHOLD),
+            OrdersService.getOrdersSince(SALES_CHART_DAYS),
+          ])
 
         setStats({
-          totalProducts: products.total,
+          totalProducts,
           totalCategories: categories.length,
-          totalOrders: allOrders.length,
-          totalRevenue,
-          recentOrders: allOrders.slice(0, 5),
-          lowStockProducts,
-          salesByDay: buildSalesByDay(allOrders, locale),
+          totalOrders: revenueStats.totalOrders,
+          totalRevenue: revenueStats.totalRevenue,
+          recentOrders,
+          lowStockProducts: lowStockProducts.sort((a, b) => a.stock - b.stock).slice(0, 5),
+          salesByDay: buildSalesByDay(recentDaysOrders, locale),
         })
       } catch (error) {
         console.error('Error fetching stats:', error)

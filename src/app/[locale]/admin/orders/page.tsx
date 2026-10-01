@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import { Search, Loader2, ShoppingCart, Clock, Package } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
@@ -44,27 +46,61 @@ export default function AdminOrdersPage() {
 
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const fetchOrders = useCallback(async () => {
+  const cursorRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null)
+
+  const fetchOrders = useCallback(
+    async (status: OrderStatus | 'all') => {
+      setLoading(true)
+      cursorRef.current = null
+      try {
+        const page = status === 'all'
+          ? await OrdersService.getAll()
+          : await OrdersService.getByStatus(status)
+        setOrders(page.items)
+        setHasMore(page.hasMore)
+        setTotalCount(page.total)
+        cursorRef.current = page.nextCursor
+      } catch (error) {
+        console.error('Error fetching orders:', error)
+        toast.error(tCommon('error'))
+      } finally {
+        setLoading(false)
+      }
+    },
+    [tCommon]
+  )
+
+  const loadMoreOrders = useCallback(async () => {
+    if (!cursorRef.current || loadingMore) return
+
+    setLoadingMore(true)
     try {
-      const data = await OrdersService.getAll()
-      setOrders(data)
+      const page = statusFilter === 'all'
+        ? await OrdersService.getAll(cursorRef.current)
+        : await OrdersService.getByStatus(statusFilter, cursorRef.current)
+      setOrders((prev) => [...prev, ...page.items])
+      setHasMore(page.hasMore)
+      cursorRef.current = page.nextCursor
     } catch (error) {
-      console.error('Error fetching orders:', error)
+      console.error('Error loading more orders:', error)
       toast.error(tCommon('error'))
     } finally {
-      setLoading(false)
+      setLoadingMore(false)
     }
-  }, [tCommon])
+  }, [statusFilter, loadingMore, tCommon])
 
   useEffect(() => {
-    fetchOrders()
-  }, [fetchOrders])
+    fetchOrders(statusFilter)
+  }, [fetchOrders, statusFilter])
 
   const openOrder = (order: Order) => {
     setSelectedOrder(order)
@@ -93,14 +129,16 @@ export default function AdminOrdersPage() {
     }
   }
 
+  // Status filtering now happens server-side (see fetchOrders/loadMoreOrders).
+  // Search is substring matching over whatever's currently loaded — Firestore
+  // has no native text search, so "Load more" first if the order isn't found.
   const filteredOrders = orders.filter((order) => {
     const search = searchTerm.trim().toLowerCase()
-    const matchesSearch =
+    return (
       !search ||
       order.id.toLowerCase().includes(search) ||
       order.recipientData?.fullName?.toLowerCase().includes(search)
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
-    return matchesSearch && matchesStatus
+    )
   })
 
   if (loading) {
@@ -123,7 +161,9 @@ export default function AdminOrdersPage() {
           {t('manageOrders')}
         </motion.h1>
         <p className="text-muted-foreground text-sm mt-1">
-          {orders.length} {t('orders').toLowerCase()}
+          {orders.length < totalCount
+            ? `${orders.length} / ${totalCount}`
+            : totalCount} {t('orders').toLowerCase()}
         </p>
       </div>
 
@@ -227,6 +267,21 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
+      {hasMore && !searchTerm.trim() && (
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={loadMoreOrders} disabled={loadingMore}>
+            {loadingMore ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {tCommon('loading')}
+              </>
+            ) : (
+              tCommon('loadMore')
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* Order detail dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
@@ -234,6 +289,7 @@ export default function AdminOrdersPage() {
             <>
               <DialogHeader>
                 <DialogTitle>#{selectedOrder.id.slice(0, 8)}</DialogTitle>
+                <DialogDescription>{t('orderDetailsDescription')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">

@@ -12,27 +12,34 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { Loading } from '@/components/common/Loading'
 import { Button } from '@/components/ui/button'
 import { Link } from '@/i18n/routing'
+import { toast } from 'sonner'
 
 export default function CheckoutPage() {
   const t = useTranslations('checkout')
   const tCart = useTranslations('cart')
+  const tAuth = useTranslations('auth')
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, firebaseUser, loading: authLoading } = useAuth()
   const { getItemCount } = useCart()
 
   const itemCount = getItemCount()
+  const isVerified = user?.verified || firebaseUser?.emailVerified
 
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (authLoading) return
+
+    if (!user) {
       router.push('/login?redirect=/checkout')
+      return
     }
-  }, [user, authLoading, router])
 
-  if (authLoading) {
-    return <Loading />
-  }
+    if (!isVerified) {
+      toast.error(tAuth('emailNotVerified'))
+      router.push('/verify-email')
+    }
+  }, [user, isVerified, authLoading, router, tAuth])
 
-  if (!user) {
+  if (authLoading || !user || !isVerified) {
     return <Loading />
   }
 
