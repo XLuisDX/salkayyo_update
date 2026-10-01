@@ -1,7 +1,5 @@
 import { ReactNode } from 'react'
 import { Sora, DM_Sans } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/context/ThemeContext'
 import '@/app/globals.css'
 
@@ -30,8 +28,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ThemeProvider>
           {children}
         </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   )
