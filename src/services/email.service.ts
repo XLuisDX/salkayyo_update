@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { render } from '@react-email/render'
+import { escapeHtml } from '@/lib/utils'
 import {
   WelcomeEmail,
   VerifyEmail,
@@ -299,11 +300,11 @@ export async function sendContactFormEmail(
   const html = `
     <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
       <h2 style="color: #101820;">New Contact Form Message</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
       <p><strong>Message:</strong></p>
-      <p style="white-space: pre-wrap; background: #f5f5f5; padding: 16px; border-radius: 8px;">${message}</p>
+      <p style="white-space: pre-wrap; background: #f5f5f5; padding: 16px; border-radius: 8px;">${escapeHtml(message)}</p>
     </div>
   `
 

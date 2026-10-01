@@ -13,17 +13,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const userRecord = await getAdminAuth().getUserByEmail(email)
-    const resetLink = await getAdminAuth().generatePasswordResetLink(email)
+    try {
+      const userRecord = await getAdminAuth().getUserByEmail(email)
+      const resetLink = await getAdminAuth().generatePasswordResetLink(email)
 
-    await sendPasswordResetEmail(email, userRecord.displayName || 'there', resetLink)
+      await sendPasswordResetEmail(email, userRecord.displayName || 'there', resetLink)
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code
+      // Don't reveal whether the account exists — only re-throw unexpected failures.
+      if (code !== 'auth/user-not-found') {
+        throw error
+      }
+    }
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
-    const code = (error as { code?: string })?.code
     const message = error instanceof Error ? error.message : 'Failed to send reset email'
-    const status = code === 'auth/user-not-found' ? 404 : 500
-
-    return NextResponse.json({ error: { code, message } }, { status })
+    return NextResponse.json({ error: { message } }, { status: 500 })
   }
 }
