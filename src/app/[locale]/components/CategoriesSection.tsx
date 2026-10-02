@@ -150,7 +150,7 @@ export function CategoriesSection() {
             <p className="text-muted-foreground">{t('noCategories')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}
@@ -158,6 +158,7 @@ export function CategoriesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3) }}
+                className="w-[calc((100%-1rem)/2)] sm:w-[calc((100%-2rem)/3)] md:w-[calc((100%-4.5rem)/4)] lg:w-[calc((100%-6rem)/5)] xl:w-[calc((100%-7.5rem)/6)]"
               >
                 <Link href={`/categories/${category.slug}`}>
                   <div className="group relative aspect-square rounded-2xl overflow-hidden bg-card border border-border hover:border-accent/50 transition-all duration-500 card-hover">

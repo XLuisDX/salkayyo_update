@@ -49,14 +49,14 @@ export function Footer() {
               >
                 <Image
                   src="/favicon.png"
-                  alt="Saklayyo"
+                  alt="Salkayyo"
                   width={45}
                   height={45}
                   className="dark:hidden"
                 />
                 <Image
                   src="/logo-email.png"
-                  alt="Saklayyo"
+                  alt="Salkayyo"
                   width={45}
                   height={45}
                   className="hidden dark:block"
@@ -131,7 +131,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex flex-col items-center md:items-start gap-1">
               <p className="text-[11px] text-muted-foreground/60 uppercase tracking-wider">
-                &copy; {currentYear} Saklayyo. {t("footer.rights")}
+                &copy; {currentYear} Salkayyo. {t("footer.rights")}
               </p>
             </div>
 

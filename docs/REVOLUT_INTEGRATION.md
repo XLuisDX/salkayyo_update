@@ -1,6 +1,6 @@
 # Guía de Integración de Revolut Merchant API
 
-Esta guía detalla paso a paso cómo integrar Revolut como pasarela de pagos en el e-commerce Saklayyo.
+Esta guía detalla paso a paso cómo integrar Revolut como pasarela de pagos en el e-commerce Salkayyo.
 
 ## Índice
 
@@ -238,7 +238,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         amount: total, // Amount in minor units (cents)
         currency: 'USD',
-        description: `Saklayyo Order #${orderId.slice(0, 8).toUpperCase()}`,
+        description: `Salkayyo Order #${orderId.slice(0, 8).toUpperCase()}`,
         merchant_order_ext_ref: orderId,
         customer_email: recipientData.email,
         redirect_url: `${APP_URL}/checkout/success?orderId=${orderId}`,

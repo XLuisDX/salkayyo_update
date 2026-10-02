@@ -36,9 +36,9 @@ export const OrderShippedEmail = ({
   carrier,
   estimatedDelivery,
   recipientData,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: OrderShippedEmailProps) => {
-  const orderNumber = orderId.slice(0, 8).toUpperCase()
+  const orderNumber = orderId.slice(0, 8).toUpperCase();
 
   return (
     <EmailBase preview={`Your order #${orderNumber} has shipped!`}>
@@ -48,13 +48,9 @@ export const OrderShippedEmail = ({
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Your order is on its way!
-      </Heading>
+      <Heading style={heading}>Your order is on its way!</Heading>
 
-      <Text style={paragraph}>
-        Hi {customerName},
-      </Text>
+      <Text style={paragraph}>Hi {customerName},</Text>
 
       <Text style={paragraph}>
         Great news! Your order #{orderNumber} has been shipped and is on its way
@@ -145,8 +141,8 @@ export const OrderShippedEmail = ({
         You&apos;ll receive another email when your order is delivered.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

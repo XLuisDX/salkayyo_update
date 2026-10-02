@@ -2,7 +2,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  applyActionCode,
   updateProfile,
   User as FirebaseUser,
   onAuthStateChanged,
@@ -28,7 +27,7 @@ function toDate(value: unknown): Date {
 
 export class AuthService {
   static async register(data: UserCreateData): Promise<User> {
-    const { email, password, name } = data
+    const { email, password, name, newsletterSubscribed = false, preferredLanguage } = data
 
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
     const firebaseUser = userCredential.user
@@ -41,6 +40,8 @@ export class AuthService {
       verified: false,
       createdAt: new Date(),
       role: 'user',
+      newsletterSubscribed,
+      preferredLanguage,
     }
 
     await setDoc(doc(db, 'users', firebaseUser.uid), {
@@ -71,6 +72,7 @@ export class AuthService {
     if (firebaseUser.emailVerified && !userData.verified) {
       await updateDoc(doc(db, 'users', firebaseUser.uid), {
         verified: true,
+        emailVerifiedAt: serverTimestamp(),
       })
       userData.verified = true
     }
@@ -82,6 +84,9 @@ export class AuthService {
       verified: userData.verified,
       createdAt: toDate(userData.createdAt),
       role: userData.role || 'user',
+      newsletterSubscribed: userData.newsletterSubscribed,
+      preferredLanguage: userData.preferredLanguage,
+      emailVerifiedAt: userData.emailVerifiedAt ? toDate(userData.emailVerifiedAt) : null,
     }
   }
 
@@ -127,21 +132,25 @@ export class AuthService {
     }
   }
 
-  static async verifyEmailCode(code: string): Promise<void> {
-    // The code is a long opaque Firebase token (~50+ chars) copy-pasted from an
-    // email — some email clients wrap it visually and the paste can pick up a
-    // stray space/line break in the middle. Strip all whitespace to recover it.
-    const cleanCode = code.replace(/\s+/g, '')
-    await applyActionCode(auth, cleanCode)
-
+  // Call after the user clicks the verification link in their email (opened
+  // in another tab) to pick up the new emailVerified status without forcing
+  // a full logout/login cycle.
+  static async refreshVerificationStatus(): Promise<boolean> {
     const user = auth.currentUser
-    if (user) {
-      await user.reload()
+    if (!user) return false
+
+    await user.reload()
+    if (user.emailVerified) {
       // Force a fresh ID token so the new email_verified claim is immediately
       // available to Firestore security rules (e.g. the checkout order-create rule).
       await user.getIdToken(true)
-      await updateDoc(doc(db, 'users', user.uid), { verified: true })
+      await updateDoc(doc(db, 'users', user.uid), {
+        verified: true,
+        emailVerifiedAt: serverTimestamp(),
+      })
     }
+
+    return user.emailVerified
   }
 
   static async getCurrentUser(): Promise<User | null> {
@@ -159,6 +168,9 @@ export class AuthService {
       verified: userData.verified,
       createdAt: toDate(userData.createdAt),
       role: userData.role || 'user',
+      newsletterSubscribed: userData.newsletterSubscribed,
+      preferredLanguage: userData.preferredLanguage,
+      emailVerifiedAt: userData.emailVerifiedAt ? toDate(userData.emailVerifiedAt) : null,
     }
   }
 

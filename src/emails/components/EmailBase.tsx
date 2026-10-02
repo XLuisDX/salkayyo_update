@@ -32,10 +32,10 @@ export const EmailBase = ({
           {/* Header */}
           <Section style={header}>
             <Img
-              src="https://saklayyo.com/logo.png"
-              width="150"
-              height="40"
-              alt="Saklayyo"
+              src="https://salkayyo.com/logo-email.png"
+              width="100"
+              height="100"
+              alt="Salkayyo"
               style={logo}
             />
           </Section>
@@ -47,20 +47,20 @@ export const EmailBase = ({
           {showFooter && (
             <Section style={footer}>
               <Text style={footerText}>
-                © {currentYear} Saklayyo Store. All rights reserved.
+                © {currentYear} Salkayyo Store. All rights reserved.
               </Text>
               <Text style={footerLinks}>
-                Need help? Contact us at support@saklayyo.com
+                Need help? Contact us at support@salkayyo.com
               </Text>
               <Text style={footerAddress}>
-                Saklayyo Store • Your Premium Shopping Destination
+                Salkayyo Store • Your Premium Shopping Destination
               </Text>
             </Section>
           )}
         </Container>
       </Body>
     </Html>
-  )
+  );
 }
 
 // Styles - Luxury Minimal Design

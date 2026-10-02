@@ -18,13 +18,8 @@ export async function POST(request: NextRequest) {
 
       if (!userRecord.emailVerified) {
         const verificationLink = await getAdminAuth().generateEmailVerificationLink(email)
-        const code = new URL(verificationLink).searchParams.get('oobCode')
 
-        if (!code) {
-          throw new Error('Failed to generate verification code')
-        }
-
-        await sendVerificationEmail(email, userRecord.displayName || 'there', code)
+        await sendVerificationEmail(email, userRecord.displayName || 'there', verificationLink)
       }
     } catch (error: unknown) {
       const code = (error as { code?: string })?.code

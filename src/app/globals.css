@@ -181,11 +181,11 @@
 
 :root {
   /* ====== SAKLAYYO BRAND COLORS ====== */
-  --saklayyo-dark: #0a0f14;
-  --saklayyo-darker: #060a0d;
-  --saklayyo-lime: #7acc00;
-  --saklayyo-lime-light: #99FF00;
-  --saklayyo-lime-dark: #5fa300;
+  --salkayyo-dark: #0a0f14;
+  --salkayyo-darker: #060a0d;
+  --salkayyo-lime: #7acc00;
+  --salkayyo-lime-light: #99FF00;
+  --salkayyo-lime-dark: #5fa300;
 
   /* ====== LIGHT THEME ====== */
   --background: #ffffff;

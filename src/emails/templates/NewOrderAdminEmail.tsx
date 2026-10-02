@@ -50,9 +50,9 @@ export const NewOrderAdminEmail = ({
   recipientData,
   paymentMethod,
   createdAt,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: NewOrderAdminEmailProps) => {
-  const orderNumber = orderId.slice(0, 8).toUpperCase()
+  const orderNumber = orderId.slice(0, 8).toUpperCase();
 
   return (
     <EmailBase preview={`🔔 New Order #${orderNumber} - $${total.toFixed(2)}`}>
@@ -62,9 +62,7 @@ export const NewOrderAdminEmail = ({
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        New order received!
-      </Heading>
+      <Heading style={heading}>New order received!</Heading>
 
       {/* Quick Stats */}
       <Section style={statsBox}>
@@ -103,7 +101,7 @@ export const NewOrderAdminEmail = ({
             <Column>
               <Text style={infoLabel}>Payment</Text>
               <Text style={infoValue}>
-                {paymentMethod === 'stripe' ? '💳 Card (Stripe)' : '💰 PayPal'}
+                {paymentMethod === "stripe" ? "💳 Card (Stripe)" : "💰 PayPal"}
               </Text>
             </Column>
             <Column>
@@ -187,11 +185,11 @@ export const NewOrderAdminEmail = ({
       </Section>
 
       <Text style={smallText}>
-        This is an automated notification from Saklayyo Store.
+        This is an automated notification from Salkayyo Store.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

@@ -18,7 +18,7 @@ export const PasswordChangedEmail = ({
   name,
   changedAt,
   ipAddress,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: PasswordChangedEmailProps) => {
   return (
     <EmailBase preview="Your password has been changed">
@@ -28,16 +28,12 @@ export const PasswordChangedEmail = ({
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Password changed successfully
-      </Heading>
+      <Heading style={heading}>Password changed successfully</Heading>
+
+      <Text style={paragraph}>Hi {name || "there"},</Text>
 
       <Text style={paragraph}>
-        Hi {name || 'there'},
-      </Text>
-
-      <Text style={paragraph}>
-        Your Saklayyo Store account password was successfully changed. If you
+        Your Salkayyo Store account password was successfully changed. If you
         made this change, no further action is needed.
       </Text>
 
@@ -59,9 +55,9 @@ export const PasswordChangedEmail = ({
       {/* Warning */}
       <Section style={warningBox}>
         <Text style={warningText}>
-          ⚠️ <strong>Wasn&apos;t you?</strong> If you didn&apos;t make this change,
-          your account may be compromised. Please reset your password immediately
-          and contact our support team.
+          ⚠️ <strong>Wasn&apos;t you?</strong> If you didn&apos;t make this
+          change, your account may be compromised. Please reset your password
+          immediately and contact our support team.
         </Text>
       </Section>
 
@@ -72,12 +68,12 @@ export const PasswordChangedEmail = ({
       </Section>
 
       <Text style={smallText}>
-        For your security, we recommend using a unique password that you don&apos;t
-        use on other websites.
+        For your security, we recommend using a unique password that you
+        don&apos;t use on other websites.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

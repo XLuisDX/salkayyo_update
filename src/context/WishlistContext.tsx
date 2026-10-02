@@ -13,7 +13,7 @@ import {
 import { useAuth } from './AuthContext'
 import { WishlistService } from '@/services/wishlist.service'
 
-const WISHLIST_STORAGE_KEY = 'saklayyo_wishlist'
+const WISHLIST_STORAGE_KEY = 'salkayyo_wishlist'
 
 interface WishlistContextType {
   wishlist: string[]

@@ -33,21 +33,21 @@ export const OrderCancelledEmail = ({
   items,
   total,
   reason,
-  refundStatus = 'pending',
-  appUrl = 'https://saklayyo.com',
+  refundStatus = "pending",
+  appUrl = "https://salkayyo.com",
 }: OrderCancelledEmailProps) => {
-  const orderNumber = orderId.slice(0, 8).toUpperCase()
+  const orderNumber = orderId.slice(0, 8).toUpperCase();
 
   const getRefundStatusText = () => {
     switch (refundStatus) {
-      case 'completed':
-        return 'Your refund has been processed and should appear in your account within 5-10 business days.'
-      case 'processed':
-        return 'Your refund is being processed. It should appear in your account within 5-10 business days.'
+      case "completed":
+        return "Your refund has been processed and should appear in your account within 5-10 business days.";
+      case "processed":
+        return "Your refund is being processed. It should appear in your account within 5-10 business days.";
       default:
-        return 'If you made a payment, a refund will be processed automatically within 3-5 business days.'
+        return "If you made a payment, a refund will be processed automatically within 3-5 business days.";
     }
-  }
+  };
 
   return (
     <EmailBase preview={`Order #${orderNumber} has been cancelled`}>
@@ -57,13 +57,9 @@ export const OrderCancelledEmail = ({
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Your order has been cancelled
-      </Heading>
+      <Heading style={heading}>Your order has been cancelled</Heading>
 
-      <Text style={paragraph}>
-        Hi {customerName},
-      </Text>
+      <Text style={paragraph}>Hi {customerName},</Text>
 
       <Text style={paragraph}>
         Your order #{orderNumber} has been cancelled.
@@ -123,9 +119,7 @@ export const OrderCancelledEmail = ({
         <Text style={ctaText}>
           Want to shop again? Browse our latest products:
         </Text>
-        <EmailButton href={`${appUrl}/products`}>
-          Continue Shopping
-        </EmailButton>
+        <EmailButton href={`${appUrl}/products`}>Continue Shopping</EmailButton>
       </Section>
 
       {/* Support */}
@@ -139,8 +133,8 @@ export const OrderCancelledEmail = ({
         </EmailButton>
       </Section>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

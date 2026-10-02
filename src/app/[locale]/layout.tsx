@@ -36,18 +36,20 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: 'Saklayyo Store',
-      template: '%s | Saklayyo Store',
+      default: "Salkayyo Store",
+      template: "%s | Salkayyo Store",
     },
-    description: t('siteDescription'),
-    keywords: t('keywords').split(',').map((k) => k.trim()),
+    description: t("siteDescription"),
+    keywords: t("keywords")
+      .split(",")
+      .map((k) => k.trim()),
     alternates: {
       canonical: `/${locale}`,
       languages,
     },
     icons: {
-      icon: '/favicon.png',
-      shortcut: '/favicon.png',
+      icon: "/favicon.png",
+      shortcut: "/favicon.png",
     },
     robots: {
       index: true,
@@ -55,27 +57,27 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
       googleBot: {
         index: true,
         follow: true,
-        'max-image-preview': 'large',
+        "max-image-preview": "large",
       },
     },
     openGraph: {
-      type: 'website',
-      siteName: 'Saklayyo Store',
+      type: "website",
+      siteName: "Salkayyo Store",
       title: {
-        default: 'Saklayyo Store',
-        template: '%s | Saklayyo Store',
+        default: "Salkayyo Store",
+        template: "%s | Salkayyo Store",
       },
-      description: t('siteDescription'),
-      locale: ogLocales[locale as Locale] ?? 'en_US',
-      images: ['/logo-email.png'],
+      description: t("siteDescription"),
+      locale: ogLocales[locale as Locale] ?? "en_US",
+      images: ["/logo-email.png"],
     },
     twitter: {
-      card: 'summary_large_image',
-      title: 'Saklayyo Store',
-      description: t('siteDescription'),
-      images: ['/logo-email.png'],
+      card: "summary_large_image",
+      title: "Salkayyo Store",
+      description: t("siteDescription"),
+      images: ["/logo-email.png"],
     },
-  }
+  };
 }
 
 export default async function LocaleLayout({
@@ -93,12 +95,12 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   const organizationJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'OnlineStore',
-    name: 'Saklayyo Store',
+    "@context": "https://schema.org",
+    "@type": "OnlineStore",
+    name: "Salkayyo Store",
     url: `${SITE_URL}/${locale}`,
     logo: `${SITE_URL}/logo-email.png`,
-  }
+  };
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>

@@ -81,24 +81,24 @@ export function LoginForm() {
           <Link href="/" className="inline-block mb-8">
             <Image
               src="/favicon.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={48}
               height={48}
               className="dark:hidden mx-auto"
             />
             <Image
               src="/logo-email.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={48}
               height={48}
               className="hidden dark:block mx-auto"
             />
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-            {t('login')}
+            {t("login")}
           </h1>
           <p className="text-muted-foreground text-lg">
-            {t('enterCredentials')}
+            {t("enterCredentials")}
           </p>
         </motion.div>
 
@@ -114,7 +114,9 @@ export function LoginForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">{t('email')}</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      {t("email")}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -137,12 +139,14 @@ export function LoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel className="text-sm font-medium">{t('password')}</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        {t("password")}
+                      </FormLabel>
                       <Link
                         href="/forgot-password"
                         className="text-sm text-accent hover:text-accent/80 transition-colors"
                       >
-                        {t('forgotPassword')}
+                        {t("forgotPassword")}
                       </Link>
                     </div>
                     <FormControl>
@@ -150,7 +154,7 @@ export function LoginForm() {
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           type="password"
-                          placeholder={t('enterPasswordPlaceholder')}
+                          placeholder={t("enterPasswordPlaceholder")}
                           className="h-13 pl-12 pr-4 rounded-xl bg-muted/50 border-0 focus-visible:ring-accent"
                           {...field}
                         />
@@ -170,7 +174,7 @@ export function LoginForm() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    {t('signIn')}
+                    {t("signIn")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -180,14 +184,17 @@ export function LoginForm() {
 
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-muted-foreground">
-              {t('noAccount')}{' '}
-              <Link href="/register" className="text-accent font-medium hover:text-accent/80 transition-colors">
-                {t('signUp')}
+              {t("noAccount")}{" "}
+              <Link
+                href="/register"
+                className="text-accent font-medium hover:text-accent/80 transition-colors"
+              >
+                {t("signUp")}
               </Link>
             </p>
           </div>
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

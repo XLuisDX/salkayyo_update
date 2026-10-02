@@ -129,14 +129,14 @@ export function AdminSidebar() {
           <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
             <Image
               src="/favicon.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={20}
               height={20}
               className="dark:hidden"
             />
             <Image
               src="/logo-email.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={20}
               height={20}
               className="hidden dark:block"

@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
             if (userData?.email) {
               // Send confirmation email
               await resend.emails.send({
-                from: 'Saklayyo Store <orders@saklayyo.com>',
+                from: "Salkayyo Store <orders@salkayyo.com>",
                 to: userData.email,
                 subject: `Order Confirmation #${orderId.slice(0, 8)}`,
                 html: `
@@ -77,13 +77,13 @@ export async function POST(request: NextRequest) {
                   <p>We'll notify you when your order ships.</p>
                   <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/en/orders/${orderId}">View Order</a></p>
                 `,
-              })
+              });
             }
 
             // Send admin notification
             if (process.env.ADMIN_EMAIL) {
               await resend.emails.send({
-                from: 'Saklayyo Store <orders@saklayyo.com>',
+                from: "Salkayyo Store <orders@salkayyo.com>",
                 to: process.env.ADMIN_EMAIL,
                 subject: `New Order #${orderId.slice(0, 8)}`,
                 html: `
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
                   <p>Items: ${orderData.items.length}</p>
                   <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/en/orders/${orderId}">View Order</a></p>
                 `,
-              })
+              });
             }
 
             // Update product stock

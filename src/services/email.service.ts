@@ -18,15 +18,26 @@ import {
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM_ADDRESSES = {
-  noreply: 'Saklayyo Store <noreply@saklayyo.com>',
-  orders: 'Saklayyo Store <orders@saklayyo.com>',
-  welcome: 'Saklayyo Store <welcome@saklayyo.com>',
-  support: 'Saklayyo Store <support@saklayyo.com>',
+// resend.emails.send() resolves with { data, error } instead of throwing on
+// API errors (e.g. an unverified sending domain) — check it explicitly so
+// failed sends surface instead of being silently reported as successful.
+async function sendEmail(payload: Parameters<typeof resend.emails.send>[0]) {
+  const result = await resend.emails.send(payload)
+  if (result.error) {
+    throw new Error(result.error.message || 'Failed to send email')
+  }
+  return result
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://saklayyo.com'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@saklayyo.com'
+const FROM_ADDRESSES = {
+  noreply: "Salkayyo Store <noreply@salkayyo.com>",
+  orders: "Salkayyo Store <orders@salkayyo.com>",
+  welcome: "Salkayyo Store <welcome@salkayyo.com>",
+  support: "Salkayyo Store <support@salkayyo.com>",
+};
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://salkayyo.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@salkayyo.com";
 
 interface OrderItem {
   title: string
@@ -52,27 +63,27 @@ interface RecipientData {
 export async function sendWelcomeEmail(email: string, name: string) {
   const html = await render(WelcomeEmail({ name, appUrl: APP_URL }))
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.welcome,
     to: email,
-    subject: 'Welcome to Saklayyo Store! 🎉',
+    subject: "Welcome to Salkayyo Store! 🎉",
     html,
-  })
+  });
 }
 
 export async function sendVerificationEmail(
   email: string,
   name: string,
-  code: string
+  verificationLink: string,
 ) {
-  const html = await render(VerifyEmail({ name, code }))
+  const html = await render(VerifyEmail({ name, verificationLink }));
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.noreply,
     to: email,
-    subject: 'Verify Your Email - Saklayyo Store',
+    subject: "Verify Your Email - Salkayyo Store",
     html,
-  })
+  });
 }
 
 export async function sendPasswordResetEmail(
@@ -82,12 +93,12 @@ export async function sendPasswordResetEmail(
 ) {
   const html = await render(ResetPasswordEmail({ name, resetLink }))
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.noreply,
     to: email,
-    subject: 'Reset Your Password - Saklayyo Store',
+    subject: "Reset Your Password - Salkayyo Store",
     html,
-  })
+  });
 }
 
 export async function sendPasswordChangedEmail(
@@ -100,12 +111,12 @@ export async function sendPasswordChangedEmail(
     PasswordChangedEmail({ name, changedAt, ipAddress, appUrl: APP_URL })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.noreply,
     to: email,
-    subject: '🔒 Password Changed - Saklayyo Store',
+    subject: "🔒 Password Changed - Salkayyo Store",
     html,
-  })
+  });
 }
 
 // ============================================
@@ -137,12 +148,12 @@ export async function sendOrderConfirmationEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.orders,
     to: email,
     subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
     html,
-  })
+  });
 }
 
 export async function sendOrderShippedEmail(
@@ -166,12 +177,12 @@ export async function sendOrderShippedEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.orders,
     to: email,
     subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Shipped! 📦`,
     html,
-  })
+  });
 }
 
 export async function sendOrderDeliveredEmail(
@@ -189,12 +200,12 @@ export async function sendOrderDeliveredEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.orders,
     to: email,
     subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Been Delivered! 🎉`,
     html,
-  })
+  });
 }
 
 export async function sendOrderCancelledEmail(
@@ -218,12 +229,12 @@ export async function sendOrderCancelledEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.orders,
     to: email,
     subject: `Order #${orderId.slice(0, 8).toUpperCase()} Has Been Cancelled`,
     html,
-  })
+  });
 }
 
 // ============================================
@@ -258,12 +269,12 @@ export async function sendNewOrderAdminNotification(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.orders,
     to: ADMIN_EMAIL,
     subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${total.toFixed(2)}`,
     html,
-  })
+  });
 }
 
 // ============================================
@@ -281,12 +292,12 @@ export async function sendNewsletterWelcomeEmail(email: string) {
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.welcome,
     to: email,
-    subject: "You're In! Welcome to the Saklayyo VIP List 🎉",
+    subject: "You're In! Welcome to the Salkayyo VIP List 🎉",
     html,
-  })
+  });
 }
 
 // ============================================
@@ -311,13 +322,13 @@ export async function sendWholesaleRequestAdminEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.support,
     to: ADMIN_EMAIL,
     replyTo: email,
     subject: `🏢 New Wholesale Request - ${companyName}`,
     html,
-  })
+  });
 }
 
 export async function sendWholesaleRequestConfirmationEmail(
@@ -331,12 +342,12 @@ export async function sendWholesaleRequestConfirmationEmail(
     })
   )
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.support,
     to: email,
-    subject: "We've Received Your Wholesale Request - Saklayyo Store",
+    subject: "We've Received Your Wholesale Request - Salkayyo Store",
     html,
-  })
+  });
 }
 
 // ============================================
@@ -360,13 +371,13 @@ export async function sendContactFormEmail(
     </div>
   `
 
-  return resend.emails.send({
+  return sendEmail({
     from: FROM_ADDRESSES.support,
     to: ADMIN_EMAIL,
     replyTo: email,
     subject: `Contact Form: ${subject}`,
     html,
-  })
+  });
 }
 
 // ============================================

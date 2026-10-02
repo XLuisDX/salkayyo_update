@@ -59,7 +59,7 @@ Valor: Resend Dashboard → API Keys.
 
 - `NEXT_PUBLIC_APP_URL` — en producción debe ser la URL real, p. ej.
   `https://tu-dominio.vercel.app` (NO `http://localhost:3000`).
-- `NEXT_PUBLIC_APP_NAME` — `Saklayyo Store` (no es secreto).
+- `NEXT_PUBLIC_APP_NAME` — `Salkayyo Store` (no es secreto).
 
 ## Admin
 

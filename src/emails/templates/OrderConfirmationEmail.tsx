@@ -48,29 +48,27 @@ export const OrderConfirmationEmail = ({
   total,
   recipientData,
   paymentMethod,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: OrderConfirmationEmailProps) => {
-  const orderNumber = orderId.slice(0, 8).toUpperCase()
+  const orderNumber = orderId.slice(0, 8).toUpperCase();
 
   return (
-    <EmailBase preview={`Order confirmed #${orderNumber} - Thank you for your purchase!`}>
+    <EmailBase
+      preview={`Order confirmed #${orderNumber} - Thank you for your purchase!`}
+    >
       {/* Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>✅ Order Confirmed</Text>
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Thank you for your order!
-      </Heading>
+      <Heading style={heading}>Thank you for your order!</Heading>
+
+      <Text style={paragraph}>Hi {customerName},</Text>
 
       <Text style={paragraph}>
-        Hi {customerName},
-      </Text>
-
-      <Text style={paragraph}>
-        We&apos;ve received your order and are getting it ready. We&apos;ll notify you
-        when it ships.
+        We&apos;ve received your order and are getting it ready. We&apos;ll
+        notify you when it ships.
       </Text>
 
       {/* Order Number */}
@@ -78,7 +76,7 @@ export const OrderConfirmationEmail = ({
         <Text style={orderLabel}>Order Number</Text>
         <Text style={orderNumber_}>{orderNumber}</Text>
         <Text style={paymentBadge}>
-          Paid with {paymentMethod === 'stripe' ? 'Card' : 'PayPal'}
+          Paid with {paymentMethod === "stripe" ? "Card" : "PayPal"}
         </Text>
       </Section>
 
@@ -174,11 +172,12 @@ export const OrderConfirmationEmail = ({
       </Section>
 
       <Text style={smallText}>
-        Questions about your order? Reply to this email or contact our support team.
+        Questions about your order? Reply to this email or contact our support
+        team.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

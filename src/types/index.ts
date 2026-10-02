@@ -6,12 +6,17 @@ export interface User {
   verified: boolean
   createdAt: Date
   role?: 'user' | 'admin'
+  newsletterSubscribed?: boolean
+  preferredLanguage?: string
+  emailVerifiedAt?: Date | null
 }
 
 export interface UserCreateData {
   name: string
   email: string
   password: string
+  newsletterSubscribed?: boolean
+  preferredLanguage?: string
 }
 
 export interface UserLoginData {

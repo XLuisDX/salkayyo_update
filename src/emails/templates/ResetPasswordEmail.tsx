@@ -17,42 +17,35 @@ export const ResetPasswordEmail = ({
   resetLink,
 }: ResetPasswordEmailProps) => {
   return (
-    <EmailBase preview="Reset your password for Saklayyo Store">
+    <EmailBase preview="Reset your password for Salkayyo Store">
       {/* Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>🔐 Password Reset</Text>
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Reset your password
-      </Heading>
+      <Heading style={heading}>Reset your password</Heading>
+
+      <Text style={paragraph}>Hi {name || "there"},</Text>
 
       <Text style={paragraph}>
-        Hi {name || 'there'},
-      </Text>
-
-      <Text style={paragraph}>
-        We received a request to reset your password for your Saklayyo Store
+        We received a request to reset your password for your Salkayyo Store
         account. Click the button below to create a new password:
       </Text>
 
       {/* CTA */}
       <Section style={ctaSection}>
-        <EmailButton href={resetLink}>
-          Reset Password
-        </EmailButton>
+        <EmailButton href={resetLink}>Reset Password</EmailButton>
       </Section>
 
       <Hr style={divider} />
 
       {/* Alternative Link */}
       <Text style={smallText}>
-        If the button doesn&apos;t work, copy and paste this link into your browser:
+        If the button doesn&apos;t work, copy and paste this link into your
+        browser:
       </Text>
-      <Text style={linkText}>
-        {resetLink}
-      </Text>
+      <Text style={linkText}>{resetLink}</Text>
 
       <Hr style={divider} />
 
@@ -60,8 +53,8 @@ export const ResetPasswordEmail = ({
       <Section style={warningBox}>
         <Text style={warningText}>
           ⚠️ <strong>Security Notice:</strong> This link will expire in 1 hour.
-          If you didn&apos;t request a password reset, please ignore this email or
-          contact support if you have concerns about your account security.
+          If you didn&apos;t request a password reset, please ignore this email
+          or contact support if you have concerns about your account security.
         </Text>
       </Section>
 
@@ -75,7 +68,7 @@ export const ResetPasswordEmail = ({
         <br />• Don&apos;t reuse passwords from other sites
       </Text>
     </EmailBase>
-  )
+  );
 }
 
 // Styles

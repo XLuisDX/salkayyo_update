@@ -1,5 +1,5 @@
 {
-  "name": "saklayyo-functions",
+  "name": "salkayyo-functions",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",

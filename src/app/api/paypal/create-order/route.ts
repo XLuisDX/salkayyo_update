@@ -38,31 +38,31 @@ export async function POST(request: NextRequest) {
     const accessToken = await getPayPalAccessToken()
 
     const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        intent: 'CAPTURE',
+        intent: "CAPTURE",
         purchase_units: [
           {
             amount: {
-              currency_code: 'USD',
+              currency_code: "USD",
               value: total.toFixed(2),
             },
-            description: 'Saklayyo Store Purchase',
+            description: "Salkayyo Store Purchase",
           },
         ],
         application_context: {
-          brand_name: 'Saklayyo Store',
-          landing_page: 'NO_PREFERENCE',
-          user_action: 'PAY_NOW',
+          brand_name: "Salkayyo Store",
+          landing_page: "NO_PREFERENCE",
+          user_action: "PAY_NOW",
           return_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
           cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
         },
       }),
-    })
+    });
 
     const order = await response.json()
 

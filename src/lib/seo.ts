@@ -1,6 +1,8 @@
 import { getAdminDb } from '@/firebase/admin'
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://saklayyo.com').replace(/\/$/, '')
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_APP_URL || "https://salkayyo.com"
+).replace(/\/$/, "");
 
 export interface SeoProduct {
   id: string

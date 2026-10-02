@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import { Link, useRouter } from '@/i18n/routing'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -29,6 +30,7 @@ function createRegisterSchema(tv: ReturnType<typeof useTranslations>) {
     email: z.string().email(tv('email')),
     password: z.string().min(6, tv('minLength', { min: 6 })),
     confirmPassword: z.string(),
+    newsletterSubscribed: z.boolean(),
   }).refine((data) => data.password === data.confirmPassword, {
     message: tv('passwordMatch'),
     path: ['confirmPassword'],
@@ -40,6 +42,7 @@ type RegisterFormValues = z.infer<ReturnType<typeof createRegisterSchema>>
 export function RegisterForm() {
   const t = useTranslations('auth')
   const tv = useTranslations('validation')
+  const locale = useLocale()
   const router = useRouter()
   const { register: registerUser } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -51,6 +54,7 @@ export function RegisterForm() {
       email: '',
       password: '',
       confirmPassword: '',
+      newsletterSubscribed: false,
     },
   })
 
@@ -62,6 +66,8 @@ export function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
+        newsletterSubscribed: data.newsletterSubscribed,
+        preferredLanguage: locale,
       })
       toast.success(t('registerSuccess'))
       router.push('/verify-email')
@@ -92,24 +98,24 @@ export function RegisterForm() {
           <Link href="/" className="inline-block mb-8">
             <Image
               src="/favicon.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={48}
               height={48}
               className="dark:hidden mx-auto"
             />
             <Image
               src="/logo-email.png"
-              alt="Saklayyo"
+              alt="Salkayyo"
               width={48}
               height={48}
               className="hidden dark:block mx-auto"
             />
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-            {t('register')}
+            {t("register")}
           </h1>
           <p className="text-muted-foreground text-lg">
-            {t('createAccountSubtitle')}
+            {t("createAccountSubtitle")}
           </p>
         </motion.div>
 
@@ -125,7 +131,9 @@ export function RegisterForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">{t('name')}</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      {t("name")}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -146,7 +154,9 @@ export function RegisterForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">{t('email')}</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      {t("email")}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -169,7 +179,9 @@ export function RegisterForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">{t('password')}</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        {t("password")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -191,7 +203,9 @@ export function RegisterForm() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">{t('confirmPassword')}</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        {t("confirmPassword")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -209,6 +223,24 @@ export function RegisterForm() {
                 />
               </div>
 
+              <FormField
+                control={form.control}
+                name="newsletterSubscribed"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="text-sm font-normal text-muted-foreground cursor-pointer">
+                      {t("newsletterOptIn")}
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+
               <Button
                 type="submit"
                 className="w-full h-13 rounded-xl font-semibold bg-accent text-accent-foreground hover:bg-accent/90 btn-shine mt-2"
@@ -218,7 +250,7 @@ export function RegisterForm() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    {t('signUp')}
+                    {t("signUp")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -228,14 +260,17 @@ export function RegisterForm() {
 
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-muted-foreground">
-              {t('hasAccount')}{' '}
-              <Link href="/login" className="text-accent font-medium hover:text-accent/80 transition-colors">
-                {t('signIn')}
+              {t("hasAccount")}{" "}
+              <Link
+                href="/login"
+                className="text-accent font-medium hover:text-accent/80 transition-colors"
+              >
+                {t("signIn")}
               </Link>
             </p>
           </div>
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

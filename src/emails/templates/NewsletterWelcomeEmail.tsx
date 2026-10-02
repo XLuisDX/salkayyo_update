@@ -18,10 +18,10 @@ interface NewsletterWelcomeEmailProps {
 export const NewsletterWelcomeEmail = ({
   email,
   unsubscribeLink,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: NewsletterWelcomeEmailProps) => {
   return (
-    <EmailBase preview="Welcome to Saklayyo Newsletter - Exclusive deals await!">
+    <EmailBase preview="Welcome to Salkayyo Newsletter - Exclusive deals await!">
       {/* Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>📬 Newsletter</Text>
@@ -33,8 +33,9 @@ export const NewsletterWelcomeEmail = ({
       </Heading>
 
       <Text style={paragraph}>
-        Thanks for subscribing! You&apos;ve just unlocked access to exclusive deals,
-        early access to new products, and insider updates from Saklayyo Store.
+        Thanks for subscribing! You&apos;ve just unlocked access to exclusive
+        deals, early access to new products, and insider updates from Salkayyo
+        Store.
       </Text>
 
       {/* What to Expect */}
@@ -86,12 +87,8 @@ export const NewsletterWelcomeEmail = ({
         <Text style={offerTitle}>10% OFF</Text>
         <Text style={offerSubtitle}>Your First Order</Text>
         <Text style={offerCode}>Use code: WELCOME10</Text>
-        <EmailButton href={`${appUrl}/products`}>
-          Shop Now
-        </EmailButton>
-        <Text style={offerExpiry}>
-          Valid for 30 days • One-time use
-        </Text>
+        <EmailButton href={`${appUrl}/products`}>Shop Now</EmailButton>
+        <Text style={offerExpiry}>Valid for 30 days • One-time use</Text>
       </Section>
 
       <Hr style={divider} />
@@ -121,15 +118,15 @@ export const NewsletterWelcomeEmail = ({
       {/* Unsubscribe */}
       <Text style={unsubscribeText}>
         Subscribed with {email}. If you no longer wish to receive these emails,
-        you can{' '}
+        you can{" "}
         <a href={unsubscribeLink} style={unsubscribeLink_}>
           unsubscribe here
         </a>
         .
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

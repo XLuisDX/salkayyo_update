@@ -24,7 +24,7 @@ export const WholesaleRequestAdminEmail = ({
   email,
   phone,
   message,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: WholesaleRequestAdminEmailProps) => {
   return (
     <EmailBase preview={`New wholesale request from ${companyName}`}>
@@ -68,11 +68,11 @@ export const WholesaleRequestAdminEmail = ({
       </Section>
 
       <Text style={smallText}>
-        This is an automated notification from Saklayyo Store.
+        This is an automated notification from Salkayyo Store.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 const badgeContainer = {
   textAlign: 'center' as const,

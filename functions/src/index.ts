@@ -37,8 +37,8 @@ function getResend(): Resend {
   return resendClient
 }
 
-const APP_URL = process.env.APP_URL || 'https://saklayyo.com'
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@saklayyo.com'
+const APP_URL = process.env.APP_URL || "https://salkayyo.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@salkayyo.com";
 
 // Stripe Webhook Handler
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
@@ -127,7 +127,7 @@ export const onOrderPaid = functions.firestore
         if (userData?.email) {
           // Send confirmation email to customer
           await getResend().emails.send({
-            from: 'Saklayyo Store <orders@saklayyo.com>',
+            from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
             html: orderConfirmationTemplate(
@@ -138,16 +138,16 @@ export const onOrderPaid = functions.firestore
               afterData.tax,
               afterData.total,
               afterData.recipientData,
-              afterData.paymentMethod || 'stripe',
-              APP_URL
+              afterData.paymentMethod || "stripe",
+              APP_URL,
             ),
-          })
+          });
 
           console.log(`Confirmation email sent for order ${orderId}`)
 
           // Notify admin about new order
           await getResend().emails.send({
-            from: 'Saklayyo Store <orders@saklayyo.com>',
+            from: "Salkayyo Store <orders@salkayyo.com>",
             to: ADMIN_EMAIL,
             subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${afterData.total.toFixed(2)}`,
             html: `
@@ -159,7 +159,7 @@ export const onOrderPaid = functions.firestore
               <p><strong>Items:</strong> ${afterData.items.length}</p>
               <p><a href="${APP_URL}/admin/orders/${orderId}">View in Admin</a></p>
             `,
-          })
+          });
         }
 
         // Update product stock
@@ -191,7 +191,7 @@ export const onOrderShipped = functions.firestore
 
         if (userData?.email) {
           await getResend().emails.send({
-            from: 'Saklayyo Store <orders@saklayyo.com>',
+            from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Shipped! 📦`,
             html: orderShippedTemplate(
@@ -201,9 +201,9 @@ export const onOrderShipped = functions.firestore
               afterData.trackingNumber,
               afterData.carrier,
               afterData.estimatedDelivery,
-              APP_URL
+              APP_URL,
             ),
-          })
+          });
 
           console.log(`Shipping notification sent for order ${orderId}`)
         }
@@ -235,16 +235,16 @@ export const onOrderDelivered = functions.firestore
           })
 
           await getResend().emails.send({
-            from: 'Saklayyo Store <orders@saklayyo.com>',
+            from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Been Delivered! 🎉`,
             html: orderDeliveredTemplate(
               orderId,
               afterData.recipientData.fullName,
               deliveredAt,
-              APP_URL
+              APP_URL,
             ),
-          })
+          });
 
           console.log(`Delivery notification sent for order ${orderId}`)
         }
@@ -269,7 +269,7 @@ export const onOrderCancelled = functions.firestore
 
         if (userData?.email) {
           await getResend().emails.send({
-            from: 'Saklayyo Store <orders@saklayyo.com>',
+            from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Order #${orderId.slice(0, 8).toUpperCase()} Has Been Cancelled`,
             html: orderCancelledTemplate(
@@ -277,9 +277,9 @@ export const onOrderCancelled = functions.firestore
               afterData.recipientData.fullName,
               afterData.total,
               afterData.cancellationReason,
-              APP_URL
+              APP_URL,
             ),
-          })
+          });
 
           console.log(`Cancellation notification sent for order ${orderId}`)
         }
@@ -326,11 +326,11 @@ export const onUserCreated = functions.firestore
     if (userData?.email) {
       try {
         await getResend().emails.send({
-          from: 'Saklayyo Store <welcome@saklayyo.com>',
+          from: "Salkayyo Store <welcome@salkayyo.com>",
           to: userData.email,
-          subject: 'Welcome to Saklayyo Store! 🎉',
-          html: welcomeEmailTemplate(userData.name || 'there', APP_URL),
-        })
+          subject: "Welcome to Salkayyo Store! 🎉",
+          html: welcomeEmailTemplate(userData.name || "there", APP_URL),
+        });
 
         console.log(`Welcome email sent to ${userData.email}`)
       } catch (error) {

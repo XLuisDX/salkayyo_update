@@ -12,7 +12,7 @@ import {
 import { Product, CartItem, Cart } from '@/types'
 import { calculateTax, calculateTotal } from '@/lib/utils'
 
-const CART_STORAGE_KEY = 'saklayyo_cart'
+const CART_STORAGE_KEY = 'salkayyo_cart'
 const TAX_RATE = 0.09
 
 interface CartContextType {

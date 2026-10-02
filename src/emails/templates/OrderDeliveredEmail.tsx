@@ -20,9 +20,9 @@ export const OrderDeliveredEmail = ({
   orderId,
   customerName,
   deliveredAt,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: OrderDeliveredEmailProps) => {
-  const orderNumber = orderId.slice(0, 8).toUpperCase()
+  const orderNumber = orderId.slice(0, 8).toUpperCase();
 
   return (
     <EmailBase preview={`Your order #${orderNumber} has been delivered!`}>
@@ -32,13 +32,9 @@ export const OrderDeliveredEmail = ({
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Your order has arrived!
-      </Heading>
+      <Heading style={heading}>Your order has arrived!</Heading>
 
-      <Text style={paragraph}>
-        Hi {customerName},
-      </Text>
+      <Text style={paragraph}>Hi {customerName},</Text>
 
       <Text style={paragraph}>
         Great news! Your order #{orderNumber} has been delivered. We hope you
@@ -80,8 +76,8 @@ export const OrderDeliveredEmail = ({
       <Section style={reviewSection}>
         <Text style={reviewTitle}>How was your experience?</Text>
         <Text style={reviewText}>
-          We&apos;d love to hear your feedback! Share your thoughts to help other
-          shoppers and help us improve.
+          We&apos;d love to hear your feedback! Share your thoughts to help
+          other shoppers and help us improve.
         </Text>
 
         <Section style={starsSection}>
@@ -99,20 +95,18 @@ export const OrderDeliveredEmail = ({
       <Section style={issueBox}>
         <Text style={issueTitle}>Any issues with your order?</Text>
         <Text style={issueText}>
-          If something isn&apos;t right, we&apos;re here to help. Contact our support
-          team and we&apos;ll make it right.
+          If something isn&apos;t right, we&apos;re here to help. Contact our
+          support team and we&apos;ll make it right.
         </Text>
         <EmailButton href={`${appUrl}/support`} variant="outline">
           Contact Support
         </EmailButton>
       </Section>
 
-      <Text style={smallText}>
-        Thank you for shopping with Saklayyo!
-      </Text>
+      <Text style={smallText}>Thank you for shopping with Salkayyo!</Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

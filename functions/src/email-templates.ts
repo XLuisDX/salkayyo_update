@@ -32,7 +32,7 @@ const baseTemplate = (content: string, preview: string) => `
     <!-- Header -->
     <tr>
       <td style="background-color: ${COLORS.bg}; padding: 32px 40px; text-align: center; border-bottom: 1px solid ${COLORS.border};">
-        <img src="https://saklayyo.com/logo.png" width="150" height="40" alt="Saklayyo" style="display: block; margin: 0 auto;" />
+        <img src="https://salkayyo.com/logo.png" width="150" height="40" alt="Salkayyo" style="display: block; margin: 0 auto;" />
       </td>
     </tr>
     <!-- Content -->
@@ -44,15 +44,15 @@ const baseTemplate = (content: string, preview: string) => `
     <!-- Footer -->
     <tr>
       <td style="background-color: ${COLORS.bg}; padding: 32px 40px; text-align: center; border-top: 1px solid ${COLORS.border};">
-        <p style="color: ${COLORS.darkGray}; font-size: 12px; margin: 0 0 8px 0;">© ${new Date().getFullYear()} Saklayyo Store. All rights reserved.</p>
-        <p style="color: #888888; font-size: 12px; margin: 0 0 8px 0;">Need help? Contact us at support@saklayyo.com</p>
-        <p style="color: #444444; font-size: 11px; margin: 0;">Saklayyo Store • Your Premium Shopping Destination</p>
+        <p style="color: ${COLORS.darkGray}; font-size: 12px; margin: 0 0 8px 0;">© ${new Date().getFullYear()} Salkayyo Store. All rights reserved.</p>
+        <p style="color: #888888; font-size: 12px; margin: 0 0 8px 0;">Need help? Contact us at support@salkayyo.com</p>
+        <p style="color: #444444; font-size: 11px; margin: 0;">Salkayyo Store • Your Premium Shopping Destination</p>
       </td>
     </tr>
   </table>
 </body>
 </html>
-`
+`;
 
 export function welcomeEmailTemplate(name: string, appUrl: string) {
   const content = `
@@ -63,7 +63,7 @@ export function welcomeEmailTemplate(name: string, appUrl: string) {
 
     <!-- Heading -->
     <h1 style="color: ${COLORS.white}; font-size: 28px; font-weight: 700; text-align: center; margin: 0 0 24px 0;">
-      Welcome to <span style="color: ${COLORS.lime};">Saklayyo</span>, ${name}!
+      Welcome to <span style="color: ${COLORS.lime};">Salkayyo</span>, ${name}!
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; text-align: center; margin: 0 0 24px 0;">
@@ -104,9 +104,9 @@ export function welcomeEmailTemplate(name: string, appUrl: string) {
     <p style="color: ${COLORS.darkGray}; font-size: 13px; text-align: center; margin: 24px 0 0 0;">
       Questions? Simply reply to this email — we're here to help!
     </p>
-  `
+  `;
 
-  return baseTemplate(content, `Welcome to Saklayyo Store, ${name}!`)
+  return baseTemplate(content, `Welcome to Salkayyo Store, ${name}!`);
 }
 
 export function orderConfirmationTemplate(
@@ -266,24 +266,36 @@ export function orderShippedTemplate(
             <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Order Number</p>
             <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0;">${orderNumber}</p>
           </td>
-          ${carrier ? `
+          ${
+            carrier
+              ? `
           <td width="50%">
             <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Carrier</p>
             <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0;">${carrier}</p>
           </td>
-          ` : ''}
+          `
+              : ""
+          }
         </tr>
       </table>
-      ${trackingNumber ? `
+      ${
+        trackingNumber
+          ? `
       <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 16px 0;" />
       <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Tracking Number</p>
       <p style="color: ${COLORS.lime}; font-size: 20px; font-weight: 700; letter-spacing: 2px; margin: 0;">${trackingNumber}</p>
-      ` : ''}
-      ${estimatedDelivery ? `
+      `
+          : ""
+      }
+      ${
+        estimatedDelivery
+          ? `
       <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 16px 0;" />
       <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Estimated Delivery</p>
       <p style="color: ${COLORS.blue}; font-size: 18px; font-weight: 600; margin: 0;">${estimatedDelivery}</p>
-      ` : ''}
+      `
+          : ""
+      }
     </div>
 
     <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 32px 0;" />
@@ -301,7 +313,7 @@ export function orderShippedTemplate(
 
     <!-- CTA -->
     <div style="text-align: center; margin: 32px 0;">
-      <a href="${appUrl || 'https://saklayyo.com'}/orders/${orderId}" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
+      <a href="${appUrl || "https://salkayyo.com"}/orders/${orderId}" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
         Track Your Order
       </a>
     </div>
@@ -309,7 +321,7 @@ export function orderShippedTemplate(
     <p style="color: ${COLORS.darkGray}; font-size: 13px; text-align: center; margin: 0;">
       You'll receive another email when your order is delivered.
     </p>
-  `
+  `;
 
   return baseTemplate(content, `Your order #${orderNumber} has shipped!`)
 }
@@ -356,15 +368,15 @@ export function orderDeliveredTemplate(
         We'd love to hear your feedback! Share your thoughts to help other shoppers and help us improve.
       </p>
       <p style="font-size: 32px; letter-spacing: 8px; margin: 0 0 20px 0;">⭐ ⭐ ⭐ ⭐ ⭐</p>
-      <a href="${appUrl || 'https://saklayyo.com'}/orders/${orderId}?review=true" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
+      <a href="${appUrl || "https://salkayyo.com"}/orders/${orderId}?review=true" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
         Leave a Review
       </a>
     </div>
 
     <p style="color: ${COLORS.darkGray}; font-size: 13px; text-align: center; margin: 24px 0 0 0;">
-      Thank you for shopping with Saklayyo!
+      Thank you for shopping with Salkayyo!
     </p>
-  `
+  `;
 
   return baseTemplate(content, `Your order #${orderNumber} has been delivered!`)
 }
@@ -393,7 +405,7 @@ export function orderCancelledTemplate(
       Hi ${customerName},
     </p>
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 24px 0;">
-      Your order #${orderNumber} has been cancelled.${reason ? ` Reason: ${reason}` : ''}
+      Your order #${orderNumber} has been cancelled.${reason ? ` Reason: ${reason}` : ""}
     </p>
 
     <!-- Order Box -->
@@ -415,11 +427,11 @@ export function orderCancelledTemplate(
     <!-- CTA -->
     <div style="text-align: center; margin: 32px 0;">
       <p style="color: #888888; font-size: 14px; margin: 0 0 16px 0;">Want to shop again? Browse our latest products:</p>
-      <a href="${appUrl || 'https://saklayyo.com'}/products" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
+      <a href="${appUrl || "https://salkayyo.com"}/products" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
         Continue Shopping
       </a>
     </div>
-  `
+  `;
 
   return baseTemplate(content, `Order #${orderNumber} has been cancelled`)
 }

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Saklayyo Store",
+    "appName": "Salkayyo Store",
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success",
@@ -62,11 +62,8 @@
     "verifyEmail": "Verify Email",
     "verificationSent": "Verification email sent",
     "resendVerification": "Resend Verification",
-    "enterCode": "Enter verification code",
-    "verify": "Verify",
-    "verificationCode": "Verification Code",
-    "verificationCodePlaceholder": "Paste the code from your email",
-    "invalidVerificationCode": "Invalid or expired code. Please request a new one.",
+    "iVerifiedCheckNow": "I clicked the link, check now",
+    "notVerifiedYet": "Your email hasn't been verified yet. Check your inbox.",
     "passwordResetSent": "Password reset email sent",
     "loginSuccess": "Login successful",
     "registerSuccess": "Registration successful. Please verify your email.",
@@ -77,14 +74,15 @@
     "enterPasswordPlaceholder": "Enter your password",
     "createAccountSubtitle": "Create an account to start shopping",
     "emailAlreadyInUse": "Email is already in use",
+    "newsletterOptIn": "I want to receive deals and updates by email",
     "checkEmailForReset": "Check your email for a password reset link",
     "resetLinkSentDescription": "We've sent a password reset link to your email address.",
     "enterEmailForReset": "Enter your email to receive a password reset link",
     "emailVerified": "Email Verified!",
     "emailVerifiedDescription": "Your email has been verified successfully.",
-    "verificationLinkSentTo": "We've sent a verification code to {email}",
+    "verificationLinkSentTo": "We've sent a verification link to {email}",
     "goToHome": "Go to Home",
-    "checkVerificationInstructions": "Enter the code from your email below to verify your account. If you don't see it, check your spam folder.",
+    "checkVerificationInstructions": "Click the link in your email to verify your account. If you don't see it, check your spam folder.",
     "verificationEmailSentCheckInbox": "Verification email sent! Check your inbox.",
     "sending": "Sending..."
   },
@@ -257,7 +255,7 @@
     "getInTouch": "Get in Touch",
     "getInTouchDescription": "Reach out with questions about orders, products, wholesale, or anything else.",
     "emailUs": "Email Us",
-    "supportEmail": "support@saklayyo.com",
+    "supportEmail": "support@salkayyo.com",
     "responseTime": "Response Time",
     "responseTimeValue": "Within 24-48 hours",
     "sendMessage": "Send us a Message",
@@ -478,7 +476,7 @@
     "orderId": "Order ID"
   },
   "seo": {
-    "siteDescription": "Shop quality products online at Saklayyo Store. Fast shipping, secure checkout, and a curated catalog for every need.",
-    "keywords": "online store, ecommerce, shopping, saklayyo, quality products, fast shipping"
+    "siteDescription": "Shop quality products online at Salkayyo Store. Fast shipping, secure checkout, and a curated catalog for every need.",
+    "keywords": "online store, ecommerce, shopping, salkayyo, quality products, fast shipping"
   }
 }

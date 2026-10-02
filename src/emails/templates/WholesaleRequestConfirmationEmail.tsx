@@ -9,10 +9,10 @@ interface WholesaleRequestConfirmationEmailProps {
 
 export const WholesaleRequestConfirmationEmail = ({
   contactName,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: WholesaleRequestConfirmationEmailProps) => {
   return (
-    <EmailBase preview="We received your wholesale request - Saklayyo Store">
+    <EmailBase preview="We received your wholesale request - Salkayyo Store">
       <Section style={badgeContainer}>
         <Text style={badge}>🏢 Wholesale</Text>
       </Section>
@@ -23,14 +23,14 @@ export const WholesaleRequestConfirmationEmail = ({
 
       <Text style={paragraph}>
         We&apos;ve received your wholesale quote request and our team is already
-        reviewing it. A member of our business team will reach out within
-        24-48 hours with a custom quote tailored to your needs.
+        reviewing it. A member of our business team will reach out within 24-48
+        hours with a custom quote tailored to your needs.
       </Text>
 
       <Section style={infoBox}>
         <Text style={infoText}>
-          In the meantime, feel free to browse our full catalog to get a
-          sense of what we offer.
+          In the meantime, feel free to browse our full catalog to get a sense
+          of what we offer.
         </Text>
       </Section>
 
@@ -40,11 +40,11 @@ export const WholesaleRequestConfirmationEmail = ({
 
       <Text style={smallText}>
         Questions in the meantime? Reply to this email or reach us at
-        support@saklayyo.com.
+        support@salkayyo.com.
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 const badgeContainer = {
   textAlign: 'center' as const,

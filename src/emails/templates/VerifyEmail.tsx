@@ -5,42 +5,34 @@ import {
   Text,
 } from '@react-email/components'
 import * as React from 'react'
-import { EmailBase } from '../components'
+import { EmailBase, EmailButton } from "../components";
 
 interface VerifyEmailProps {
-  name: string
-  code: string
+  name: string;
+  verificationLink: string;
 }
 
-export const VerifyEmail = ({
-  name,
-  code,
-}: VerifyEmailProps) => {
+export const VerifyEmail = ({ name, verificationLink }: VerifyEmailProps) => {
   return (
-    <EmailBase preview={`Your Saklayyo verification code: ${code}`}>
+    <EmailBase preview="Verify your email for Salkayyo Store">
       {/* Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>📧 Email Verification</Text>
       </Section>
 
       {/* Main Heading */}
-      <Heading style={heading}>
-        Verify your email
-      </Heading>
+      <Heading style={heading}>Verify your email</Heading>
+
+      <Text style={paragraph}>Hi {name || "there"},</Text>
 
       <Text style={paragraph}>
-        Hi {name || 'there'},
+        Thanks for signing up for Salkayyo Store! Click the button below to
+        confirm your email and unlock all features.
       </Text>
 
-      <Text style={paragraph}>
-        Thanks for signing up for Saklayyo Store! Enter this code on the
-        verification page to complete your registration and unlock all features.
-      </Text>
-
-      {/* Code */}
-      <Section style={codeBox}>
-        <Text style={codeLabel}>YOUR VERIFICATION CODE</Text>
-        <Text style={codeText}>{code}</Text>
+      {/* CTA */}
+      <Section style={ctaSection}>
+        <EmailButton href={verificationLink}>Verify my email</EmailButton>
       </Section>
 
       <Hr style={divider} />
@@ -48,14 +40,14 @@ export const VerifyEmail = ({
       {/* Security Notice */}
       <Section style={noticeBox}>
         <Text style={noticeText}>
-          🔒 This code is only valid for a short time. If it doesn&apos;t work,
-          request a new one from the verification page. If you didn&apos;t create
-          an account with Saklayyo Store, you can safely ignore this email.
+          🔒 This link is only valid for a short time. If it expires, request a
+          new one from the verification page. If you didn&apos;t create an
+          account with Salkayyo Store, you can safely ignore this email.
         </Text>
       </Section>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {
@@ -91,37 +83,14 @@ const paragraph = {
   margin: '0 0 16px 0',
 }
 
+const ctaSection = {
+  textAlign: "center" as const,
+  margin: "32px 0",
+};
+
 const divider = {
   borderColor: '#262626',
   margin: '32px 0',
-}
-
-const codeBox = {
-  backgroundColor: '#0a0a0a',
-  padding: '32px',
-  borderRadius: '16px',
-  border: '2px solid #99FF00',
-  textAlign: 'center' as const,
-  margin: '32px 0',
-}
-
-const codeLabel = {
-  color: '#99FF00',
-  fontSize: '11px',
-  fontWeight: '700',
-  letterSpacing: '2px',
-  margin: '0 0 12px 0',
-}
-
-const codeText = {
-  color: '#ffffff',
-  fontSize: '18px',
-  fontFamily: 'monospace',
-  fontWeight: '700',
-  letterSpacing: '0.5px',
-  margin: '0',
-  wordBreak: 'break-all' as const,
-  lineHeight: '26px',
 }
 
 const noticeBox = {

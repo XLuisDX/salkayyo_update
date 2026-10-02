@@ -14,10 +14,10 @@ interface WelcomeEmailProps {
 
 export const WelcomeEmail = ({
   name,
-  appUrl = 'https://saklayyo.com',
+  appUrl = "https://salkayyo.com",
 }: WelcomeEmailProps) => {
   return (
-    <EmailBase preview={`Welcome to Saklayyo Store, ${name}!`}>
+    <EmailBase preview={`Welcome to Salkayyo Store, ${name}!`}>
       {/* Welcome Badge */}
       <Section style={badgeContainer}>
         <Text style={badge}>✨ Welcome</Text>
@@ -25,13 +25,13 @@ export const WelcomeEmail = ({
 
       {/* Main Heading */}
       <Heading style={heading}>
-        Welcome to <span style={accentText}>Saklayyo</span>, {name}!
+        Welcome to <span style={accentText}>Salkayyo</span>, {name}!
       </Heading>
 
       <Text style={paragraph}>
-        We&apos;re thrilled to have you join our community of savvy shoppers. Your
-        account has been successfully created and you&apos;re ready to explore our
-        curated collection.
+        We&apos;re thrilled to have you join our community of savvy shoppers.
+        Your account has been successfully created and you&apos;re ready to
+        explore our curated collection.
       </Text>
 
       <Hr style={divider} />
@@ -72,17 +72,15 @@ export const WelcomeEmail = ({
 
       {/* CTA */}
       <Section style={ctaSection}>
-        <EmailButton href={`${appUrl}/products`}>
-          Start Shopping
-        </EmailButton>
+        <EmailButton href={`${appUrl}/products`}>Start Shopping</EmailButton>
       </Section>
 
       <Text style={smallText}>
         Questions? Simply reply to this email — we&apos;re here to help!
       </Text>
     </EmailBase>
-  )
-}
+  );
+};
 
 // Styles
 const badgeContainer = {

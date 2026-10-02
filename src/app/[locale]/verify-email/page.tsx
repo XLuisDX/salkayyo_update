@@ -1,48 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { getErrorMessage, isExpectedAuthError } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import { Mail, Loader2, CheckCircle } from 'lucide-react'
+import { Mail, Loader2, CheckCircle, RefreshCw } from 'lucide-react'
 import { Link } from '@/i18n/routing'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-
-function createVerifyCodeSchema(tv: ReturnType<typeof useTranslations>) {
-  return z.object({
-    code: z.string().min(1, tv('required')),
-  })
-}
-
-type VerifyCodeFormValues = z.infer<ReturnType<typeof createVerifyCodeSchema>>
+import { getErrorMessage } from '@/lib/utils'
 
 export default function VerifyEmailPage() {
   const t = useTranslations('auth')
-  const tv = useTranslations('validation')
-  const { user, firebaseUser, resendVerification, verifyEmailCode } = useAuth()
+  const { user, firebaseUser, resendVerification, checkEmailVerified } = useAuth()
   const [resending, setResending] = useState(false)
-  const [verifying, setVerifying] = useState(false)
+  const [checking, setChecking] = useState(false)
   const [sent, setSent] = useState(false)
 
-  const form = useForm<VerifyCodeFormValues>({
-    resolver: zodResolver(createVerifyCodeSchema(tv)),
-    defaultValues: { code: '' },
-  })
+  const isVerified = user?.verified || firebaseUser?.emailVerified
+
+  // If the user clicks the verification link in another tab, pick up the
+  // new status as soon as they come back to this one.
+  useEffect(() => {
+    if (isVerified) return
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        checkEmailVerified().catch(() => {})
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [isVerified, checkEmailVerified])
 
   const handleResend = async () => {
     setResending(true)
@@ -57,22 +48,21 @@ export default function VerifyEmailPage() {
     }
   }
 
-  const onSubmit = async (data: VerifyCodeFormValues) => {
-    setVerifying(true)
+  const handleCheck = async () => {
+    setChecking(true)
     try {
-      await verifyEmailCode(data.code.trim())
-      toast.success(t('emailVerified'))
-    } catch (error: unknown) {
-      if (!isExpectedAuthError(error)) {
-        console.error('Verify email code error:', error)
+      const verified = await checkEmailVerified()
+      if (verified) {
+        toast.success(t('emailVerified'))
+      } else {
+        toast.error(t('notVerifiedYet'))
       }
-      toast.error(t('invalidVerificationCode'))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error))
     } finally {
-      setVerifying(false)
+      setChecking(false)
     }
   }
-
-  const isVerified = user?.verified || firebaseUser?.emailVerified
 
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-8">
@@ -110,38 +100,19 @@ export default function VerifyEmailPage() {
                   {t('checkVerificationInstructions')}
                 </p>
 
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="code"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('verificationCode')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder={t('verificationCodePlaceholder')}
-                              autoComplete="one-time-code"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button type="submit" className="w-full" disabled={verifying}>
-                      {verifying ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('sending')}
-                        </>
-                      ) : (
-                        t('verify')
-                      )}
-                    </Button>
-                  </form>
-                </Form>
+                <Button className="w-full" onClick={handleCheck} disabled={checking}>
+                  {checking ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t('sending')}
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      {t('iVerifiedCheckNow')}
+                    </>
+                  )}
+                </Button>
 
                 {sent ? (
                   <div className="text-center text-sm text-green-600 dark:text-green-400">

@@ -15,11 +15,11 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
   return {
     title: {
-      absolute: 'Saklayyo Store',
+      absolute: "Salkayyo Store",
     },
-    description: t('siteDescription'),
+    description: t("siteDescription"),
     alternates: { canonical: `/${locale}` },
-  }
+  };
 }
 
 export default async function HomePage({ params }: HomePageProps) {
