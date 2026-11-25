@@ -35,6 +35,12 @@ function createWholesaleSchema(tv: ReturnType<typeof useTranslations>) {
 
 type WholesaleFormValues = z.infer<ReturnType<typeof createWholesaleSchema>>
 
+const wholesaleProducts = [
+  { key: 'detergent', price: 25 },
+  { key: 'toothpasteCharcoal', price: 50 },
+  { key: 'toothpasteAloe', price: 45 },
+] as const
+
 export default function WholesalePage() {
   const t = useTranslations('wholesale')
   const tv = useTranslations('validation')
@@ -144,22 +150,32 @@ export default function WholesalePage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('minOrder')}</CardTitle>
+              <CardTitle>{t('priceListTitle')}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t('priceListDescription')}</p>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span>{t('standardProducts')}</span>
-                  <span className="font-semibold">{t('standardUnits')}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span>{t('customProducts')}</span>
-                  <span className="font-semibold">{t('customUnits')}</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span>{t('mixedOrders')}</span>
-                  <span className="font-semibold">{t('mixedValue')}</span>
-                </div>
+              <div className="divide-y">
+                {wholesaleProducts.map((product) => (
+                  <div
+                    key={product.key}
+                    className="flex justify-between items-center gap-4 py-3"
+                  >
+                    <div>
+                      <p className="font-medium">{t(`products.${product.key}.name`)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t(`products.${product.key}.pack`)}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-semibold text-primary">
+                        ${product.price} USD
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t(`products.${product.key}.per`)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

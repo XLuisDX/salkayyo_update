@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import {
@@ -57,6 +58,9 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const cursor = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [formOpen, setFormOpen] = useState(false);
@@ -67,10 +71,12 @@ export default function AdminProductsPage() {
   const fetchData = useCallback(async () => {
     try {
       const [productsData, categoriesData] = await Promise.all([
-        ProductsService.getAll({ limit: 100 }),
+        ProductsService.getAll(),
         CategoriesService.getAll(),
       ]);
       setProducts(productsData.items);
+      cursor.current = productsData.nextCursor;
+      setHasMore(productsData.hasMore);
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -84,10 +90,28 @@ export default function AdminProductsPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleCreate = async (data: ProductCreateData) => {
+  const loadMore = async () => {
+    if (!cursor.current || loadingMore) return;
+    setLoadingMore(true);
     try {
-      const newProduct = await ProductsService.create(data);
-      setProducts([newProduct, ...products]);
+      const page = await ProductsService.getAll(undefined, cursor.current);
+      cursor.current = page.nextCursor;
+      setHasMore(page.hasMore);
+      setProducts(current => {
+        const ids = new Set(current.map(product => product.id));
+        return [...current, ...page.items.filter(item => !ids.has(item.id))];
+      });
+    } catch {
+      toast.error(tCommon('error'));
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const handleCreate = async (data: ProductCreateData, id?: string) => {
+    try {
+      const newProduct = await ProductsService.create(data, id);
+      setProducts(current => [newProduct, ...current]);
       toast.success(t("productCreated"));
     } catch (error) {
       console.error("Error creating product:", error);
@@ -100,9 +124,10 @@ export default function AdminProductsPage() {
     if (!editingProduct) return;
 
     try {
-      await ProductsService.update(editingProduct.id, data);
-      setProducts(
-        products.map((p) =>
+      const { stock, ...details } = data;
+      await ProductsService.update(editingProduct.id, stock === editingProduct.stock ? details : data);
+      setProducts(current =>
+        current.map((p) =>
           p.id === editingProduct.id ? { ...p, ...data } : p,
         ),
       );
@@ -120,9 +145,9 @@ export default function AdminProductsPage() {
 
     setIsDeleting(true);
     try {
-      await StorageService.deleteProductImages(deleteProduct.id);
+      await StorageService.deleteCatalogImages('products', deleteProduct.id, deleteProduct.images);
       await ProductsService.delete(deleteProduct.id);
-      setProducts(products.filter((p) => p.id !== deleteProduct.id));
+      setProducts(current => current.filter((p) => p.id !== deleteProduct.id));
       setDeleteProduct(null);
       toast.success(t("productDeleted"));
     } catch (error) {
@@ -407,6 +432,15 @@ export default function AdminProductsPage() {
       />
 
       {/* Delete Confirmation */}
+      {hasMore && (
+        <div className="mt-6 flex justify-center">
+          <Button variant="outline" disabled={loadingMore} onClick={loadMore}>
+            {loadingMore && <Loader2 className="size-4 animate-spin" />}
+            {tCommon('loadMore')}
+          </Button>
+        </div>
+      )}
+
       <AlertDialog
         open={!!deleteProduct}
         onOpenChange={(open) => !open && setDeleteProduct(null)}

@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
-import Stripe from 'stripe'
-import { Resend } from 'resend'
+import type { CreateEmailOptions } from 'resend'
 import {
+  escapeHtml,
   welcomeEmailTemplate,
   orderConfirmationTemplate,
   orderShippedTemplate,
@@ -12,185 +12,110 @@ import {
 
 admin.initializeApp()
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message
-  }
-  if (typeof error === 'string') {
-    return error
-  }
-  return 'An unknown error occurred'
+const db = admin.firestore()
+
+async function sendEmail(key: string, email: CreateEmailOptions) {
+  const sent = db.collection('emailDeliveries').doc(key)
+  if ((await sent.get()).exists) return
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + process.env.RESEND_API_KEY,
+      'Content-Type': 'application/json',
+      'Idempotency-Key': key,
+    },
+    body: JSON.stringify(email),
+    signal: AbortSignal.timeout(15_000),
+  })
+  if (!response.ok) throw new Error('Resend returned ' + response.status)
+  await sent.set({ sentAt: admin.firestore.FieldValue.serverTimestamp() })
 }
 
-const db = admin.firestore()
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
-})
-
-// Lazily constructed: avoids crashing Firebase's static source analysis
-// (which requires this module without the real env/secrets present).
-let resendClient: Resend | null = null
-function getResend(): Resend {
-  if (!resendClient) {
-    resendClient = new Resend(process.env.RESEND_API_KEY)
-  }
-  return resendClient
+async function getUser(uid: string) {
+  return admin.auth().getUser(uid).catch(error => {
+    if (error.code === 'auth/user-not-found') return null
+    throw error
+  })
 }
 
 const APP_URL = process.env.APP_URL || "https://salkayyo.com";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@salkayyo.com";
 
-// Stripe Webhook Handler
-export const stripeWebhook = functions.https.onRequest(async (req, res) => {
-  const signature = req.headers['stripe-signature'] as string
-
-  if (!signature) {
-    res.status(400).send('Missing stripe-signature header')
-    return
-  }
-
-  let event: Stripe.Event
-
+async function notifyPaidOrder(orderId: string, afterData: admin.firestore.DocumentData) {
+  if (afterData.status !== 'paid' || (afterData.paymentMethod === 'paypal' && !afterData.paymentId)) return
   try {
-    event = stripe.webhooks.constructEvent(
-      req.rawBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET || ''
-    )
-  } catch (err: unknown) {
-    const message = getErrorMessage(err)
-    console.error('Webhook signature verification failed:', message)
-    res.status(400).send(`Webhook Error: ${message}`)
-    return
-  }
+    // Get user email
+    const userData = await getUser(afterData.userId)
 
-  try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
-        const orderId = session.metadata?.orderId
+    if (userData?.email) {
+      // Send confirmation email to customer
+      await sendEmail('paid-customer-' + orderId, {
+        from: "Salkayyo Store <orders@salkayyo.com>",
+        to: userData.email,
+        subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
+        html: orderConfirmationTemplate(
+          orderId,
+          afterData.recipientData.fullName,
+          afterData.items,
+          afterData.subtotal,
+          afterData.tax,
+          afterData.total,
+          afterData.recipientData,
+          afterData.paymentMethod,
+          APP_URL,
+        ),
+      });
 
-        if (orderId) {
-          await db.collection('orders').doc(orderId).update({
-            status: 'paid',
-            paymentId: session.payment_intent as string,
-            paidAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          })
+      console.log(`Confirmation email sent for order ${orderId}`)
 
-          console.log(`Order ${orderId} marked as paid`)
-        }
-        break
-      }
-
-      case 'checkout.session.expired': {
-        const session = event.data.object as Stripe.Checkout.Session
-        const orderId = session.metadata?.orderId
-
-        if (orderId) {
-          await db.collection('orders').doc(orderId).update({
-            status: 'cancelled',
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          })
-
-          console.log(`Order ${orderId} cancelled (session expired)`)
-        }
-        break
-      }
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`)
+      // Notify admin about new order
+      await sendEmail('paid-admin-' + orderId, {
+        from: "Salkayyo Store <orders@salkayyo.com>",
+        to: ADMIN_EMAIL,
+        subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${afterData.total.toFixed(2)}`,
+        html: `
+          <h1>New Order Received!</h1>
+          <p><strong>Order #:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
+          <p><strong>Customer:</strong> ${escapeHtml(afterData.recipientData.fullName)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(userData.email)}</p>
+          <p><strong>Total:</strong> $${afterData.total.toFixed(2)}</p>
+          <p><strong>Items:</strong> ${afterData.items.length}</p>
+          <p><a href="${APP_URL}/en/admin/orders">View in Admin</a></p>
+        `,
+      });
     }
 
-    res.status(200).json({ received: true })
-  } catch (error: unknown) {
-    console.error('Webhook handler error:', error)
-    res.status(500).json({ error: getErrorMessage(error) })
+  } catch (error) {
+    console.error('Error processing paid order:', error)
+    throw error
   }
-})
+}
 
-// Send order confirmation email when order status changes to 'paid'
-export const onOrderPaid = functions.firestore
+export const onPaidOrderCreated = functions.runWith({ failurePolicy: true }).firestore
+  .document('orders/{orderId}')
+  .onCreate((snapshot, context) => notifyPaidOrder(context.params.orderId, snapshot.data()))
+
+export const onOrderPaid = functions.runWith({ failurePolicy: true }).firestore
   .document('orders/{orderId}')
   .onUpdate(async (change, context) => {
-    const beforeData = change.before.data()
-    const afterData = change.after.data()
-    const orderId = context.params.orderId
-
-    // Only proceed if status changed to 'paid'
-    if (beforeData.status !== 'paid' && afterData.status === 'paid') {
-      try {
-        // Get user email
-        const userDoc = await db.collection('users').doc(afterData.userId).get()
-        const userData = userDoc.data()
-
-        if (userData?.email) {
-          // Send confirmation email to customer
-          await getResend().emails.send({
-            from: "Salkayyo Store <orders@salkayyo.com>",
-            to: userData.email,
-            subject: `Order Confirmed #${orderId.slice(0, 8).toUpperCase()} ✅`,
-            html: orderConfirmationTemplate(
-              orderId,
-              afterData.recipientData.fullName,
-              afterData.items,
-              afterData.subtotal,
-              afterData.tax,
-              afterData.total,
-              afterData.recipientData,
-              afterData.paymentMethod || "stripe",
-              APP_URL,
-            ),
-          });
-
-          console.log(`Confirmation email sent for order ${orderId}`)
-
-          // Notify admin about new order
-          await getResend().emails.send({
-            from: "Salkayyo Store <orders@salkayyo.com>",
-            to: ADMIN_EMAIL,
-            subject: `🔔 New Order #${orderId.slice(0, 8).toUpperCase()} - $${afterData.total.toFixed(2)}`,
-            html: `
-              <h1>New Order Received!</h1>
-              <p><strong>Order #:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
-              <p><strong>Customer:</strong> ${afterData.recipientData.fullName}</p>
-              <p><strong>Email:</strong> ${userData.email}</p>
-              <p><strong>Total:</strong> $${afterData.total.toFixed(2)}</p>
-              <p><strong>Items:</strong> ${afterData.items.length}</p>
-              <p><a href="${APP_URL}/admin/orders/${orderId}">View in Admin</a></p>
-            `,
-          });
-        }
-
-        // Update product stock
-        for (const item of afterData.items) {
-          const productRef = db.collection('products').doc(item.productId)
-          await productRef.update({
-            stock: admin.firestore.FieldValue.increment(-item.quantity),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          })
-        }
-      } catch (error) {
-        console.error('Error processing paid order:', error)
-      }
-    }
+    if (change.before.data().status === 'paid') return
+    await notifyPaidOrder(context.params.orderId, change.after.data())
   })
 
 // Send shipping notification when order status changes to 'shipped'
-export const onOrderShipped = functions.firestore
+export const onOrderShipped = functions.runWith({ failurePolicy: true }).firestore
   .document('orders/{orderId}')
   .onUpdate(async (change, context) => {
     const beforeData = change.before.data()
     const afterData = change.after.data()
     const orderId = context.params.orderId
 
-    if (beforeData.status !== 'shipped' && afterData.status === 'shipped') {
+    if (beforeData.status === 'paid' && afterData.status === 'shipped') {
       try {
-        const userDoc = await db.collection('users').doc(afterData.userId).get()
-        const userData = userDoc.data()
+        const userData = await getUser(afterData.userId)
 
         if (userData?.email) {
-          await getResend().emails.send({
+          await sendEmail('shipped-' + orderId, {
             from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Shipped! 📦`,
@@ -201,7 +126,6 @@ export const onOrderShipped = functions.firestore
               afterData.trackingNumber,
               afterData.carrier,
               afterData.estimatedDelivery,
-              APP_URL,
             ),
           });
 
@@ -209,32 +133,32 @@ export const onOrderShipped = functions.firestore
         }
       } catch (error) {
         console.error('Error sending shipping notification:', error)
+        throw error
       }
     }
   })
 
 // Send delivery notification when order status changes to 'delivered'
-export const onOrderDelivered = functions.firestore
+export const onOrderDelivered = functions.runWith({ failurePolicy: true }).firestore
   .document('orders/{orderId}')
   .onUpdate(async (change, context) => {
     const beforeData = change.before.data()
     const afterData = change.after.data()
     const orderId = context.params.orderId
 
-    if (beforeData.status !== 'delivered' && afterData.status === 'delivered') {
+    if (beforeData.status === 'shipped' && afterData.status === 'delivered') {
       try {
-        const userDoc = await db.collection('users').doc(afterData.userId).get()
-        const userData = userDoc.data()
+        const userData = await getUser(afterData.userId)
 
         if (userData?.email) {
-          const deliveredAt = new Date().toLocaleDateString('en-US', {
+          const deliveredAt = new Date(context.timestamp).toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric',
           })
 
-          await getResend().emails.send({
+          await sendEmail('delivered-' + orderId, {
             from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Your Order #${orderId.slice(0, 8).toUpperCase()} Has Been Delivered! 🎉`,
@@ -242,7 +166,6 @@ export const onOrderDelivered = functions.firestore
               orderId,
               afterData.recipientData.fullName,
               deliveredAt,
-              APP_URL,
             ),
           });
 
@@ -250,12 +173,13 @@ export const onOrderDelivered = functions.firestore
         }
       } catch (error) {
         console.error('Error sending delivery notification:', error)
+        throw error
       }
     }
   })
 
 // Send cancellation notification when order status changes to 'cancelled'
-export const onOrderCancelled = functions.firestore
+export const onOrderCancelled = functions.runWith({ failurePolicy: true }).firestore
   .document('orders/{orderId}')
   .onUpdate(async (change, context) => {
     const beforeData = change.before.data()
@@ -264,11 +188,10 @@ export const onOrderCancelled = functions.firestore
 
     if (beforeData.status !== 'cancelled' && afterData.status === 'cancelled') {
       try {
-        const userDoc = await db.collection('users').doc(afterData.userId).get()
-        const userData = userDoc.data()
+        const userData = await getUser(afterData.userId)
 
         if (userData?.email) {
-          await getResend().emails.send({
+          await sendEmail('cancelled-' + context.eventId, {
             from: "Salkayyo Store <orders@salkayyo.com>",
             to: userData.email,
             subject: `Order #${orderId.slice(0, 8).toUpperCase()} Has Been Cancelled`,
@@ -285,6 +208,7 @@ export const onOrderCancelled = functions.firestore
         }
       } catch (error) {
         console.error('Error sending cancellation notification:', error)
+        throw error
       }
     }
   })
@@ -300,41 +224,41 @@ export const cleanupPendingOrders = functions.pubsub
       .collection('orders')
       .where('status', '==', 'pending')
       .where('createdAt', '<', cutoffTime)
+      .limit(100)
       .get()
 
-    const batch = db.batch()
-
-    pendingOrders.docs.forEach((doc) => {
-      batch.update(doc.ref, {
-        status: 'cancelled',
-        cancellationReason: 'Payment timeout',
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    for (const doc of pendingOrders.docs) {
+      await db.runTransaction(async transaction => {
+        const order = (await transaction.get(doc.ref)).data()
+        if (order?.status !== 'pending' || order.inventoryReserved || order.paymentMethod === 'paypal') return
+        transaction.update(doc.ref, {
+          status: 'cancelled',
+          cancellationReason: 'Payment timeout',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        })
       })
-    })
-
-    await batch.commit()
-
-    console.log(`Cleaned up ${pendingOrders.size} pending orders`)
+    }
   })
 
 // Welcome email on new user creation
-export const onUserCreated = functions.firestore
+export const onUserCreated = functions.runWith({ failurePolicy: true }).firestore
   .document('users/{userId}')
-  .onCreate(async (snapshot) => {
-    const userData = snapshot.data()
+  .onCreate(async (snapshot, context) => {
+    const userData = await getUser(snapshot.id)
 
     if (userData?.email) {
       try {
-        await getResend().emails.send({
+        await sendEmail('welcome-' + context.eventId, {
           from: "Salkayyo Store <welcome@salkayyo.com>",
           to: userData.email,
           subject: "Welcome to Salkayyo Store! 🎉",
-          html: welcomeEmailTemplate(userData.name || "there", APP_URL),
+          html: welcomeEmailTemplate(userData.displayName || "there", APP_URL),
         });
 
         console.log(`Welcome email sent to ${userData.email}`)
       } catch (error) {
         console.error('Error sending welcome email:', error)
+        throw error
       }
     }
   })

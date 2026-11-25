@@ -101,7 +101,7 @@ export const NewOrderAdminEmail = ({
             <Column>
               <Text style={infoLabel}>Payment</Text>
               <Text style={infoValue}>
-                {paymentMethod === "stripe" ? "💳 Card (Stripe)" : "💰 PayPal"}
+                {paymentMethod === "paypal" ? "PayPal" : "Card"}
               </Text>
             </Column>
             <Column>

@@ -41,7 +41,6 @@ export function Header() {
   const { getWishlistCount } = useWishlist()
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -144,19 +143,6 @@ export function Header() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
-            {/* Search */}
-            <AnimatePresence mode="wait">
-              {isSearchOpen && (
-                <motion.div
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 220, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="hidden md:block overflow-hidden"
-                ></motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Locale Switcher */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, KeyboardEvent } from 'react'
+import { useRef, useEffect, useState, KeyboardEvent } from 'react'
 import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,7 +36,7 @@ function createProductSchema(tv: ReturnType<typeof useTranslations>) {
     title: z.string().min(1, tv('required')),
     description: z.string().min(1, tv('required')),
     price: z.number().min(0.01, tv('priceGreaterThanZero')),
-    stock: z.number().min(0, tv('nonNegative')),
+    stock: z.number().int().min(0, tv('nonNegative')),
     categoryId: z.string().min(1, tv('required')),
     images: z.array(z.string()).min(1, tv('atLeastOneImage')),
     reference: z.string().optional(),
@@ -48,11 +48,19 @@ function createProductSchema(tv: ReturnType<typeof useTranslations>) {
 
 type ProductFormData = z.infer<ReturnType<typeof createProductSchema>>
 
+/** Trim, lowercase, strip stray brackets/quotes and drop duplicates so tags are safe to use as React keys. */
+function normalizeTags(tags: string[] | undefined): string[] {
+  const cleaned = (tags ?? []).map((tag) =>
+    tag.trim().replace(/^\[+|\]+$/g, '').trim().replace(/^["']+|["']+$/g, '').trim().toLowerCase()
+  )
+  return [...new Set(cleaned.filter(Boolean))]
+}
+
 interface ProductFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   product?: Product | null
-  onSubmit: (data: ProductCreateData) => Promise<void>
+  onSubmit: (data: ProductCreateData, id?: string) => Promise<void>
 }
 
 export function ProductForm({
@@ -122,7 +130,7 @@ export function ProductForm({
         categoryId: product.categoryId,
         images: product.images,
         reference: product.reference || '',
-        tags: product.tags || [],
+        tags: normalizeTags(product.tags),
         isActive: product.isActive ?? true,
         featured: product.featured || false,
       })
@@ -144,18 +152,23 @@ export function ProductForm({
   }, [product, reset])
 
   const handleFormSubmit = async (data: ProductFormData) => {
-    await onSubmit(data)
+    await onSubmit(data, uploadId.current)
     onOpenChange(false)
     reset()
   }
 
+  const uploadId = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!open) uploadId.current = undefined
+  }, [open])
+
   const handleImageUpload = async (file: File): Promise<string> => {
-    const tempId = product?.id || `temp-${Date.now()}`
-    return StorageService.uploadProductImage(file, tempId)
+    const id = product?.id ?? (uploadId.current ??= crypto.randomUUID())
+    return StorageService.uploadProductImage(file, id)
   }
 
   const handleAddTag = () => {
-    const tag = tagInput.trim().toLowerCase()
+    const [tag] = normalizeTags([tagInput])
     if (tag && !tagsValue.includes(tag)) {
       setValue('tags', [...tagsValue, tag])
       setTagInput('')

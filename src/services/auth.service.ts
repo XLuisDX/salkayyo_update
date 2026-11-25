@@ -49,7 +49,7 @@ export class AuthService {
       createdAt: serverTimestamp(),
     })
 
-    await AuthService.sendVerificationEmail(email)
+    await AuthService.sendVerificationEmail()
 
     return {
       id: firebaseUser.uid,
@@ -116,14 +116,16 @@ export class AuthService {
     if (!user?.email) {
       throw new Error('No user logged in')
     }
-    await AuthService.sendVerificationEmail(user.email)
+    await AuthService.sendVerificationEmail()
   }
 
-  static async sendVerificationEmail(email: string): Promise<void> {
+  private static async sendVerificationEmail(): Promise<void> {
+    const user = auth.currentUser
+    if (!user) throw new Error('No user logged in')
+    const token = await user.getIdToken()
     const response = await fetch('/api/auth/send-verification', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     if (!response.ok) {
@@ -142,7 +144,7 @@ export class AuthService {
     await user.reload()
     if (user.emailVerified) {
       // Force a fresh ID token so the new email_verified claim is immediately
-      // available to Firestore security rules (e.g. the checkout order-create rule).
+      // available to the checkout API.
       await user.getIdToken(true)
       await updateDoc(doc(db, 'users', user.uid), {
         verified: true,

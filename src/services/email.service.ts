@@ -21,8 +21,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 // resend.emails.send() resolves with { data, error } instead of throwing on
 // API errors (e.g. an unverified sending domain) — check it explicitly so
 // failed sends surface instead of being silently reported as successful.
-async function sendEmail(payload: Parameters<typeof resend.emails.send>[0]) {
-  const result = await resend.emails.send(payload)
+async function sendEmail(payload: Parameters<typeof resend.emails.send>[0], idempotencyKey?: string) {
+  const result = await resend.emails.send(payload, idempotencyKey ? { idempotencyKey } : undefined)
   if (result.error) {
     throw new Error(result.error.message || 'Failed to send email')
   }
@@ -281,8 +281,8 @@ export async function sendNewOrderAdminNotification(
 // MARKETING EMAILS
 // ============================================
 
-export async function sendNewsletterWelcomeEmail(email: string) {
-  const unsubscribeLink = `${APP_URL}/unsubscribe?email=${encodeURIComponent(email)}`
+export async function sendNewsletterWelcomeEmail(email: string, token: string) {
+  const unsubscribeLink = `${APP_URL}/api/email/newsletter/unsubscribe?token=${token}`
 
   const html = await render(
     NewsletterWelcomeEmail({
@@ -297,7 +297,7 @@ export async function sendNewsletterWelcomeEmail(email: string) {
     to: email,
     subject: "You're In! Welcome to the Salkayyo VIP List 🎉",
     html,
-  });
+  }, `newsletter/${token}`)
 }
 
 // ============================================

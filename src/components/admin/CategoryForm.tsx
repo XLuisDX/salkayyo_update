@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2 } from 'lucide-react'
@@ -35,7 +35,7 @@ interface CategoryFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   category?: Category | null
-  onSubmit: (data: CategoryCreateData) => Promise<void>
+  onSubmit: (data: CategoryCreateData, id?: string) => Promise<void>
 }
 
 function generateSlug(name: string): string {
@@ -60,7 +60,7 @@ export function CategoryForm({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     reset,
     formState: { errors, isSubmitting },
@@ -74,8 +74,8 @@ export function CategoryForm({
     },
   })
 
-  const nameValue = watch('name')
-  const imageValue = watch('image')
+  const nameValue = useWatch({ control, name: 'name' })
+  const imageValue = useWatch({ control, name: 'image' })
 
   useEffect(() => {
     if (category) {
@@ -102,14 +102,19 @@ export function CategoryForm({
   }, [nameValue, category, setValue])
 
   const handleFormSubmit = async (data: CategoryFormData) => {
-    await onSubmit(data)
+    await onSubmit(data, uploadId.current)
     onOpenChange(false)
     reset()
   }
 
+  const uploadId = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!open) uploadId.current = undefined
+  }, [open])
+
   const handleImageUpload = async (file: File): Promise<string> => {
-    const tempId = category?.id || `temp-${Date.now()}`
-    return StorageService.uploadCategoryImage(file, tempId)
+    const id = category?.id ?? (uploadId.current ??= crypto.randomUUID())
+    return StorageService.uploadCategoryImage(file, id)
   }
 
   return (

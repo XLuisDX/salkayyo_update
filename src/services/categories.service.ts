@@ -3,7 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
-  addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -69,8 +69,9 @@ export class CategoriesService {
     }
   }
 
-  static async create(data: CategoryCreateData): Promise<Category> {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+  static async create(data: CategoryCreateData, id?: string): Promise<Category> {
+    const docRef = id ? doc(db, COLLECTION_NAME, id) : doc(collection(db, COLLECTION_NAME))
+    await setDoc(docRef, {
       ...data,
       createdAt: serverTimestamp(),
     })

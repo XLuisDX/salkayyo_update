@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { CategoryForm } from '@/components/admin/CategoryForm'
+import { StorageService } from '@/services/storage.service'
 import { CategoriesService } from '@/services/categories.service'
 import { Category, CategoryCreateData } from '@/types'
 import { toast } from 'sonner'
@@ -58,9 +59,9 @@ export default function AdminCategoriesPage() {
     fetchCategories()
   }, [fetchCategories])
 
-  const handleCreate = async (data: CategoryCreateData) => {
+  const handleCreate = async (data: CategoryCreateData, id?: string) => {
     try {
-      const newCategory = await CategoriesService.create(data)
+      const newCategory = await CategoriesService.create(data, id)
       setCategories([...categories, newCategory])
       toast.success(t('categoryCreated'))
     } catch (error) {
@@ -94,6 +95,7 @@ export default function AdminCategoriesPage() {
 
     setIsDeleting(true)
     try {
+      await StorageService.deleteCatalogImages('categories', deleteCategory.id, deleteCategory.image ? [deleteCategory.image] : [])
       await CategoriesService.delete(deleteCategory.id)
       setCategories(categories.filter((c) => c.id !== deleteCategory.id))
       setDeleteCategory(null)

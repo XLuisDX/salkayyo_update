@@ -36,7 +36,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
     {
       heading: "4. Orders and Payment",
       paragraphs: [
-        "Payments are processed securely through Stripe or PayPal. Placing an order constitutes an offer to purchase, which we may accept or decline (for example, due to stock availability or a pricing error).",
+        "Payments are processed securely through PayPal. Placing an order constitutes an offer to purchase, which we may accept or decline (for example, due to stock availability or a pricing error).",
         "Order confirmation is sent by email once payment has been successfully processed.",
       ],
     },
@@ -108,7 +108,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
     {
       heading: "4. Pedidos y Pago",
       paragraphs: [
-        "Los pagos se procesan de forma segura a través de Stripe o PayPal. Realizar un pedido constituye una oferta de compra, que podemos aceptar o rechazar (por ejemplo, por falta de stock o un error de precio).",
+        "Los pagos se procesan de forma segura a través de PayPal. Realizar un pedido constituye una oferta de compra, que podemos aceptar o rechazar (por ejemplo, por falta de stock o un error de precio).",
         "La confirmación del pedido se envía por correo electrónico una vez que el pago se ha procesado correctamente.",
       ],
     },

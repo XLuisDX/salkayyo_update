@@ -25,7 +25,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
       paragraphs: [
         "Account information: your name, email address, and password (stored securely by Firebase Authentication) when you register.",
         "Order and shipping information: recipient name, shipping address, phone number, and order history, used to fulfill and track your purchases.",
-        "Payment information: payments are processed directly by Stripe and PayPal. We do not store your full card number or banking details on our servers.",
+        "Payment information: payments are processed directly by PayPal. We do not store your full card number or banking details on our servers.",
         "Usage information: we use your browser's local storage to remember your cart and wishlist, so we do not require an account just to browse.",
       ],
     },
@@ -41,7 +41,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
     {
       heading: "4. How We Share Your Information",
       paragraphs: [
-        "We do not sell your personal information. We share information only with trusted service providers who help us operate the store: Firebase/Google (authentication and database), Stripe and PayPal (payment processing), and Resend (transactional email delivery).",
+        "We do not sell your personal information. We share information only with trusted service providers who help us operate the store: Firebase/Google (authentication and database), PayPal (payment processing), and Resend (transactional email delivery).",
         "We may disclose information when required by law or to protect the rights, property, or safety of Salkayyo Store, our customers, or others.",
       ],
     },
@@ -91,7 +91,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
       paragraphs: [
         "Información de cuenta: tu nombre, correo electrónico y contraseña (almacenada de forma segura por Firebase Authentication) cuando te registras.",
         "Información de pedidos y envío: nombre del destinatario, dirección de envío, teléfono e historial de pedidos, usados para procesar y rastrear tus compras.",
-        "Información de pago: los pagos son procesados directamente por Stripe y PayPal. No almacenamos el número completo de tu tarjeta ni tus datos bancarios en nuestros servidores.",
+        "Información de pago: los pagos son procesados directamente por PayPal. No almacenamos el número completo de tu tarjeta ni tus datos bancarios en nuestros servidores.",
         "Información de uso: usamos el almacenamiento local de tu navegador para recordar tu carrito y tu lista de favoritos, así que no necesitas una cuenta solo para navegar.",
       ],
     },
@@ -107,7 +107,7 @@ const CONTENT: Record<Locale, { heading: string; paragraphs: string[] }[]> = {
     {
       heading: "4. Cómo Compartimos tu Información",
       paragraphs: [
-        "No vendemos tu información personal. Compartimos información únicamente con proveedores de servicios de confianza que nos ayudan a operar la tienda: Firebase/Google (autenticación y base de datos), Stripe y PayPal (procesamiento de pagos) y Resend (envío de correos transaccionales).",
+        "No vendemos tu información personal. Compartimos información únicamente con proveedores de servicios de confianza que nos ayudan a operar la tienda: Firebase/Google (autenticación y base de datos), PayPal (procesamiento de pagos) y Resend (envío de correos transaccionales).",
         "Podemos divulgar información cuando lo exija la ley o para proteger los derechos, la propiedad o la seguridad de Salkayyo Store, nuestros clientes u otras personas.",
       ],
     },

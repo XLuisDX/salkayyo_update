@@ -1,3 +1,8 @@
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 // Email Templates for Firebase Functions
 // These are HTML templates that match the React Email design
 
@@ -28,11 +33,11 @@ const baseTemplate = (content: string, preview: string) => `
   <title>${preview}</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; margin: 0; padding: 20px; background-color: ${COLORS.bg};">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background-color: ${COLORS.container}; border-radius: 16px; border: 1px solid ${COLORS.border}; overflow: hidden;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: ${COLORS.container}; border-radius: 16px; border: 1px solid ${COLORS.border}; overflow: hidden;">
     <!-- Header -->
     <tr>
       <td style="background-color: ${COLORS.bg}; padding: 32px 40px; text-align: center; border-bottom: 1px solid ${COLORS.border};">
-        <img src="https://salkayyo.com/logo.png" width="150" height="40" alt="Salkayyo" style="display: block; margin: 0 auto;" />
+        <img src="https://salkayyo.com/logo-email.png" width="100" height="100" alt="Salkayyo" style="display: block; margin: 0 auto;" />
       </td>
     </tr>
     <!-- Content -->
@@ -63,7 +68,7 @@ export function welcomeEmailTemplate(name: string, appUrl: string) {
 
     <!-- Heading -->
     <h1 style="color: ${COLORS.white}; font-size: 28px; font-weight: 700; text-align: center; margin: 0 0 24px 0;">
-      Welcome to <span style="color: ${COLORS.lime};">Salkayyo</span>, ${name}!
+      Welcome to <span style="color: ${COLORS.lime};">Salkayyo</span>, ${escapeHtml(name)}!
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; text-align: center; margin: 0 0 24px 0;">
@@ -88,7 +93,7 @@ export function welcomeEmailTemplate(name: string, appUrl: string) {
 
       <div>
         <span style="font-size: 24px; vertical-align: top; margin-right: 12px;">💰</span>
-        <span style="color: ${COLORS.lightGray}; font-size: 14px;"><strong>Secure Payments</strong><br/>Pay with Stripe or PayPal</span>
+        <span style="color: ${COLORS.lightGray}; font-size: 14px;"><strong>Secure Payments</strong><br/>Pay with PayPal</span>
       </div>
     </div>
 
@@ -106,7 +111,7 @@ export function welcomeEmailTemplate(name: string, appUrl: string) {
     </p>
   `;
 
-  return baseTemplate(content, `Welcome to Salkayyo Store, ${name}!`);
+  return baseTemplate(content, `Welcome to Salkayyo Store, ${escapeHtml(name)}!`);
 }
 
 export function orderConfirmationTemplate(
@@ -134,7 +139,7 @@ export function orderConfirmationTemplate(
     .map(
       (item) => `
       <tr>
-        <td style="color: ${COLORS.white}; font-size: 14px; padding: 8px 0;">${item.title}</td>
+        <td style="color: ${COLORS.white}; font-size: 14px; padding: 8px 0;">${escapeHtml(item.title)}</td>
         <td style="color: ${COLORS.darkGray}; font-size: 14px; padding: 8px 0; text-align: center;">×${item.quantity}</td>
         <td style="color: ${COLORS.white}; font-size: 14px; font-weight: 600; padding: 8px 0; text-align: right;">$${(item.price * item.quantity).toFixed(2)}</td>
       </tr>
@@ -145,7 +150,7 @@ export function orderConfirmationTemplate(
   const content = `
     <!-- Badge -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <span style="background-color: ${COLORS.greenBg}; color: ${COLORS.green}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">✅ Order Confirmed</span>
+      <span style="background-color: ${COLORS.limeBg}; color: ${COLORS.lime}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">✅ Order Confirmed</span>
     </div>
 
     <!-- Heading -->
@@ -154,7 +159,7 @@ export function orderConfirmationTemplate(
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 16px 0;">
-      Hi ${customerName},
+      Hi ${escapeHtml(customerName)},
     </p>
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 24px 0;">
       We've received your order and are getting it ready. We'll notify you when it ships.
@@ -164,7 +169,7 @@ export function orderConfirmationTemplate(
     <div style="background-color: #1a1a1a; padding: 24px; border-radius: 12px; border: 1px solid ${COLORS.border}; text-align: center; margin-bottom: 32px;">
       <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 8px 0;">Order Number</p>
       <p style="color: ${COLORS.lime}; font-size: 32px; font-weight: 700; letter-spacing: 2px; margin: 0 0 12px 0;">${orderNumber}</p>
-      <p style="color: #888888; font-size: 13px; margin: 0;">Paid with ${paymentMethod === 'stripe' ? 'Card' : 'PayPal'}</p>
+      <p style="color: #888888; font-size: 13px; margin: 0;">Paid with ${paymentMethod === 'paypal' ? 'PayPal' : 'Card'}</p>
     </div>
 
     <!-- Items -->
@@ -199,17 +204,17 @@ export function orderConfirmationTemplate(
     <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0 0 16px 0;">Shipping Address</p>
     <div style="background-color: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid ${COLORS.border};">
       <p style="color: ${COLORS.lightGray}; font-size: 14px; line-height: 24px; margin: 0;">
-        ${recipientData.fullName}<br/>
-        ${recipientData.address}<br/>
-        ${recipientData.city}, ${recipientData.state} ${recipientData.zipCode}<br/>
-        ${recipientData.country}<br/>
-        📞 ${recipientData.phone}
+        ${escapeHtml(recipientData.fullName)}<br/>
+        ${escapeHtml(recipientData.address)}<br/>
+        ${escapeHtml(recipientData.city)}, ${escapeHtml(recipientData.state)} ${escapeHtml(recipientData.zipCode)}<br/>
+        ${escapeHtml(recipientData.country)}<br/>
+        📞 ${escapeHtml(recipientData.phone)}
       </p>
     </div>
 
     <!-- CTA -->
     <div style="text-align: center; margin: 32px 0;">
-      <a href="${appUrl}/orders/${orderId}" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
+      <a href="${appUrl}/en/orders/${orderId}" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
         View Order Details
       </a>
     </div>
@@ -235,15 +240,14 @@ export function orderShippedTemplate(
   },
   trackingNumber?: string,
   carrier?: string,
-  estimatedDelivery?: string,
-  appUrl?: string
+  estimatedDelivery?: string
 ) {
   const orderNumber = orderId.slice(0, 8).toUpperCase()
 
   const content = `
     <!-- Badge -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <span style="background-color: ${COLORS.blueBg}; color: ${COLORS.blue}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">📦 Shipped</span>
+      <span style="background-color: ${COLORS.limeBg}; color: ${COLORS.lime}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">📦 Shipped</span>
     </div>
 
     <!-- Heading -->
@@ -252,7 +256,7 @@ export function orderShippedTemplate(
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 16px 0;">
-      Hi ${customerName},
+      Hi ${escapeHtml(customerName)},
     </p>
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 24px 0;">
       Great news! Your order #${orderNumber} has been shipped and is on its way to you.
@@ -271,7 +275,7 @@ export function orderShippedTemplate(
               ? `
           <td width="50%">
             <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Carrier</p>
-            <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0;">${carrier}</p>
+            <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0;">${escapeHtml(carrier)}</p>
           </td>
           `
               : ""
@@ -283,7 +287,7 @@ export function orderShippedTemplate(
           ? `
       <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 16px 0;" />
       <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Tracking Number</p>
-      <p style="color: ${COLORS.lime}; font-size: 20px; font-weight: 700; letter-spacing: 2px; margin: 0;">${trackingNumber}</p>
+      <p style="color: ${COLORS.lime}; font-size: 20px; font-weight: 700; letter-spacing: 2px; margin: 0;">${escapeHtml(trackingNumber)}</p>
       `
           : ""
       }
@@ -292,7 +296,7 @@ export function orderShippedTemplate(
           ? `
       <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 16px 0;" />
       <p style="color: ${COLORS.darkGray}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px 0;">Estimated Delivery</p>
-      <p style="color: ${COLORS.blue}; font-size: 18px; font-weight: 600; margin: 0;">${estimatedDelivery}</p>
+      <p style="color: ${COLORS.blue}; font-size: 18px; font-weight: 600; margin: 0;">${escapeHtml(estimatedDelivery)}</p>
       `
           : ""
       }
@@ -304,18 +308,11 @@ export function orderShippedTemplate(
     <p style="color: ${COLORS.white}; font-size: 16px; font-weight: 600; margin: 0 0 16px 0;">Shipping To</p>
     <div style="background-color: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid ${COLORS.border};">
       <p style="color: ${COLORS.lightGray}; font-size: 14px; line-height: 24px; margin: 0;">
-        ${recipientData.fullName}<br/>
-        ${recipientData.address}<br/>
-        ${recipientData.city}, ${recipientData.state} ${recipientData.zipCode}<br/>
-        ${recipientData.country}
+        ${escapeHtml(recipientData.fullName)}<br/>
+        ${escapeHtml(recipientData.address)}<br/>
+        ${escapeHtml(recipientData.city)}, ${escapeHtml(recipientData.state)} ${escapeHtml(recipientData.zipCode)}<br/>
+        ${escapeHtml(recipientData.country)}
       </p>
-    </div>
-
-    <!-- CTA -->
-    <div style="text-align: center; margin: 32px 0;">
-      <a href="${appUrl || "https://salkayyo.com"}/orders/${orderId}" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
-        Track Your Order
-      </a>
     </div>
 
     <p style="color: ${COLORS.darkGray}; font-size: 13px; text-align: center; margin: 0;">
@@ -329,15 +326,14 @@ export function orderShippedTemplate(
 export function orderDeliveredTemplate(
   orderId: string,
   customerName: string,
-  deliveredAt: string,
-  appUrl?: string
+  deliveredAt: string
 ) {
   const orderNumber = orderId.slice(0, 8).toUpperCase()
 
   const content = `
     <!-- Badge -->
     <div style="text-align: center; margin-bottom: 24px;">
-      <span style="background-color: ${COLORS.greenBg}; color: ${COLORS.green}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">✅ Delivered</span>
+      <span style="background-color: ${COLORS.limeBg}; color: ${COLORS.lime}; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px;">✅ Delivered</span>
     </div>
 
     <!-- Heading -->
@@ -346,32 +342,20 @@ export function orderDeliveredTemplate(
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 16px 0;">
-      Hi ${customerName},
+      Hi ${escapeHtml(customerName)},
     </p>
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 24px 0;">
       Great news! Your order #${orderNumber} has been delivered. We hope you love your purchase!
     </p>
 
     <!-- Delivery Box -->
-    <div style="background-color: ${COLORS.greenBg}; padding: 32px; border-radius: 12px; border: 1px solid ${COLORS.green}; text-align: center; margin-bottom: 32px;">
+    <div style="background-color: #1a1a1a; padding: 24px; border-radius: 8px; border: 1px solid ${COLORS.border}; text-align: center; margin-bottom: 32px;">
       <p style="font-size: 48px; margin: 0 0 16px 0;">🎉</p>
-      <p style="color: ${COLORS.green}; font-size: 20px; font-weight: 700; margin: 0 0 8px 0;">Successfully Delivered</p>
-      <p style="color: #88FFBB; font-size: 14px; margin: 0;">Delivered on ${deliveredAt}</p>
+      <p style="color: ${COLORS.lime}; font-size: 20px; font-weight: 700; margin: 0 0 8px 0;">Successfully Delivered</p>
+      <p style="color: ${COLORS.gray}; font-size: 14px; margin: 0;">Delivered on ${deliveredAt}</p>
     </div>
 
     <hr style="border: none; border-top: 1px solid ${COLORS.border}; margin: 32px 0;" />
-
-    <!-- Review Request -->
-    <div style="text-align: center;">
-      <p style="color: ${COLORS.white}; font-size: 18px; font-weight: 600; margin: 0 0 12px 0;">How was your experience?</p>
-      <p style="color: #888888; font-size: 14px; line-height: 22px; margin: 0 0 20px 0;">
-        We'd love to hear your feedback! Share your thoughts to help other shoppers and help us improve.
-      </p>
-      <p style="font-size: 32px; letter-spacing: 8px; margin: 0 0 20px 0;">⭐ ⭐ ⭐ ⭐ ⭐</p>
-      <a href="${appUrl || "https://salkayyo.com"}/orders/${orderId}?review=true" style="background-color: ${COLORS.lime}; color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
-        Leave a Review
-      </a>
-    </div>
 
     <p style="color: ${COLORS.darkGray}; font-size: 13px; text-align: center; margin: 24px 0 0 0;">
       Thank you for shopping with Salkayyo!
@@ -402,10 +386,10 @@ export function orderCancelledTemplate(
     </h1>
 
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 16px 0;">
-      Hi ${customerName},
+      Hi ${escapeHtml(customerName)},
     </p>
     <p style="color: ${COLORS.gray}; font-size: 16px; line-height: 26px; margin: 0 0 24px 0;">
-      Your order #${orderNumber} has been cancelled.${reason ? ` Reason: ${reason}` : ""}
+      Your order #${orderNumber} has been cancelled.${reason ? ` Reason: ${escapeHtml(reason)}` : ""}
     </p>
 
     <!-- Order Box -->

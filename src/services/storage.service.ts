@@ -44,16 +44,24 @@ export class StorageService {
     }
   }
 
-  static async deleteProductImages(productId: string): Promise<void> {
-    try {
-      const folderRef = ref(storage, `products/${productId}`)
-      const list = await listAll(folderRef)
-
-      await Promise.all(list.items.map((item) => deleteObject(item)))
-    } catch (error) {
-      console.error('Error deleting product images:', error)
-      throw error
+  static async deleteCatalogImages(collection: 'products' | 'categories', id: string, urls: string[]): Promise<void> {
+    const folder = ref(storage, collection + '/' + id)
+    const { items } = await listAll(folder)
+    const images = new Map(items.map(item => [item.fullPath, item]))
+    for (const url of urls) {
+      if (!url.startsWith('https://firebasestorage.googleapis.com/')) continue
+      const image = ref(storage, url)
+      const [root, parent, file, extra] = image.fullPath.split('/')
+      if (image.bucket === folder.bucket && root === collection && file && !extra &&
+          (parent === id || /^temp-\d+$/.test(parent))) images.set(image.fullPath, image)
     }
+    await Promise.all(Array.from(images.values(), async image => {
+      try {
+        await deleteObject(image)
+      } catch (error) {
+        if ((error as { code?: string }).code !== 'storage/object-not-found') throw error
+      }
+    }))
   }
 
   static async getImageUrl(path: string): Promise<string> {

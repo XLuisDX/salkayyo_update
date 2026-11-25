@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import { Product, Category, ProductFilters as Filters } from '@/types'
@@ -12,7 +12,6 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { LogoWatermarks } from '@/components/common/LogoWatermarks'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
-import { debounce } from '@/lib/utils'
 
 export default function ProductsPage() {
   const t = useTranslations('products')
@@ -30,6 +29,7 @@ export default function ProductsPage() {
 
   // Cursor for the next page — not component state, since it's an opaque
   // Firestore snapshot that only needs to survive until the next fetch.
+  const requestVersion = useRef(0)
   const cursorRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null)
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function ProductsPage() {
     loadCategories()
   }, [])
 
-  const loadProducts = useCallback(async (currentFilters: Filters) => {
+  const loadProducts = useCallback(async (currentFilters: Filters, version: number) => {
     setLoading(true)
     cursorRef.current = null
 
@@ -53,11 +53,13 @@ export default function ProductsPage() {
       if (currentFilters.search) {
         setIsSearchMode(true)
         const results = await ProductsService.search(currentFilters.search)
+        if (version !== requestVersion.current) return
         setProducts(results)
         setHasMore(false)
       } else {
         setIsSearchMode(false)
         const response = await ProductsService.getAll(currentFilters)
+        if (version !== requestVersion.current) return
         setProducts(response.items)
         setHasMore(response.hasMore)
         cursorRef.current = response.nextCursor
@@ -65,42 +67,42 @@ export default function ProductsPage() {
     } catch (error) {
       console.error('Error loading products:', error)
     } finally {
-      setLoading(false)
+      if (version === requestVersion.current) setLoading(false)
     }
   }, [])
 
   const loadMore = useCallback(async () => {
-    if (!cursorRef.current || loadingMore) return
+    if (!cursorRef.current || loadingMore || loading) return
+    const version = requestVersion.current
 
     setLoadingMore(true)
     try {
       const response = await ProductsService.getAll(filters, cursorRef.current)
+      if (version !== requestVersion.current) return
       setProducts((prev) => [...prev, ...response.items])
       setHasMore(response.hasMore)
       cursorRef.current = response.nextCursor
     } catch (error) {
       console.error('Error loading more products:', error)
     } finally {
-      setLoadingMore(false)
+      if (version === requestVersion.current) setLoadingMore(false)
     }
-  }, [filters, loadingMore])
-
-  const debouncedLoadProducts = useMemo(
-    () => debounce((filters: Filters) => {
-      loadProducts(filters)
-    }, 300),
-    [loadProducts]
-  )
+  }, [filters, loading, loadingMore])
 
   useEffect(() => {
-    if (filters.search) {
-      debouncedLoadProducts(filters)
-    } else {
-      loadProducts(filters)
+    const version = ++requestVersion.current
+    const timer = setTimeout(() => loadProducts(filters, version), filters.search ? 300 : 0)
+    return () => {
+      clearTimeout(timer)
+      if (requestVersion.current === version) requestVersion.current = version + 1
     }
-  }, [filters, loadProducts, debouncedLoadProducts])
+  }, [filters, loadProducts])
 
   const handleFilterChange = (newFilters: Filters) => {
+    requestVersion.current++
+    cursorRef.current = null
+    setLoadingMore(false)
+    setLoading(true)
     setFilters(newFilters)
   }
 

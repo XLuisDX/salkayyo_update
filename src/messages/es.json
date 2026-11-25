@@ -95,6 +95,7 @@
     "addToCart": "Carrito",
     "addedToCart": "Agregado al carrito",
     "outOfStock": "Agotado",
+    "lowStock": "¡Últimas unidades!",
     "inStock": "En Stock",
     "quantity": "Cantidad",
     "description": "Descripción",
@@ -175,14 +176,20 @@
     "placeOrder": "Realizar Pedido",
     "selectRecipient": "Seleccionar Dirección",
     "addNewRecipient": "Agregar Nueva Dirección",
-    "payWithStripe": "Pagar con Tarjeta",
     "payWithPayPal": "Pagar con PayPal",
     "processing": "Procesando pago...",
     "orderPlaced": "¡Pedido realizado exitosamente!",
     "orderFailed": "El pedido falló. Por favor intenta de nuevo.",
+    "paymentPending": "Aún estamos verificando tu pago con PayPal. Consulta su estado aquí antes de volver a pagar.",
+    "checkingPayment": "Consultando el estado del pago…",
+    "checkPayment": "Consultar estado del pago",
     "loginRequired": "Por favor inicia sesión para continuar",
     "emptyCartDescription": "Agrega productos a tu carrito para continuar",
-    "selectAddressError": "Por favor selecciona una dirección de envío"
+    "selectAddressError": "Por favor selecciona una dirección de envío",
+    "cartUpdated": "Algunos precios o existencias cambiaron. Actualizamos tu carrito: revísalo antes de pagar.",
+    "checkingCart": "Verificando precios y disponibilidad...",
+    "paymentUnderReview": "PayPal está revisando tu pago. Tu pedido aparecerá y recibirás un email en cuanto se confirme.",
+    "paymentDeclined": "El pago no se completó y no se te ha cobrado. Inténtalo de nuevo o usa otro método de pago."
   },
   "orders": {
     "title": "Mis Pedidos",
@@ -278,7 +285,25 @@
   "wholesale": {
     "title": "Mayoreo",
     "subtitle": "Precios especiales para pedidos al por mayor",
-    "minOrder": "Pedido Mínimo",
+    "priceListTitle": "Precios de Mayoreo",
+    "priceListDescription": "Precios en dólares estadounidenses (USD)",
+    "products": {
+      "detergent": {
+        "name": "Detergente Salkayyo 500 g",
+        "pack": "Saco de 20 paquetes",
+        "per": "por saco"
+      },
+      "toothpasteCharcoal": {
+        "name": "Pasta de dientes de carbón 100 g",
+        "pack": "Caja de 72 unidades",
+        "per": "por caja"
+      },
+      "toothpasteAloe": {
+        "name": "Pasta de dientes de aloe vera 100 g",
+        "pack": "Caja de 72 unidades",
+        "per": "por caja"
+      }
+    },
     "contact": "Contáctanos",
     "requestQuote": "Solicitar Cotización",
     "description": "Obtén precios especiales para pedidos al por mayor. Contáctanos para cotizaciones personalizadas y oportunidades de mayoreo.",
@@ -291,12 +316,6 @@
     "benefitQuotesDescription": "Precios adaptados a tus necesidades",
     "benefitPriorityTitle": "Soporte Prioritario",
     "benefitPriorityDescription": "Soporte al cliente 24/7 para socios mayoristas",
-    "standardProducts": "Productos Estándar",
-    "customProducts": "Productos Personalizados",
-    "mixedOrders": "Pedidos Mixtos",
-    "standardUnits": "50+ unidades",
-    "customUnits": "100+ unidades",
-    "mixedValue": "$1,000+ en valor",
     "requestSubmitted": "¡Solicitud Enviada!",
     "requestSubmittedDescription": "Nos pondremos en contacto contigo dentro de 24-48 horas con una cotización personalizada.",
     "submitAnother": "Enviar Otra Solicitud",
@@ -365,6 +384,7 @@
     }
   },
   "newsletter": {
+    "error": "No se pudo completar la suscripción.",
     "badge": "Actualizaciones Exclusivas",
     "title": "Mantente al",
     "titleHighlight": "día",

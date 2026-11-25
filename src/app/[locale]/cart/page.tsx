@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Trash2 } from 'lucide-react'
@@ -14,7 +16,18 @@ import { Button } from '@/components/ui/button'
 
 export default function CartPage() {
   const t = useTranslations('cart')
-  const { cart, clearCart, getItemCount } = useCart()
+  const tCheckout = useTranslations('checkout')
+  const { cart, clearCart, getItemCount, isReady, syncWithCatalog } = useCart()
+
+  // Prices and stock may have changed since the items were added.
+  useEffect(() => {
+    if (!isReady) return
+    syncWithCatalog()
+      .then((changed) => {
+        if (changed) toast.info(tCheckout('cartUpdated'))
+      })
+      .catch((error) => console.error('Error refreshing cart:', error))
+  }, [isReady, syncWithCatalog, tCheckout])
 
   const itemCount = getItemCount()
 

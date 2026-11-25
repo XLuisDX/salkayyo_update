@@ -1,172 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getAdminAuth, getAdminDb } from '@/firebase/admin'
-import { Resend } from 'resend'
-import { CartItem, RecipientData } from '@/types'
-import { getErrorMessage } from '@/lib/utils'
+import { z } from 'zod'
+import { CheckoutError, checkoutError, documentId, paypalId, settleCheckout, verifiedBuyer } from '../_checkout'
 
-const PAYPAL_API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api-m.paypal.com'
-  : 'https://api-m.sandbox.paypal.com'
+const input = z.object({ checkoutId: documentId, orderId: paypalId.optional() })
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-async function getPayPalAccessToken(): Promise<string> {
-  const auth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-  ).toString('base64')
-
-  const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
-  })
-
-  const data = await response.json()
-  return data.access_token
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { orderId, items, recipientData, userId, total } = body as {
-      orderId: string
-      items: CartItem[]
-      recipientData: RecipientData
-      userId: string
-      total: number
-    }
-
-    if (!orderId || !items || !recipientData || !userId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    const userRecord = await getAdminAuth().getUser(userId)
-    if (!userRecord.emailVerified) {
-      return NextResponse.json(
-        { error: 'Please verify your email before placing an order' },
-        { status: 403 }
-      )
-    }
-
-    // Capture the PayPal order
-    const accessToken = await getPayPalAccessToken()
-
-    const captureResponse = await fetch(
-      `${PAYPAL_API_URL}/v2/checkout/orders/${orderId}/capture`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-
-    const captureData = await captureResponse.json()
-
-    if (!captureResponse.ok) {
-      console.error('PayPal capture error:', captureData)
-      return NextResponse.json(
-        { error: captureData.message || 'Failed to capture PayPal order' },
-        { status: captureResponse.status }
-      )
-    }
-
-    // Calculate totals
-    const subtotal = items.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
-      0
-    )
-    const tax = subtotal * 0.09
-
-    // Create order in Firestore
-    const db = getAdminDb()
-    const orderRef = await db.collection('orders').add({
-      userId,
-      items: items.map((item) => ({
-        productId: item.product.id,
-        title: item.product.title,
-        price: item.product.price,
-        quantity: item.quantity,
-        image: item.product.images?.[0] || '',
-      })),
-      subtotal,
-      tax,
-      total,
-      status: 'paid',
-      paymentMethod: 'paypal',
-      paymentId: captureData.id,
-      recipientData,
-      createdAt: new Date(),
-      paidAt: new Date(),
+    const uid = await verifiedBuyer(request)
+    const parsed = input.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) throw new CheckoutError('Invalid order details')
+    const result = await settleCheckout(parsed.data.checkoutId, {
+      uid,
+      providerId: parsed.data.orderId,
+      capture: true,
     })
-
-    // Get user email
-    const userDoc = await db.collection('users').doc(userId).get()
-    const userData = userDoc.data()
-
-    if (userData?.email) {
-      // Send confirmation email
-      await resend.emails.send({
-        from: "Salkayyo Store <orders@salkayyo.com>",
-        to: userData.email,
-        subject: `Order Confirmation #${orderRef.id.slice(0, 8)}`,
-        html: `
-          <h1>Thank you for your order!</h1>
-          <p>Your order #${orderRef.id.slice(0, 8)} has been confirmed.</p>
-          <p><strong>Total:</strong> $${total.toFixed(2)}</p>
-          <p>We'll notify you when your order ships.</p>
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/en/orders/${orderRef.id}">View Order</a></p>
-        `,
-      });
+    switch (result.status) {
+      case 'paid':
+        return Response.json({ status: 'paid', orderId: result.orderId })
+      case 'pending':
+        // Captured but held for review by PayPal; the webhook completes the order.
+        return Response.json({ status: 'pending' }, { status: 202 })
+      case 'failed':
+        throw new CheckoutError('PayPal payment was declined', 409, 'PAYMENT_DECLINED')
+      default:
+        throw new CheckoutError('PayPal has not approved this payment', 409, 'NOT_APPROVED')
     }
-
-    // Send admin notification
-    if (process.env.ADMIN_EMAIL) {
-      await resend.emails.send({
-        from: "Salkayyo Store <orders@salkayyo.com>",
-        to: process.env.ADMIN_EMAIL,
-        subject: `New Order #${orderRef.id.slice(0, 8)}`,
-        html: `
-          <h1>New Order Received (PayPal)</h1>
-          <p>Order ID: ${orderRef.id}</p>
-          <p>Total: $${total.toFixed(2)}</p>
-          <p>Items: ${items.length}</p>
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/en/orders/${orderRef.id}">View Order</a></p>
-        `,
-      });
-    }
-
-    // Update product stock
-    for (const item of items) {
-      const productRef = db.collection('products').doc(item.product.id)
-      const productDoc = await productRef.get()
-      const productData = productDoc.data()
-
-      if (productData) {
-        await productRef.update({
-          stock: Math.max(0, productData.stock - item.quantity),
-          updatedAt: new Date(),
-        })
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      orderId: orderRef.id,
-      captureId: captureData.id,
-    })
-  } catch (error: unknown) {
-    console.error('PayPal capture error:', error)
-    return NextResponse.json(
-      { error: getErrorMessage(error) },
-      { status: 500 }
-    )
+  } catch (error) {
+    return checkoutError(error)
   }
 }

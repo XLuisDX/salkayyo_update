@@ -31,7 +31,7 @@ import { ProductsService } from '@/services/products.service'
 import { CategoriesService } from '@/services/categories.service'
 import { OrdersService } from '@/services/orders.service'
 import { Order, OrderStatus, Product } from '@/types'
-import { cn, formatPrice } from '@/lib/utils'
+import { cn, formatPrice, LOW_STOCK_THRESHOLD } from '@/lib/utils'
 
 interface DashboardStats {
   totalProducts: number
@@ -44,7 +44,6 @@ interface DashboardStats {
 }
 
 const REVENUE_STATUSES: OrderStatus[] = ['paid', 'shipped', 'delivered']
-const LOW_STOCK_THRESHOLD = 5
 const SALES_CHART_DAYS = 14
 const RECENT_ORDERS_COUNT = 5
 

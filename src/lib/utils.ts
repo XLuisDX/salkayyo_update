@@ -5,6 +5,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Products with stock at or below this (but above 0) are flagged as low stock — i.e. fewer than 20 units. */
+export const LOW_STOCK_THRESHOLD = 19
+
 export function formatPrice(price: number, locale: string = 'en-US'): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -26,7 +29,7 @@ export function generateId(): string {
 }
 
 export function calculateTax(subtotal: number, taxRate: number = 0.09): number {
-  return subtotal * taxRate
+  return Math.round(Math.round(subtotal * 100) * taxRate) / 100
 }
 
 export function calculateTotal(subtotal: number, taxRate: number = 0.09): number {

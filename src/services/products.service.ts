@@ -4,7 +4,7 @@ import {
   getDoc,
   getDocs,
   getCountFromServer,
-  addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -239,8 +239,9 @@ export class ProductsService {
       )
   }
 
-  static async create(data: ProductCreateData): Promise<Product> {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+  static async create(data: ProductCreateData, id?: string): Promise<Product> {
+    const docRef = id ? doc(db, COLLECTION_NAME, id) : doc(collection(db, COLLECTION_NAME))
+    await setDoc(docRef, {
       ...mapProductToFirestoreData(data),
       createdAt: serverTimestamp(),
     })

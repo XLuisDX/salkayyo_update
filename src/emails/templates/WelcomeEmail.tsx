@@ -63,7 +63,7 @@ export const WelcomeEmail = ({
           <Text style={featureText}>
             <strong>Secure Payments</strong>
             <br />
-            Pay with Stripe or PayPal
+            Pay with PayPal
           </Text>
         </Section>
       </Section>

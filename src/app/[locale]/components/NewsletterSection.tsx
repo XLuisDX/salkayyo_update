@@ -15,16 +15,23 @@ export function NewsletterSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email) return
+    if (!email || loading) return
 
     setLoading(true)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    toast.success(t('success'))
-    setEmail('')
-    setLoading(false)
+    try {
+      const response = await fetch('/api/email/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!response.ok) throw new Error('Subscription failed')
+      toast.success(t('success'))
+      setEmail('')
+    } catch {
+      toast.error(t('error'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

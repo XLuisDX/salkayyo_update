@@ -7,13 +7,14 @@ import {
   useState,
   ReactNode,
   useCallback,
+  useRef,
   startTransition,
 } from 'react'
 import { Product, CartItem, Cart } from '@/types'
 import { calculateTax, calculateTotal } from '@/lib/utils'
+import { ProductsService } from '@/services/products.service'
 
 const CART_STORAGE_KEY = 'salkayyo_cart'
-const TAX_RATE = 0.09
 
 interface CartContextType {
   cart: Cart
@@ -23,6 +24,14 @@ interface CartContextType {
   clearCart: () => void
   getItemCount: () => number
   isInCart: (productId: string) => boolean
+  /** True once the saved cart has been restored from localStorage. */
+  isReady: boolean
+  /**
+   * Re-reads every cart product from the catalog: refreshes price/title/stock,
+   * drops unavailable products and caps quantities at the available stock.
+   * Resolves to true if anything in the cart changed.
+   */
+  syncWithCatalog: () => Promise<boolean>
 }
 
 const initialCart: Cart = {
@@ -34,9 +43,21 @@ const initialCart: Cart = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+function calculateCartTotals(items: CartItem[]): Cart {
+  const subtotal = items.reduce(
+    (cents, item) => cents + Math.round(item.product.price * 100) * item.quantity,
+    0
+  ) / 100
+  return { items, subtotal, tax: calculateTax(subtotal), total: calculateTotal(subtotal) }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(initialCart)
   const [isInitialized, setIsInitialized] = useState(false)
+  const cartRef = useRef(cart)
+  useEffect(() => {
+    cartRef.current = cart
+  }, [cart])
 
   useEffect(() => {
     const savedCart = localStorage.getItem(CART_STORAGE_KEY)
@@ -44,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const parsedCart = JSON.parse(savedCart)
         startTransition(() => {
-          setCart(parsedCart)
+          setCart(calculateCartTotals(parsedCart.items))
         })
       } catch (error) {
         console.error('Error parsing cart from localStorage:', error)
@@ -60,22 +81,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
     }
   }, [cart, isInitialized])
-
-  const calculateCartTotals = useCallback((items: CartItem[]): Cart => {
-    const subtotal = items.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
-      0
-    )
-    const tax = calculateTax(subtotal, TAX_RATE)
-    const total = calculateTotal(subtotal, TAX_RATE)
-
-    return {
-      items,
-      subtotal,
-      tax,
-      total,
-    }
-  }, [])
 
   const addToCart = useCallback(
     (product: Product, quantity: number = 1) => {
@@ -99,7 +104,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return calculateCartTotals(newItems)
       })
     },
-    [calculateCartTotals]
+    []
   )
 
   const removeFromCart = useCallback(
@@ -111,7 +116,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return calculateCartTotals(newItems)
       })
     },
-    [calculateCartTotals]
+    []
   )
 
   const updateQuantity = useCallback(
@@ -128,11 +133,46 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return calculateCartTotals(newItems)
       })
     },
-    [calculateCartTotals, removeFromCart]
+    [removeFromCart]
   )
 
   const clearCart = useCallback(() => {
     setCart(initialCart)
+  }, [])
+
+  const syncWithCatalog = useCallback(async () => {
+    const ids = cartRef.current.items.map((item) => item.product.id)
+    if (ids.length === 0) return false
+    const fresh = new Map<string, Product | null>()
+    await Promise.all(ids.map(async (id) => {
+      fresh.set(id, await ProductsService.getById(id))
+    }))
+
+    const reconcile = (current: CartItem[]) => {
+      let changed = false
+      const items: CartItem[] = []
+      for (const item of current) {
+        if (!fresh.has(item.product.id)) {
+          items.push(item) // added while we were fetching
+          continue
+        }
+        const product = fresh.get(item.product.id)
+        if (!product || product.isActive === false || product.stock <= 0) {
+          changed = true
+          continue
+        }
+        const quantity = Math.min(item.quantity, product.stock)
+        if (quantity !== item.quantity || product.price !== item.product.price) changed = true
+        items.push({ product, quantity })
+      }
+      return { items, changed }
+    }
+
+    // State updaters may run later, so compute the answer from the latest cart
+    // and apply the same reconciliation inside the updater.
+    const { changed } = reconcile(cartRef.current.items)
+    setCart((prevCart) => calculateCartTotals(reconcile(prevCart.items).items))
+    return changed
   }, [])
 
   const getItemCount = useCallback(() => {
@@ -156,6 +196,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getItemCount,
         isInCart,
+        isReady: isInitialized,
+        syncWithCatalog,
       }}
     >
       {children}

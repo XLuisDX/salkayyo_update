@@ -76,7 +76,7 @@ export const OrderConfirmationEmail = ({
         <Text style={orderLabel}>Order Number</Text>
         <Text style={orderNumber_}>{orderNumber}</Text>
         <Text style={paymentBadge}>
-          Paid with {paymentMethod === "stripe" ? "Card" : "PayPal"}
+          Paid with {paymentMethod === "paypal" ? "PayPal" : "Card"}
         </Text>
       </Section>
 

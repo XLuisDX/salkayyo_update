@@ -1,34 +1,94 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback, type ComponentProps } from 'react'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
-import { CreditCard, Loader2 } from 'lucide-react'
+import { Loader2, ShoppingCart } from 'lucide-react'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
-import { Recipient, RecipientData } from '@/types'
-import { RecipientsService } from '@/services/recipients.service'
+import { Recipient } from '@/types'
+import { auth } from '@/firebase/config'
+import { Link, useRouter } from '@/i18n/routing'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/common/EmptyState'
+import { RecipientsService } from '@/services/recipients.service'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { formatPrice } from '@/lib/utils'
 import { toast } from 'sonner'
 import { RecipientSelector } from './RecipientSelector'
 
+type ApproveHandler = NonNullable<ComponentProps<typeof PayPalButtons>['onApprove']>
+
+/** Server error codes that mean "the cart no longer matches the catalog". */
+const CART_ERRORS = new Set(['CART_CHANGED', 'OUT_OF_STOCK'])
+
+class CheckoutRequestError extends Error {
+  constructor(readonly code?: string) {
+    super(code ?? 'Checkout unavailable')
+  }
+}
 
 export function CheckoutForm() {
   const t = useTranslations('checkout')
   const tCart = useTranslations('cart')
-  const { cart, clearCart } = useCart()
+  const { cart, clearCart, isReady: cartReady, syncWithCatalog } = useCart()
   const { user } = useAuth()
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal'>('stripe')
+  const router = useRouter()
+  const checkout = useRef<{ orderId: string; checkoutId: string } | null>(null)
+  // Set when we already told the buyer what went wrong, so the PayPal
+  // onError callback does not stack a generic "order failed" toast on top.
+  const errorHandled = useRef(false)
   const [loading, setLoading] = useState(false)
   const [loadingRecipients, setLoadingRecipients] = useState(true)
+  const [catalogSynced, setCatalogSynced] = useState(false)
+  const [checkingPayment, setCheckingPayment] = useState(true)
+  const [paymentUnconfirmed, setPaymentUnconfirmed] = useState(false)
+
+  const checkPayment = useCallback(async (signal?: AbortSignal) => {
+    if (!user || auth.currentUser?.uid !== user.id) return
+    setCheckingPayment(true)
+    try {
+      const token = await auth.currentUser.getIdToken()
+      const response = await fetch('/api/paypal/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ checkoutId: checkout.current?.checkoutId, resume: !signal }),
+        signal,
+      })
+      const result = await response.json()
+      if (signal?.aborted) return
+      if (result.code === 'INSTRUMENT_DECLINED') {
+        checkout.current = null
+        setPaymentUnconfirmed(false)
+        toast.error(t('paymentDeclined'))
+        return
+      }
+      if (!response.ok) throw new Error('Could not verify PayPal status')
+      setPaymentUnconfirmed(result.status === 'pending')
+      if (result.status === 'paid') {
+        if (checkout.current) clearCart()
+        toast.success(t('orderPlaced'))
+        router.push(`/orders/${result.orderId}`)
+      } else if (result.status === 'failed') {
+        toast.error(t('paymentDeclined'))
+      }
+      if (result.status !== 'pending') checkout.current = null
+    } catch {
+      if (!signal?.aborted) setPaymentUnconfirmed(true)
+    } finally {
+      if (!signal?.aborted) setCheckingPayment(false)
+    }
+  }, [user, clearCart, router, t])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    void checkPayment(controller.signal)
+    return () => controller.abort()
+  }, [checkPayment])
 
   useEffect(() => {
     const loadRecipients = async () => {
@@ -50,86 +110,99 @@ export function CheckoutForm() {
     loadRecipients()
   }, [user])
 
-  const getRecipientData = (): RecipientData | null => {
-    if (!selectedRecipient) return null
-    return {
-      fullName: selectedRecipient.fullName,
-      address: selectedRecipient.address,
-      city: selectedRecipient.city,
-      state: selectedRecipient.state,
-      zipCode: selectedRecipient.zipCode,
-      country: selectedRecipient.country,
-      phone: selectedRecipient.phone,
-    }
-  }
-
-  const handleStripeCheckout = async () => {
-    if (!user || !selectedRecipient) {
-      toast.error(t('selectAddressError'))
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.items,
-          recipientData: getRecipientData(),
-          userId: user.id,
-        }),
+  // Refresh prices/stock before showing the PayPal button, so the amount the
+  // buyer approves matches what the server will charge.
+  useEffect(() => {
+    if (!cartReady) return
+    let cancelled = false
+    syncWithCatalog()
+      .then((changed) => {
+        if (changed && !cancelled) toast.info(t('cartUpdated'))
       })
-
-      const { checkoutUrl, error } = await response.json()
-
-      if (error) {
-        toast.error(error)
-        return
-      }
-
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl
-      }
-    } catch (error) {
-      console.error('Checkout error:', error)
-      toast.error(t('orderFailed'))
-    } finally {
-      setLoading(false)
+      .catch((error) => console.error('Error refreshing cart:', error))
+      .finally(() => {
+        if (!cancelled) setCatalogSynced(true)
+      })
+    return () => {
+      cancelled = true
     }
+  }, [cartReady, syncWithCatalog, t])
+
+  const resyncCart = async () => {
+    errorHandled.current = true
+    await syncWithCatalog().catch((error) => console.error('Error refreshing cart:', error))
+    toast.warning(t('cartUpdated'))
   }
 
-  const handlePayPalApprove = async (data: { orderID: string }) => {
-    if (!user || !selectedRecipient) return
+  const createPayPalOrder = async () => {
+    errorHandled.current = false
+    if (!selectedRecipient || !auth.currentUser) throw new CheckoutRequestError()
+    const token = await auth.currentUser.getIdToken()
+    const response = await fetch('/api/paypal/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        recipientId: selectedRecipient.id,
+        items: cart.items.map(({ product, quantity }) => ({ productId: product.id, quantity })),
+        expectedTotalCents: Math.round(cart.total * 100),
+      }),
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok || !data.orderId || !data.checkoutId) {
+      if (data.code === 'PAYMENT_PENDING') {
+        checkout.current = null
+        errorHandled.current = true
+        setPaymentUnconfirmed(true)
+      }
+      if (CART_ERRORS.has(data.code)) await resyncCart()
+      throw new CheckoutRequestError(data.code)
+    }
+    checkout.current = { orderId: data.orderId, checkoutId: data.checkoutId }
+    return data.orderId as string
+  }
 
+  const handlePayPalApprove: ApproveHandler = async ({ orderID }, actions) => {
+    const payment = checkout.current
+    if (!auth.currentUser || !payment || payment.orderId !== orderID) return
     setLoading(true)
-
     try {
+      const token = await auth.currentUser.getIdToken()
       const response = await fetch('/api/paypal/capture', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: data.orderID,
-          items: cart.items,
-          recipientData: getRecipientData(),
-          userId: user.id,
-          total: cart.total,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payment),
       })
+      const result = await response.json().catch(() => ({}))
 
-      const result = await response.json()
-
-      if (result.success) {
+      if (response.ok && result.status === 'paid') {
         clearCart()
         toast.success(t('orderPlaced'))
-        window.location.href = `/orders/${result.orderId}`
-      } else {
-        toast.error(t('orderFailed'))
+        router.push(`/orders/${result.orderId}`)
+        return
       }
-    } catch (error) {
-      console.error('PayPal capture error:', error)
-      toast.error(t('orderFailed'))
+      if (response.ok && result.status === 'pending') {
+        setPaymentUnconfirmed(true)
+        return
+      }
+      if (result.code === 'INSTRUMENT_DECLINED') {
+        // Let the buyer pick another card/funding source in the same PayPal window.
+        return actions.restart()
+      }
+      if (CART_ERRORS.has(result.code)) {
+        await resyncCart()
+        return
+      }
+      if (response.status === 401 || response.status === 403 || response.status === 404 ||
+          result.code === 'PAYMENT_DECLINED' || result.code === 'NOT_APPROVED' || response.status === 422) {
+        // Nothing was charged.
+        const reference = [result.code, result.debugId].filter(Boolean).join(' · ')
+        toast.error(t('paymentDeclined'), { description: reference || undefined })
+        return
+      }
+      // Unknown outcome (network error, needs review): money may have been taken.
+      setPaymentUnconfirmed(true)
+    } catch {
+      setPaymentUnconfirmed(true)
     } finally {
       setLoading(false)
     }
@@ -142,6 +215,28 @@ export function CheckoutForm() {
           <p className="text-muted-foreground">{t('loginRequired')}</p>
         </CardContent>
       </Card>
+    )
+  }
+
+  if (checkingPayment || paymentUnconfirmed) {
+    return (
+      <Card>
+        <CardContent className="space-y-4 py-6">
+          <p role="status">{t(checkingPayment ? 'checkingPayment' : 'paymentPending')}</p>
+          <Button disabled={checkingPayment} onClick={() => void checkPayment()}>{t('checkPayment')}</Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (cartReady && cart.items.length === 0) {
+    return (
+      <EmptyState
+        icon={ShoppingCart}
+        title={tCart('empty')}
+        description={t('emptyCartDescription')}
+        action={<Link href="/products"><Button>{tCart('continueShopping')}</Button></Link>}
+      />
     )
   }
 
@@ -200,67 +295,29 @@ export function CheckoutForm() {
           <CardTitle>{t('paymentMethod')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <RadioGroup
-            value={paymentMethod}
-            onValueChange={(value) => setPaymentMethod(value as 'stripe' | 'paypal')}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="stripe" id="stripe" />
-              <Label htmlFor="stripe" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                {t('payWithStripe')}
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="paypal" id="paypal" />
-              <Label htmlFor="paypal">{t('payWithPayPal')}</Label>
-            </div>
-          </RadioGroup>
-
-          <Separator />
-
-          {paymentMethod === 'stripe' ? (
-            <Button
-              onClick={handleStripeCheckout}
-              disabled={loading || !selectedRecipient || cart.items.length === 0}
-              className="w-full"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('processing')}
-                </>
-              ) : (
-                t('placeOrder')
-              )}
-            </Button>
+          {!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? (
+            <p role="status">{t('orderFailed')}</p>
+          ) : !catalogSynced ? (
+            <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+              {t('checkingCart')}
+            </p>
           ) : (
-            <PayPalScriptProvider
-              options={{
-                clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                currency: 'USD',
-              }}
-            >
+            <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, currency: 'USD' }}>
               <PayPalButtons
-                disabled={!selectedRecipient || cart.items.length === 0}
-                createOrder={async () => {
-                  const response = await fetch('/api/paypal/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      total: cart.total,
-                    }),
-                  })
-                  const data = await response.json()
-                  return data.orderId
-                }}
+                disabled={loading || !selectedRecipient || cart.items.length === 0}
+                createOrder={createPayPalOrder}
                 onApprove={handlePayPalApprove}
-                onError={(err) => {
-                  console.error('PayPal error:', err)
+                onError={(error) => {
+                  if (errorHandled.current) {
+                    errorHandled.current = false
+                    return
+                  }
+                  console.error('PayPal checkout error:', error)
                   toast.error(t('orderFailed'))
                 }}
               />
+              {loading && <p role="status" className="flex items-center gap-2"><Loader2 className="size-4 animate-spin" />{t('processing')}</p>}
             </PayPalScriptProvider>
           )}
         </CardContent>

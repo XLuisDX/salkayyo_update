@@ -10,7 +10,7 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, LOW_STOCK_THRESHOLD } from '@/lib/utils'
 import { toast } from 'sonner'
 
 interface ProductCardProps {
@@ -41,6 +41,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
   const inCart = isInCart(product.id)
   const isOutOfStock = product.stock <= 0
+  const isLowStock = !isOutOfStock && product.stock <= LOW_STOCK_THRESHOLD
 
   return (
     <motion.div
@@ -77,6 +78,11 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
               {isOutOfStock && (
                 <Badge className="bg-destructive/90 text-destructive-foreground backdrop-blur-sm px-3 py-1 text-xs font-medium">
                   {t("outOfStock")}
+                </Badge>
+              )}
+              {isLowStock && (
+                <Badge className="bg-amber-500/90 text-white backdrop-blur-sm px-3 py-1 text-xs font-medium">
+                  {t("lowStock")}
                 </Badge>
               )}
               {product.featured && !isOutOfStock && (

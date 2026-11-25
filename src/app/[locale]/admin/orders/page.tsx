@@ -267,7 +267,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {hasMore && !searchTerm.trim() && (
+      {hasMore && (
         <div className="flex justify-center">
           <Button variant="outline" onClick={loadMoreOrders} disabled={loadingMore}>
             {loadingMore ? (
@@ -303,7 +303,12 @@ export default function AdminOrdersPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {ORDER_STATUSES.map((status) => (
+                      {ORDER_STATUSES.filter(status =>
+                        status === selectedOrder.status ||
+                        (selectedOrder.status === 'paid' && status === 'shipped') ||
+                        (selectedOrder.status === 'shipped' && status === 'delivered') ||
+                        (selectedOrder.status === 'pending' && selectedOrder.paymentMethod !== 'paypal' && status === 'cancelled')
+                      ).map((status) => (
                         <SelectItem key={status} value={status}>
                           {tOrders(status)}
                         </SelectItem>

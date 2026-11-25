@@ -95,6 +95,7 @@
     "addToCart": "Add",
     "addedToCart": "Added to cart",
     "outOfStock": "Out of Stock",
+    "lowStock": "Low stock!",
     "inStock": "In Stock",
     "quantity": "Quantity",
     "description": "Description",
@@ -175,14 +176,20 @@
     "placeOrder": "Place Order",
     "selectRecipient": "Select Recipient",
     "addNewRecipient": "Add New Recipient",
-    "payWithStripe": "Pay with Card",
     "payWithPayPal": "Pay with PayPal",
     "processing": "Processing payment...",
     "orderPlaced": "Order placed successfully!",
     "orderFailed": "Order failed. Please try again.",
+    "paymentPending": "We are still verifying your payment with PayPal. Check its status here before paying again.",
+    "checkingPayment": "Checking payment status…",
+    "checkPayment": "Check payment status",
     "loginRequired": "Please login to checkout",
     "emptyCartDescription": "Add some products to your cart to checkout",
-    "selectAddressError": "Please select a shipping address"
+    "selectAddressError": "Please select a shipping address",
+    "cartUpdated": "Some prices or stock changed. Your cart has been updated — please review it before paying.",
+    "checkingCart": "Checking prices and availability...",
+    "paymentUnderReview": "PayPal is reviewing your payment. Your order will appear and you will get an email as soon as it is confirmed.",
+    "paymentDeclined": "The payment was not completed and you have not been charged. Please try again or use another payment method."
   },
   "orders": {
     "title": "My Orders",
@@ -278,7 +285,25 @@
   "wholesale": {
     "title": "Wholesale",
     "subtitle": "Special prices for bulk orders",
-    "minOrder": "Minimum Order",
+    "priceListTitle": "Wholesale Prices",
+    "priceListDescription": "Prices in US dollars (USD)",
+    "products": {
+      "detergent": {
+        "name": "Salkayyo Detergent 500 g",
+        "pack": "Sack of 20 packs",
+        "per": "per sack"
+      },
+      "toothpasteCharcoal": {
+        "name": "Charcoal Toothpaste 100 g",
+        "pack": "Box of 72 units",
+        "per": "per box"
+      },
+      "toothpasteAloe": {
+        "name": "Aloe Vera Toothpaste 100 g",
+        "pack": "Box of 72 units",
+        "per": "per box"
+      }
+    },
     "contact": "Contact Us",
     "requestQuote": "Request Quote",
     "description": "Get special pricing for bulk orders. Contact us for custom quotes and wholesale opportunities.",
@@ -291,12 +316,6 @@
     "benefitQuotesDescription": "Tailored pricing based on your needs",
     "benefitPriorityTitle": "Priority Support",
     "benefitPriorityDescription": "24/7 customer support for wholesale partners",
-    "standardProducts": "Standard Products",
-    "customProducts": "Custom Products",
-    "mixedOrders": "Mixed Orders",
-    "standardUnits": "50+ units",
-    "customUnits": "100+ units",
-    "mixedValue": "$1,000+ value",
     "requestSubmitted": "Request Submitted!",
     "requestSubmittedDescription": "We'll get back to you within 24-48 hours with a custom quote.",
     "submitAnother": "Submit Another Request",
@@ -365,6 +384,7 @@
     }
   },
   "newsletter": {
+    "error": "Could not complete your subscription.",
     "badge": "Exclusive Updates",
     "title": "Stay in the",
     "titleHighlight": "loop",

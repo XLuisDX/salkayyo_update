@@ -111,20 +111,11 @@ export interface Order {
   total: number
   status: OrderStatus
   paymentId?: string
-  paymentMethod?: 'stripe' | 'paypal'
+  paymentMethod?: string
+  paypalOrderId?: string
   recipientData: RecipientData
   createdAt: Date
   updatedAt?: Date
-}
-
-export interface OrderCreateData {
-  userId: string
-  items: OrderItem[]
-  subtotal: number
-  tax: number
-  total: number
-  paymentMethod: 'stripe' | 'paypal'
-  recipientData: RecipientData
 }
 
 // Recipient Types
@@ -205,14 +196,6 @@ export interface EmailData {
 }
 
 // Payment Types
-export interface StripeCheckoutData {
-  items: CartItem[]
-  recipientData: RecipientData
-  userId: string
-  successUrl: string
-  cancelUrl: string
-}
-
 export interface PayPalOrderData {
   items: CartItem[]
   recipientData: RecipientData

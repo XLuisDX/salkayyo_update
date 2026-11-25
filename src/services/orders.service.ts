@@ -6,7 +6,6 @@ import {
   getCountFromServer,
   getAggregateFromServer,
   sum,
-  addDoc,
   updateDoc,
   query,
   where,
@@ -21,7 +20,7 @@ import {
   DocumentData,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { Order, OrderCreateData, OrderStatus } from '@/types'
+import { Order, OrderStatus } from '@/types'
 
 const COLLECTION_NAME = 'orders'
 const PAGE_SIZE = 20
@@ -116,41 +115,9 @@ export class OrdersService {
     return this.mapDocToOrder(snapshot.docs[0])
   }
 
-  static async create(data: OrderCreateData): Promise<Order> {
-    const orderData = {
-      ...data,
-      status: 'pending' as OrderStatus,
-      createdAt: serverTimestamp(),
-    }
-
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), orderData)
-
-    return {
-      id: docRef.id,
-      ...data,
-      status: 'pending',
-      createdAt: new Date(),
-    }
-  }
-
   static async updateStatus(id: string, status: OrderStatus): Promise<void> {
     await updateDoc(doc(db, COLLECTION_NAME, id), {
       status,
-      updatedAt: serverTimestamp(),
-    })
-  }
-
-  static async updatePaymentId(id: string, paymentId: string): Promise<void> {
-    await updateDoc(doc(db, COLLECTION_NAME, id), {
-      paymentId,
-      updatedAt: serverTimestamp(),
-    })
-  }
-
-  static async markAsPaid(id: string, paymentId: string): Promise<void> {
-    await updateDoc(doc(db, COLLECTION_NAME, id), {
-      status: 'paid' as OrderStatus,
-      paymentId,
       updatedAt: serverTimestamp(),
     })
   }
@@ -212,6 +179,7 @@ export class OrdersService {
       status: data.status,
       paymentId: data.paymentId,
       paymentMethod: data.paymentMethod,
+      paypalOrderId: data.paypalOrderId,
       recipientData: data.recipientData,
       createdAt: data.createdAt instanceof Timestamp
         ? data.createdAt.toDate()
